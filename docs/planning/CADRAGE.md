@@ -7,9 +7,11 @@
 > vide dans le prompt — voir point ouvert 7).
 
 ## 0 · Verdict de viabilité (après l'analyse de marché)
-_À remplir à l'étape 2 (ANALYSE_MARCHE.md)._ Pré-lecture honnête : **le
-produit est viable comme démonstrateur → pilote B2G ; il n'est PAS viable comme
-« surcouche » branchée sur une API qui n'existe pas publiquement** (§5).
+**Score 65/100 (calculé, calibration v1-2026-09-04) → GO conditionnel, dégradé à
+NO-GO tant que la faille haute « aucune API/export Agora+ » n'est pas parée.** Le
+marché existe et paie (demande FORTE, médiane 64 800 € HT / 48 mois sur 45 marchés
+DECP, marge nette calculée 64 %) ; ce qui manque est la porte : accès au décideur et
+interopérabilité. Détail : `ANALYSE_MARCHE.md`, cockpit `/pilotage/marche`.
 
 ## 1 · Le problème et la promesse
 

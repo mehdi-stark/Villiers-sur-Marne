@@ -59,3 +59,23 @@ export const alertes = pgTable(
   // échappe à un index unique (CONVENTIONS_TECHNIQUES).
   (t) => [index("alertes_code_idx").on(t.code, t.resolueLe)],
 );
+
+// ---- Paramètres techniques (clés VAPID générées, etc.) — jamais de secret produit ---
+export const parametres = pgTable("parametres", {
+  code: text("code").primaryKey(),
+  valeur: jsonb("valeur").$type<Record<string, unknown>>().notNull(),
+  description: text("description"),
+  majLe: timestamp("maj_le", { withTimezone: true }).notNull().defaultNow(),
+});
+
+// ---- Push web : un abonnement par appareil, purgé quand le navigateur répond 404/410 ---
+export const pushAbonnements = pgTable("push_abonnements", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  email: text("email").notNull(),
+  endpoint: text("endpoint").notNull().unique(),
+  p256dh: text("p256dh").notNull(),
+  auth: text("auth").notNull(),
+  agent: text("agent"),
+  creeLe: timestamp("cree_le", { withTimezone: true }).notNull().defaultNow(),
+  dernierEnvoiLe: timestamp("dernier_envoi_le", { withTimezone: true }),
+});

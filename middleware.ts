@@ -5,7 +5,8 @@ import { COOKIE, DUREE_SESSION_MS, SEUIL_REEMISSION_MS, signerSession, verifierS
 // l'app (manifest/icônes : un 401 rend une PWA non installable).
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
-  if (pathname === "/connexion" || pathname.startsWith("/api/auth")) return NextResponse.next();
+  // /api/agent vérifie son propre secret (x-agent-secret) : l'agent n'a pas de session.
+  if (pathname === "/connexion" || pathname.startsWith("/api/auth") || pathname === "/api/agent") return NextResponse.next();
   if (pathname === "/manifest.webmanifest" || pathname === "/sw.js" || /\.(png|svg|ico|webp)$/.test(pathname)) return NextResponse.next();
 
   const session = await verifierSession(req.cookies.get(COOKIE)?.value);

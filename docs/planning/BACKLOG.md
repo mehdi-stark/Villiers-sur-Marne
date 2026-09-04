@@ -9,3 +9,8 @@
 | Retirer la protection SSO Vercel sur le projet ville (Deployment Protection) | L'accès au cockpit depuis le téléphone | 1 clic opérateur | Go — opérateur |
 | Poser RESEND_API_KEY (+ EMAIL_FROM sur domaine vérifié) en production | Les codes OTP partent réellement ; l'alerte « clé absente » se ferme seule | 5 min opérateur | Go — opérateur |
 | Créer le dépôt GitHub distant et pousser (CI active) | La CI tourne réellement ; le repo n'est plus seulement sur le Mac | 5 min | Go — auteur git à confirmer (cartcallai-lab) |
+| Page « Analyse de marché » dans le cockpit (proposé 04/09/2026, Feature) | Le verdict marché se lit et se tranche depuis le téléphone | ~2 h | **Fait le 04/09/2026** (`/pilotage/marche`, verdict par code) |
+| Cockpit en PWA installable (proposé 04/09/2026, Design) | Icône sur l'écran d'accueil, push | ~1 h | **Fait le 04/09/2026** (manifest, icônes par code, SW push-only, bandeau) |
+| Boucle de notification agent → opérateur (proposé 04/09/2026, UX) | L'opérateur est prévenu quand une décision l'attend | ~2 h | **Fait le 04/09/2026** (`pnpm notifier`, /api/agent, abonnements push) ; sens opérateur → agent = `pnpm decisions` en début de session |
+| Dépôt GitHub `mehdi-stark/ville` + projet Vercel sur le compte mehdi-stark (demande Mehdi 04/09/2026) | CI réelle ; déploiement sur le bon compte | jeton GitHub + `vercel login` | **Opérateur** : poser `GITHUB_TOKEN` dans `~/.config/trames/github.env` puis `creer-depot-github.sh mehdi-stark ville` ; se connecter à Vercel (mehdi-stark) et importer le dépôt, ou `vercel login` sur le Mac |
+| Mesurer les parts de marché (HHI) sur les DECP — titulaires par SIRET | Déplafonne « compétition » (3 → mesuré) ; forme du moat | ~2 h | Go à l'étape 3 |

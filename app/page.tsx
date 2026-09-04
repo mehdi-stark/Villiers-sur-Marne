@@ -4,15 +4,16 @@ import { alertesOuvertes } from "@/lib/alertes";
 import { origineBase } from "@/lib/db";
 import { compteurs, decisionsPrises } from "@/lib/decisions";
 import { extraireBacklog, extraireDecisions, lireDoc } from "@/lib/docs";
+import { analyse } from "@/lib/marche";
 
 export const dynamic = "force-dynamic";
 
 // Les 8 étapes de la trame (0 → 7) et leur état — c'est la « page pipeline »
 // du projet, mise à jour à chaque maillon.
 const ETAPES: { n: string; titre: string; etat: "fait" | "cours" | "attente"; detail: string }[] = [
-  { n: "0", titre: "Squelette du cockpit", etat: "fait", detail: "App, jetons, responsive, OTP, décisions en base" },
-  { n: "1", titre: "Cadrage", etat: "cours", detail: "Rédigé — à trancher depuis cet écran" },
-  { n: "2", titre: "Analyse de marché", etat: "attente", detail: "Après validation du cadrage" },
+  { n: "0", titre: "Squelette du cockpit", etat: "fait", detail: "App, jetons, responsive, OTP, décisions en base, PWA, push" },
+  { n: "1", titre: "Cadrage", etat: "cours", detail: "Rédigé — 7 décisions à trancher" },
+  { n: "2", titre: "Analyse de marché", etat: "cours", detail: "Verdict calculé — à trancher" },
   { n: "3", titre: "Architecture & outils", etat: "attente", detail: "Après le verdict marché" },
   { n: "4", titre: "CLAUDE.md + plan d'exécution", etat: "attente", detail: "" },
   { n: "5", titre: "Squelette complet (CI, PWA, cron, jobs, alertes)", etat: "attente", detail: "" },
@@ -20,14 +21,17 @@ const ETAPES: { n: string; titre: string; etat: "fait" | "cours" | "attente"; de
 ];
 
 export default async function Accueil() {
-  const [cadrageMd, backlogMd, prisesCadrage, prisesBacklog, cpt, alertes] = await Promise.all([
+  const [cadrageMd, backlogMd, prisesCadrage, prisesBacklog, prisesMarche, cpt, alertes] = await Promise.all([
     lireDoc("CADRAGE.md"),
     lireDoc("BACKLOG.md"),
     decisionsPrises("cadrage"),
     decisionsPrises("backlog"),
+    decisionsPrises("marche"),
     compteurs(),
     alertesOuvertes(),
   ]);
+  const marche = analyse();
+  const marcheTranche = prisesMarche.has("marche:verdict");
   const dCadrage = extraireDecisions(cadrageMd);
   const dBacklog = extraireBacklog(backlogMd);
   const restCadrage = dCadrage.filter((d) => !prisesCadrage.has(d.cle)).length;
@@ -39,7 +43,7 @@ export default async function Accueil() {
       <div className="page-tete">
         <div>
           <h1>Pilotage</h1>
-          <p className="muted">Ville — portail famille de nouvelle génération pour Villiers-sur-Marne. Étape 1/7 : cadrage.</p>
+          <p className="muted">Ville — portail famille de nouvelle génération pour Villiers-sur-Marne. Étapes 1-2/7 : cadrage et marché à trancher.</p>
         </div>
       </div>
 
@@ -58,6 +62,11 @@ export default async function Accueil() {
           <span className="muted">Cadrage</span>
           <span className="tuile-chiffre">{restCadrage}</span>
           <span className="tiny">{restCadrage ? "décisions à trancher" : "tout est tranché"} · {dCadrage.length - restCadrage}/{dCadrage.length} prises</span>
+        </Link>
+        <Link href="/pilotage/marche" className="tuile">
+          <span className="muted">Marché</span>
+          <span className="tuile-chiffre">{marche.score}<span className="muted" style={{ fontSize: 14 }}>/100</span></span>
+          <span className="tiny">{marche.final}{marcheTranche ? " · tranché" : " · à trancher"}</span>
         </Link>
         <Link href="/pilotage/backlog" className="tuile">
           <span className="muted">Backlog</span>

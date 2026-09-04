@@ -11,7 +11,7 @@ const fmt = new Intl.DateTimeFormat("fr-FR", { dateStyle: "medium", timeStyle: "
 /** Une décision : ses options en boutons, une note facultative, l'état pris.
  *  Re-trancher est toujours possible — l'historique complet reste en base. */
 export function Decision(p: {
-  sujet: "cadrage" | "backlog";
+  sujet: "cadrage" | "backlog" | "marche";
   cle: string;
   numero?: number;
   titre: string;

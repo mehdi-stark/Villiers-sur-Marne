@@ -10,6 +10,9 @@ export const metadata: Metadata = {
   title: { default: "Ville — cockpit", template: "%s · Ville" },
   description: "Cockpit du projet Ville : cadrage, backlog, décisions.",
   applicationName: "Ville",
+  manifest: "/manifest.webmanifest",
+  appleWebApp: { capable: true, statusBarStyle: "default", title: "Ville" },
+  icons: { icon: "/icon-192.png", apple: "/apple-touch-icon.png" },
 };
 export const viewport: Viewport = {
   width: "device-width",
