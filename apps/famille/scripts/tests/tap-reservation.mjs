@@ -22,21 +22,21 @@ try {
   const p = await ctx.newPage();
   await p.goto(`${BASE}/?s=${lundi}`, { waitUntil: "networkidle" });
   if (new URL(p.url()).pathname === "/connexion") throw new Error("renvoyé vers /connexion : compte test absent (seed-familles) ?");
-  const repas = p.locator('button.creneau[data-etat="libre"]').filter({ hasText: "repas" }).first();
+  const repas = p.locator("button.creneau[data-etat=\"libre\"]:not(:disabled)").first();
   await repas.waitFor({ timeout: 15000 });
   const label = await repas.getAttribute("aria-label");
   await repas.click();
-  await p.locator('button.creneau[data-etat="reservee"]').filter({ hasText: "repas" }).first().waitFor({ timeout: 15000 });
+  await p.locator("button.creneau[data-etat=\"reservee\"]").first().waitFor({ timeout: 15000 });
   const l1 = await sql`SELECT etat, acteur FROM reservations_demo WHERE acteur = ${EMAIL}`;
   if (l1.length !== 1 || l1[0].etat !== "reservee") throw new Error(`base après réservation : ${JSON.stringify(l1)}`);
-  await p.locator('button.creneau[data-etat="reservee"]').filter({ hasText: "repas" }).first().click();
+  await p.locator("button.creneau[data-etat=\"reservee\"]").first().click();
   await p.waitForTimeout(1500);
   const l2 = await sql`SELECT etat FROM reservations_demo WHERE acteur = ${EMAIL}`;
   if (l2[0]?.etat !== "annulee") throw new Error(`base après annulation : ${JSON.stringify(l2)}`);
   const j = await sql`SELECT accepte FROM journal_reservations WHERE acteur = ${EMAIL} ORDER BY cree_le`;
   // Hors délai : la semaine courante → tous les créneaux repas désactivés
   await p.goto(`${BASE}/?s=${new Date().toISOString().slice(0, 10)}`, { waitUntil: "networkidle" });
-  const actifs = await p.locator('button.creneau:not(:disabled)').filter({ hasText: "repas" }).count();
+  const actifs = await p.locator("button.creneau:not(:disabled)").count();
   if (actifs !== 0) throw new Error(`${actifs} créneau(x) repas encore tapables hors délai`);
   console.log(`✓ réservation puis annulation constatées en base (${j.length} lignes de journal, ${j.filter((x) => x.accepte).length} acceptées) ; créneau testé : ${label?.slice(0, 60)} ; hors délai : 0 tapable`);
   code = 0;

@@ -73,6 +73,7 @@ export const parametres = pgTable("parametres", {
 // ---- Push web : un abonnement par appareil, purgé quand le navigateur répond 404/410 ---
 export const pushAbonnements = pgTable("push_abonnements", {
   id: uuid("id").primaryKey().defaultRandom(),
+  app: text("app").notNull().default("cockpit"), // un abonnement vaut pour UNE application
   email: text("email").notNull(),
   endpoint: text("endpoint").notNull().unique(),
   p256dh: text("p256dh").notNull(),
@@ -166,5 +167,62 @@ export const documents = pgTable("documents", {
   periode: text("periode"),
   donnees: jsonb("donnees").$type<Record<string, unknown>>().notNull(),
   pdfBase64: text("pdf_base64").notNull(), // le rendu réellement montré (petit : quelques Ko)
+  creeLe: timestamp("cree_le", { withTimezone: true }).notNull().defaultNow(),
+});
+
+// ---- Tâches planifiées : verrou, journal, heartbeat (recette CRON_RESILIENT) --------
+export const runs = pgTable(
+  "runs",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    code: text("code").notNull(), // rappel_reservations | …
+    statut: text("statut").notNull(), // running | ok | erreur | ignore
+    debutLe: timestamp("debut_le", { withTimezone: true }).notNull().defaultNow(),
+    finLe: timestamp("fin_le", { withTimezone: true }),
+    dureeMs: integer("duree_ms"),
+    resultat: jsonb("resultat").$type<Record<string, unknown>>(),
+    erreur: text("erreur"),
+  },
+  (t) => [index("runs_code_idx").on(t.code, t.debutLe)],
+);
+
+// ---- Démarches à pièces (inscription, quotient familial, coordonnées) ---------------
+// L'état est une machine explicite ; chaque transition laisse une ligne de journal.
+export const demarches = pgTable(
+  "demarches",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    familleId: text("famille_id").notNull(),
+    email: text("email").notNull(),
+    type: text("type").notNull(), // inscription_periscolaire | quotient_familial | coordonnees
+    etat: text("etat").notNull().default("deposee"), // deposee | en_cours | validee | refusee
+    donnees: jsonb("donnees").$type<Record<string, unknown>>().notNull(),
+    motif: text("motif"), // motif de refus ou note de l'agent
+    agent: text("agent"),
+    creeLe: timestamp("cree_le", { withTimezone: true }).notNull().defaultNow(),
+    majLe: timestamp("maj_le", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("demarches_etat_idx").on(t.etat, t.creeLe), index("demarches_famille_idx").on(t.familleId)],
+);
+
+export const pieces = pgTable("pieces", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  demarcheId: uuid("demarche_id").notNull().references(() => demarches.id, { onDelete: "cascade" }),
+  code: text("code").notNull(), // identite | domicile | caf | vaccins | imposition
+  nom: text("nom").notNull(),
+  mime: text("mime").notNull(),
+  taille: integer("taille").notNull(),
+  contenuBase64: text("contenu_base64").notNull(),
+  creeLe: timestamp("cree_le", { withTimezone: true }).notNull().defaultNow(),
+});
+
+export const journalDemarches = pgTable("journal_demarches", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  demarcheId: uuid("demarche_id").notNull(),
+  avant: text("avant"),
+  apres: text("apres").notNull(),
+  acteur: text("acteur").notNull(),
+  app: text("app").notNull(),
+  motif: text("motif"),
   creeLe: timestamp("cree_le", { withTimezone: true }).notNull().defaultNow(),
 });

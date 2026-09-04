@@ -20,7 +20,13 @@
     "./ui/passkeys": "./src/ui/passkeys.tsx",
     "./donnees/facturation": "./src/donnees/facturation.ts",
     "./paiement/payfip": "./src/paiement/payfip.ts",
-    "./documents/attestation": "./src/documents/attestation.ts"
+    "./documents/attestation": "./src/documents/attestation.ts",
+    "./donnees/services": "./src/donnees/services.ts",
+    "./embleme": "./src/embleme.ts",
+    "./runs": "./src/runs.ts",
+    "./ui/push": "./src/ui/push.tsx",
+    "./demarches": "./src/demarches.ts",
+    "./demarches-definitions": "./src/demarches-definitions.ts"
   },
   "scripts": {
     "db:generate": "drizzle-kit generate",

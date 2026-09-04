@@ -16,20 +16,23 @@ export async function clesVapid(): Promise<{ publicKey: string; privateKey: stri
   return cles;
 }
 
-export async function enregistrerAbonnement(p: { email: string; endpoint: string; p256dh: string; auth: string; agent?: string }): Promise<void> {
+export async function enregistrerAbonnement(p: { app: string; email: string; endpoint: string; p256dh: string; auth: string; agent?: string }): Promise<void> {
   await db
     .insert(schema.pushAbonnements)
     .values(p)
-    .onConflictDoUpdate({ target: schema.pushAbonnements.endpoint, set: { email: p.email, p256dh: p.p256dh, auth: p.auth, agent: p.agent } });
+    .onConflictDoUpdate({ target: schema.pushAbonnements.endpoint, set: { app: p.app, email: p.email, p256dh: p.p256dh, auth: p.auth, agent: p.agent } });
 }
 
 export type Notification = { titre: string; corps: string; url?: string; tag?: string };
 
 /** Envoie à tous les appareils inscrits. Zéro appareil = rien n'est parti : on le DIT (retour), et
  *  une alerte « info » le rappelle tant que personne n'est abonné. */
-export async function envoyerPush(n: Notification): Promise<{ envoyes: number; purges: number; abonnes: number }> {
-  const subs = await db.select().from(schema.pushAbonnements);
+export async function envoyerPush(n: Notification, cible?: { app?: string; email?: string }): Promise<{ envoyes: number; purges: number; abonnes: number }> {
+  const { and, eq } = await import("drizzle-orm");
+  const conds = [cible?.app ? eq(schema.pushAbonnements.app, cible.app) : undefined, cible?.email ? eq(schema.pushAbonnements.email, cible.email) : undefined].filter(Boolean);
+  const subs = conds.length ? await db.select().from(schema.pushAbonnements).where(and(...(conds as never[]))) : await db.select().from(schema.pushAbonnements);
   if (!subs.length) {
+    if (cible?.email) return { envoyes: 0, purges: 0, abonnes: 0 };
     await poserAlerte("info", "push_aucun_appareil", "Aucun appareil inscrit aux notifications : active-les depuis le cockpit installé", {});
     return { envoyes: 0, purges: 0, abonnes: 0 };
   }

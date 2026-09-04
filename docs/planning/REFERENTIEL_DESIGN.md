@@ -39,7 +39,20 @@ Safe areas, inputs ≥ 16 px, `min-width: 0`, onglets fixes avec `env(safe-area-
 | Famille · Factures | 4 | 5 | 4 | 5 | 3 | 3 | 5 | oui — mouvement : rien n'anime encore le montant |
 | Agents · File du jour (1440 + 390) | 5 | 5 | 4 | 5 | 3 | 4 | 5 | oui — identité : même remarque |
 | Cockpit · Pilotage (1440) | 4 | 5 | 4 | 5 | 3 | 4 | 4 | oui |
-| Cockpit · Décisions (390) | 3 | 5 | 3 | 5 | 3 | 3 | 4 | **non** — 12 cartes longues : grouper par bloc replié, une décision à la fois (« suivante ») |
+| Cockpit · Décisions (390) | 5 | 5 | 5 | 5 | 4 | 4 | 5 | oui — assistant « une décision à la fois » |
+| Famille · Ma semaine PAR SERVICE (390, clair + sombre) | 5 | 5 | 4 | 5 | 4 | 4 | 5 | oui — chaque service nommé, horaire, tarif, formules groupées |
+| Famille · Démarche guidée (390) | 5 | 5 | 5 | 5 | 4 | 3 | 5 | oui — une pièce par carte, le bouton dit ce qui manque |
+| Agents · Démarches à traiter (1440 + 390) | 5 | 5 | 5 | 5 | 4 | 3 | 5 | oui — refus impossible sans motif |
+
+### Correctif du 04/09/2026 (retour : « on ne comprend pas les services réservés »)
+Trois défauts corrigés : (1) la semaine empilait des pastilles par JOUR sans jamais nommer le
+service — elle se lit désormais PAR SERVICE, une ligne par service, cinq colonnes de jours
+alignées sous un en-tête unique ; (2) les libellés étaient des abréviations (« repas », « matin »)
+au lieu des noms de la ville (« Pause méridienne », « Accueil du matin ») — chaque ligne porte
+maintenant le nom complet, l'horaire et le tarif ; (3) les services SANS réservation affichaient
+« Libre » avec un bouton mort — ils portent un badge « Inscrit à l'année » et une phrase qui
+l'explique. Les trois formules du mercredi (journée, matinée, après-midi) sont UN service avec
+un sélecteur de formule, au lieu de trois blocs quasi vides.
 
 Notes du 04/09/2026 (première passe, avant maquette validée) : l'axe **identité** plafonne à 3 tant que la
 charte officielle de Villiers (couleur, logo, typographie) n'est pas fournie ; l'écran Décisions du cockpit

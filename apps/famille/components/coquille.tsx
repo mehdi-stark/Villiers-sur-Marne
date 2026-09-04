@@ -1,6 +1,6 @@
 "use client";
 
-import { CalendarDays, Receipt, Smartphone, Users } from "lucide-react";
+import { CalendarDays, FileText, Receipt, Users } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { VerrouBiometrique } from "@ville/core/ui/passkeys";
 import { CoquilleClient } from "@ville/ui";
@@ -8,8 +8,8 @@ import { CoquilleClient } from "@ville/ui";
 const DESTINATIONS = [
   { href: "/", label: "Ma semaine", Icone: CalendarDays },
   { href: "/factures", label: "Factures", Icone: Receipt },
+  { href: "/demarches", label: "Démarches", Icone: FileText },
   { href: "/enfants", label: "Enfants", Icone: Users },
-  { href: "/appareils", label: "Appareils", Icone: Smartphone },
 ];
 
 export function Coquille({ children, commune }: { children: React.ReactNode; commune: { nom: string; courte: string; initiale: string; telephone: string } }) {

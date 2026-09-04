@@ -4,6 +4,7 @@ import { sourceFictive } from "@ville/core/donnees/fictif";
 import type { EtatReservation } from "@ville/core/donnees/types";
 import { Pointage } from "@/components/pointage";
 import { Cascade, EtatVide, IlluFile, TuileChiffre } from "@ville/ui";
+import { compterAValider } from "@ville/core/demarches";
 
 import { ActiverFaceId } from "@ville/core/ui/passkeys";
 
@@ -20,7 +21,7 @@ export default async function FileDuJour({ searchParams }: { searchParams: Promi
   if (!a) redirect("/connexion");
   const { d } = await searchParams;
   const jour = d ?? new Intl.DateTimeFormat("sv-SE", { timeZone: "Europe/Paris" }).format(new Date());
-  const activites = await a.source.activites();
+  const [activites, aValider] = await Promise.all([a.source.activites(), compterAValider()]);
   const lignes: Ligne[] = [];
   for (const fid of ["fam-demo-1", "fam-demo-2"]) {
     for (const e of await sourceFictive.enfants(fid)) {
@@ -48,7 +49,7 @@ export default async function FileDuJour({ searchParams }: { searchParams: Promi
           <TuileChiffre libelle="À pointer" valeur={reserves} tone={reserves ? "accent" : undefined} detail="réservés, pas encore pointés" />
           <TuileChiffre libelle="Présents" valeur={presents} tone="ok" />
           <TuileChiffre libelle="Absents" valeur={absents} tone={absents ? "warn" : undefined} detail="réservé non consommé : ×2" />
-          <TuileChiffre libelle="Réservations" valeur={lignes.length} detail={`${groupes.size} groupe${groupes.size > 1 ? "s" : ""}`} />
+          <TuileChiffre href="/demarches" libelle="Démarches à traiter" valeur={aValider} tone={aValider ? "warn" : undefined} detail="déposées par les familles" />
         </div>
       )}
       {lignes.length === 0 ? (

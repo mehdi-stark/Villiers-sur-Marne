@@ -30,6 +30,7 @@ Modèle : `.env.example`. Le test `scripts/tests/tap-decision.mjs` exige `test@v
 | `SOURCE_DONNEES` | `fictif` (défaut) · `export-agora` · `api-agora` | Vercel | non |
 | `RESEND_API_KEY` / `EMAIL_FROM` | codes OTP des familles, e-mail « nouvel appareil » | Vercel | oui en prod |
 | `FAMILLE_URL` | URL publique du portail (retour PayFIP) | Vercel | avec PayFIP |
+| `CRON_SECRET` | Autorise `POST /api/cron/rappels` (rappel hebdomadaire des créneaux réservables) | Vercel · `.env.local` | pour le rappel |
 | `PAYFIP_NUMCLI` / `PAYFIP_MODE` | numéro client de la régie (DGFiP) ; `T` test (défaut) ou `M` | Vercel | pour payer |
 Comptes : table `comptes_familles` (e-mail → famille de la source) — seed de démo `apps/famille/scripts/seed-familles.mjs email=familleId`.
 

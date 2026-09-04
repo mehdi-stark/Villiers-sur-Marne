@@ -1,12 +1,13 @@
 "use client";
 
-import { CalendarDays, Receipt, Smartphone, Users } from "lucide-react";
+import { CalendarDays, FileText, Receipt, Smartphone, Users } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { VerrouBiometrique } from "@ville/core/ui/passkeys";
 import { CoquilleAdmin } from "@ville/ui";
 
 const DESTINATIONS = [
   { href: "/", label: "File du jour", Icone: CalendarDays },
+  { href: "/demarches", label: "Démarches", Icone: FileText },
   { href: "/familles", label: "Familles", Icone: Users },
   { href: "/activites", label: "Activités", Icone: Receipt },
   { href: "/appareils", label: "Appareils", Icone: Smartphone },
