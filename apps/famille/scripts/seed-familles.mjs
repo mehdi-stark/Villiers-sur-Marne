@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Comptes de démo du portail famille : e-mail → famille de la source. Idempotent.
-//   node scripts/seed-familles.mjs admin@delivup.io=fam-demo-1 test@ville.local=fam-demo-2
+//   node scripts/seed-familles.mjs mehdi.stark@gmail.com=fam-demo-1 test@ville.local=fam-demo-2
 import postgres from "postgres";
 import { config } from "dotenv";
 config({ path: ".env.local" }); config();

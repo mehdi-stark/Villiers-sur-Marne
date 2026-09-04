@@ -14,24 +14,25 @@
     "icones": "node scripts/icones.mjs"
   },
   "dependencies": {
-    "@ville/core": "workspace:*",
-    "next": "^15.5.25",
-    "react": "^19.2.8",
-    "react-dom": "^19.2.8",
-    "marked": "^18.0.11",
     "@radix-ui/react-dialog": "^1.1.23",
-    "lucide-react": "^1.40.0",
+    "@simplewebauthn/browser": "^14.0.0",
+    "@ville/core": "workspace:*",
     "drizzle-orm": "^0.45.2",
-    "postgres": "^3.4.9"
+    "lucide-react": "^1.40.0",
+    "marked": "^18.0.11",
+    "next": "^15.5.25",
+    "postgres": "^3.4.9",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8"
   },
   "devDependencies": {
-    "typescript": "^5.9.3",
     "@types/node": "^26.4.1",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.7",
+    "dotenv": "^17.4.2",
     "playwright": "^1.62.1",
     "sharp": "^0.35.4",
     "tsx": "^4.23.13",
-    "dotenv": "^17.4.2"
+    "typescript": "^5.9.3"
   }
 }

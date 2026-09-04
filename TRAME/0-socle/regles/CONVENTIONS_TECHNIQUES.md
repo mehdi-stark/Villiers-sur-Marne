@@ -3,6 +3,10 @@
 > Référence pour l'agent pendant le build (phase 3). Chaque pattern vient d'un problème
 > réellement rencontré sur Delivup.
 
+## Identités
+- **`admin@delivup.io` = équipe Delivup uniquement.** Projets personnels : `mehdi.stark@gmail.com`
+  (whitelists, comptes de démo, contacts techniques, comptes GitHub/Vercel `mehdi-stark`).
+
 ## Données
 - **Une seule source de vérité du schéma**, migrations générées, jamais de SQL à la main.
   Attention aux types du driver (numériques rendus en string → convertir avant calcul).

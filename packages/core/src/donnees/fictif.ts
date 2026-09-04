@@ -1,5 +1,6 @@
 import type { Activite, Enfant, Facture, Famille, Reservation, SourceDonnees } from "./types";
 import { tarif, trancheDe } from "./regles";
+import { fusionner, reservationsPersistees } from "./reservations";
 
 // SOURCE FICTIVE — le démonstrateur tourne dessus tant qu'aucune interop Agora+ n'existe.
 // RÉEL (sources datées) : écoles et accueils (villiers94.fr, accueils périscolaires, 04/09/2026),
@@ -77,7 +78,8 @@ export const sourceFictive: SourceDonnees = {
   famille: async (id) => FAMILLES.find((f) => f.id === id) ?? null,
   enfants: async (familleId) => ENFANTS.filter((e) => e.familleId === familleId),
   activites: async () => ACTIVITES,
-  reservations: async (enfantId, du, au) => reservationsFictives(enfantId).filter((r) => r.date >= du && r.date <= au),
+  // Fixture + écritures persistées (réservations du parent, pointages de l'agent).
+  reservations: async (enfantId, du, au) => fusionner(reservationsFictives(enfantId).filter((r) => r.date >= du && r.date <= au), await reservationsPersistees(enfantId, du, au)),
   factures: async (familleId) => facturesFictives(familleId),
 };
 

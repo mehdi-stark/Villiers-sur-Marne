@@ -7,7 +7,8 @@ const auth = creerAuth({ app: "famille", cookie: "famille_session", secretEnv: "
 
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
-  if (pathname === "/connexion" || pathname.startsWith("/api/auth")) return NextResponse.next();
+  // /api/passkey : les options de CONNEXION sont publiques par nature ; la route protège elle-même les étapes qui exigent une session.
+  if (pathname === "/connexion" || pathname.startsWith("/api/auth") || pathname.startsWith("/api/passkey")) return NextResponse.next();
   if (pathname === "/manifest.webmanifest" || pathname === "/sw.js" || /\.(png|svg|ico|webp)$/.test(pathname)) return NextResponse.next();
   const session = await auth.verifierSession(req.cookies.get(auth.COOKIE)?.value);
   if (session) {

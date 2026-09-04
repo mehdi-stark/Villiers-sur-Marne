@@ -31,7 +31,9 @@ trois cookies/secrets** (`ville_session`/`AUTH_SECRET`, `famille_session`/`FAMIL
 - Convention du §7 du cadrage : dernière ligne `Options : A · B — Recommandation : A` (parsée par `lib/docs.ts`).
 
 **Déployé (3 projets Vercel mehdi-starks-projects, sans SSO)** : cockpit `https://villiers-sur-marne.vercel.app` · famille `https://villiers-famille.vercel.app` · agents `https://villiers-agents.vercel.app` — `pnpm deployer cockpit|famille|agents` (depuis la racine). GitHub `mehdi-stark/Villiers-sur-Marne`.
-**Données** : adaptateur `lib/donnees/` (`SOURCE_DONNEES=fictif`), règles réelles de Villiers sourcées (`regles.ts`, `fictif.ts`), page `/pilotage/donnees`.
+**Données** : adaptateur `packages/core/src/donnees/` (`SOURCE_DONNEES=fictif`), règles réelles de Villiers sourcées, écritures persistées (`reservations.ts` : réserver/annuler avec verdict, pointer), page `/pilotage/donnees`.
+**Auth (3 apps)** : OTP + passkeys (`packages/core/src/passkeys.ts`, `/api/passkey`, `/appareils`) ; identité `mehdi.stark@gmail.com` (JAMAIS `admin@delivup.io`, réservé à Delivup).
+**Tests réels** : `apps/cockpit/scripts/tests/*` (tap décision, consigne Lanceur), `apps/famille/scripts/tests/*` (réservation, passkey), `apps/agents/scripts/tests/tap-pointage.mjs` — tous auto-purgés, acteur `test@ville.local` (à mettre dans la liste blanche du serveur de dev).
 
 **Ce qui n'existe PAS encore** : connexion GitHub → Vercel (app GitHub à installer),
 `RESEND_API_KEY` en prod (sans elle aucun code ne part — alerte affichée), passkeys/appareils,

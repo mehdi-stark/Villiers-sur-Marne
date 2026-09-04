@@ -134,3 +134,12 @@ ouvre les deux. Coût réel : zéro (Neon, offre gratuite).
   copie (rollback en 30 s). Exemple outillé : `lanceur/scripts/basculer-base.sh`.
 - Clés d'API d'infrastructure : `~/.config/trames/*.env` (chmod 600), jamais
   dans un repo, jamais affichées ; rotation si elles ont transité par un chat.
+
+## Identités et comptes — `admin@delivup.io` n'est PAS un compte personnel (04/09/2026, règle Mehdi)
+
+`admin@delivup.io` appartient au projet d'ÉQUIPE Delivup et ne s'utilise que là. Tout
+projet personnel (usines, cockpits, ville, apps mobiles…) utilise **`mehdi.stark@gmail.com`** :
+listes blanches d'OTP (`ADMIN_EMAILS`, `AGENT_EMAILS`…), comptes de démo, contact VAPID,
+expéditeurs, comptes d'hébergeur/GitHub/Vercel (`mehdi-stark`). Un projet qui embarque
+l'adresse Delivup mélange deux périmètres — et une révocation côté équipe couperait un
+projet personnel. Vérification : `git grep -n "admin@delivup.io"` vide hors Delivup.

@@ -15,6 +15,7 @@
 | `COCKPIT_URL` | URL du cockpit visée par `pnpm notifier` | `.env.local` (Mac) | non (défaut localhost) |
 | `PUSH_CONTACT` | Contact VAPID (`mailto:`) | Vercel | non |
 | `LANCEUR_URL` / `LANCEUR_SECRET` / `LANCEUR_DOSSIER` | « Prévenir l'agent maintenant » dépose une consigne au Lanceur (même secret que l'écouteur du Mac, `~/.config/trames/lanceur.env`) | Vercel · `.env.local` | non (sans elles, le bouton le dit) |
+| `PASSKEY_RP_ID` | RP ID WebAuthn (défaut : hôte de la requête — `villiers-sur-marne.vercel.app`) ; à poser quand un domaine propre arrive | Vercel | non |
 | `EMAIL_FROM` | Expéditeur (`Ville <…@domaine-vérifié>`) ; défaut `onboarding@resend.dev` (tests seulement) | Vercel | non |
 
 Modèle : `.env.example`. Le test `scripts/tests/tap-decision.mjs` exige `test@ville.local` dans `ADMIN_EMAILS` du serveur visé — **dev uniquement**, jamais en prod.
@@ -42,7 +43,7 @@ Comptes : table `comptes_familles` (e-mail → famille de la source) — seed de
 |---|---|---|---|
 | Neon (base) | organisation `org-square-star-05491818`, projet `ville` | Mehdi | clé API `~/.config/trames/neon.env` ; URI via `creer-base-neon.sh ville` (idempotent) |
 | Vercel (hébergement) | compte `contact-6950` (CLI connectée sur le Mac) | Mehdi | `vercel whoami` |
-| Resend (e-mail) | **à créer / clé à poser** pour ce projet — un service ≠ un compte : ne pas réutiliser la clé d'un autre projet | Mehdi | dashboard Resend → API Keys |
+| Resend (e-mail) | compte Resend de Mehdi (domaine vérifié `croscel.com`) — **clé dédiée `ville-…` créée par API le 04/09/2026** (permission envoi), posée sur les 3 projets ; expéditeur provisoire `Ville <contact@croscel.com>` jusqu'à un domaine du projet | Mehdi | dashboard Resend → API Keys |
 | GitHub (CI) | `mehdi-stark/Villiers-sur-Marne` — créé par Mehdi le 04/09/2026, `main` poussée | Mehdi (mehdi-stark) | SSH du Mac authentifié comme mehdi-stark |
 | Vercel (hébergement) | **`mehdi-starks-projects/villiers-sur-marne`** (id `prj_YuePUUnNhWN7aGyr6mfmLHsTNFfY`), prod `https://villiers-sur-marne.vercel.app`, déployé par jeton `VERCEL_ACCESS_TOKEN` (`.env.local`, jamais commité). **Ce jeton a été affiché par la CLI dans une erreur le 04/09/2026 → à révoquer et régénérer.** L'ancien projet `yuqots-projects/ville` reste en place (à supprimer par Mehdi). | Mehdi (mehdi-stark) | dashboard Vercel |
 

@@ -14,7 +14,10 @@
     "./donnees/types": "./src/donnees/types.ts",
     "./donnees/regles": "./src/donnees/regles.ts",
     "./donnees/fictif": "./src/donnees/fictif.ts",
-    "./communes": "./src/communes.ts"
+    "./communes": "./src/communes.ts",
+    "./donnees/reservations": "./src/donnees/reservations.ts",
+    "./passkeys": "./src/passkeys.ts",
+    "./ui/passkeys": "./src/ui/passkeys.tsx"
   },
   "scripts": {
     "db:generate": "drizzle-kit generate",
@@ -24,16 +27,22 @@
     "test": "node --import tsx --test tests/*.test.ts"
   },
   "dependencies": {
+    "@simplewebauthn/server": "^14.0.0",
     "drizzle-orm": "^0.45.2",
     "postgres": "^3.4.9",
-    "web-push": "^3.6.7"
+    "web-push": "^3.6.7",
+    "@simplewebauthn/browser": "^13.1.0"
   },
   "devDependencies": {
-    "drizzle-kit": "^0.31.10",
-    "typescript": "^5.9.3",
     "@types/node": "^26.4.1",
     "@types/web-push": "^3.6.4",
+    "dotenv": "^17.4.2",
+    "drizzle-kit": "^0.31.10",
     "tsx": "^4.23.13",
-    "dotenv": "^17.4.2"
+    "typescript": "^5.9.3",
+    "@types/react": "^19.2.18"
+  },
+  "peerDependencies": {
+    "react": "*"
   }
 }

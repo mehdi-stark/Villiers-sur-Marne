@@ -60,6 +60,11 @@ Gravité : 🔴 bloquant (prod, argent, sécurité) · 🟠 important (qualité,
 ## B. Déploiement, infra, sécurité
 12. **Un push n'est jamais une mise en ligne** : vérifier READY ; 19 déploiements
     morts en silence ont figé une app un jour (DelivUp).
+12bis. **READY n'est pas l'URL servie** : un alias posé à la main (`lanceur-usine`)
+    reste sur l'ancien déploiement quand la CLI en publie un nouveau — la nouvelle
+    route répondait 404 alors que le déploiement était READY. `vercel alias set`
+    après chaque déploiement, et le test E2E vise l'URL consommée par les clients,
+    jamais l'URL du déploiement (`ville` ↔ Lanceur, 04/09/2026).
 13. **Quotas connus AVANT qu'ils mordent** : Vercel Hobby = 100 déploiements/jour
     (les annulés comptent), 4 h CPU/mois, 300 s/fonction → pousser EN LOT, un
     push par lot vérifié ; ne jamais re-proposer l'upgrade quand la décision est
@@ -157,6 +162,23 @@ Gravité : 🔴 bloquant (prod, argent, sécurité) · 🟠 important (qualité,
     rétroactif ; Play : 12 testeurs/14 j pour les comptes personnels) : vérifier
     à date, protéger le COMPTE avant l'app (jamais de gimmick parmi les premières
     publications).
+
+41bis. **B2G : les prix réels sont dans les DECP** (data.economie.gouv.fr,
+    `decp-v3-marches-valides`) — montant HT, durée, SIRET du titulaire en une
+    requête ; les sites éditeurs ne publient rien et les stores n'ont pas d'avis
+    exploitables. Et **un verdict calculé ne s'adoucit pas à la main** : 65/100
+    dégradé à NO-GO par une faille haute non parée — la parade se CODE
+    (`paree: true` quand elle est signée) et le calcul se rejoue (`ville`, 04/09/2026).
+
+41ter. **Un jeton passé sans guillemets finit dans un message d'erreur** : `T="--token X"`
+    puis `vercel … $T` (zsh ne découpe pas) → « unknown option: --token vcp_… » affiché
+    en clair, donc transité par le chat, donc à révoquer. Toujours `--token "$VAR"`,
+    et masquer la sortie (`sed "s/$VAR/***/g"`) avant de la lire (`ville`, 04/09/2026).
+
+41quater. **Une adresse d'équipe n'est pas une adresse personnelle** : `ville` a embarqué
+    `admin@delivup.io` (whitelist, seed, VAPID) parce que c'était l'adresse de la session.
+    Règle Mehdi : `admin@delivup.io` = Delivup (équipe) seulement ; tout projet personnel
+    = `mehdi.stark@gmail.com`. Contrôle : `git grep admin@delivup.io` vide (04/09/2026).
 
 ## E. Chaînes, contrôles et instruments (usine mobile, 09/2026)
 42. **Une chaîne qui exige un clic humain à un maillon s'ARRÊTE à ce maillon** :
@@ -303,3 +325,79 @@ Gravité : 🔴 bloquant (prod, argent, sécurité) · 🟠 important (qualité,
     ne se rend que si TOUTES les pièces sont là ; sinon l'écran dit ce qui
     manque pour juger, et propose le geste qui le complète. Un avertissement qui
     se trompe une fois est un avertissement qu'on n'ouvrira plus.
+65. **Le préfixe d'une valeur n'identifie pas son émetteur** : `sk_test_…` est
+    le format de Stripe ET de Clerk ; `sk-…` celui d'OpenAI ET de DeepSeek.
+    Trois des cinq « clés mortes » annoncées un jour plus tôt étaient en fait
+    des clés parfaitement valides d'un AUTRE fournisseur, envoyées se faire
+    refuser chez le mauvais — et le compte affiché sur la fiche du projet était
+    faux. Une reconnaissance par la valeur se corrobore par le NOM de la
+    variable (`STRIPE` pour Stripe, `DEEPSEEK` pour DeepSeek) : deux indices
+    concordants, ou rien. Corollaire : une alerte émise sur une détection non
+    corroborée coûte plus cher que l'absence d'alerte, parce qu'elle a été crue.
+66. **Un composant client ne doit importer que du pur** : un fichier partagé
+    entre le rendu serveur et un composant `"use client"` a tiré le pilote
+    Postgres dans le paquet du navigateur. Le build a cassé — bruyamment, donc
+    bien. Séparer dès le premier partage : les types et les fonctions sans
+    effet d'un côté, tout ce qui touche la base ou un secret de l'autre.
+67. **Un secret ne se protège pas par une promesse, mais par une porte
+    étroite** : « l'index ne contient pas les clés » n'est vrai que le jour où
+    on l'écrit. La publication ne recopie donc pas l'objet reçu, elle le
+    RECONSTRUIT champ par champ, et le champ qui liste les variables n'accepte
+    que des NOMS (`[A-Z0-9_]{2,60}`) — une valeur ne peut pas passer, même si
+    un refactor futur l'y met. Une garde codée survit à l'intention.
+68. **Un trousseau n'est utile que s'il couvre les TROIS gisements** : les clés
+    des projets (`.env`), les sessions des CLI (`~/Library/Application
+    Support/com.vercel.cli/auth.json`, les clés de la trame) et le reste, saisi
+    une fois à la main. La première version ne lisait que les `.env` : on
+    pouvait choisir Stripe et Resend au moment de créer un projet, mais pas
+    Vercel ni la base — donc la moitié du projet restait à brancher à la main,
+    et le geste qu'on voulait supprimer survivait. Un outil qui supprime 60 %
+    d'une corvée ne la supprime pas : on la fait encore.
+69. **Une liste d'action qui exclut par construction ce sur quoi elle agit** :
+    l'écran « Adopter la trame » ne listait que les dossiers possédant déjà
+    `CLAUDE.md` ou `.trame.json` — c'est-à-dire ceux qui ont DÉJÀ la trame. 32
+    projets sur 39 étaient invisibles, et le bouton n'apparaissait que là où il
+    ne servait à rien. Le filtre avait été écrit pour « lister les projets de la
+    trame » puis réutilisé pour « proposer l'adoption », sans que personne
+    relise sa condition. Quand une liste sert à DEUX usages opposés (ce qui est
+    déjà fait / ce qui reste à faire), son filtre doit être relu pour chacun.
+70. **Tout type accepté par l'interface doit l'être par l'exécutant** : le
+    Lanceur acceptait un nouveau type de demande que le script du Mac ne
+    connaissait pas ; la demande était enregistrée, affichée, puis jetée en
+    silence. Une liste blanche dupliquée des deux côtés d'une file est un
+    piège : elle doit être vérifiée par un test qui les compare, ou dérivée
+    d'une source unique.
+
+## Un détecteur aveugle est pire que pas de détecteur (04/09/2026)
+
+`capturer.mjs` comparait `document.documentElement.scrollWidth > window.innerWidth`.
+En simulation mobile, le navigateur DÉZOOME pour faire tenir le contenu :
+`innerWidth` devient la largeur du CONTENU (1200), pas celle de l'écran (390).
+La comparaison était donc TOUJOURS fausse à 390 px.
+
+Mesuré : une table de 1200 px dans un écran de 390 px n'était pas signalée.
+La bonne mesure est `clientWidth` — le viewport de MISE EN PAGE, qui reste à 390.
+
+Ce que ça coûtait : des mois de « aucun débordement horizontal » rassurants,
+sur lesquels plusieurs projets se sont appuyés pour déclarer le responsive
+prouvé. Un outil de vérification qui ne trouve jamais rien ne rassure pas :
+il ANESTHÉSIE. Le bug était dans la trame, donc dans tous les projets adoptants.
+
+**Règle** : tout détecteur se valide d'abord sur un cas qui doit ÉCHOUER.
+Un vert n'a de valeur que si l'on a vu l'outil produire un rouge. Vaut pour les
+tests, les linters, les alertes et les sondes de supervision.
+71. **Un garde-fou se vérifie en lui donnant une vraie panne à attraper** : le
+    contrôle « aucune clé dans l'index publié » exigeait 12 caractères
+    ALPHANUMÉRIQUES juste après le préfixe — or une vraie clé porte un `_` très
+    tôt (`sk_live_51Q…`, `sk_test_****`). Il ne pouvait donc matcher AUCUNE clé
+    réelle et rendait « propre » à tous les coups. Il avait servi trois fois
+    dans la journée à affirmer qu'aucun secret ne fuyait. Un instrument qui ne
+    peut pas échouer ne prouve rien : après avoir écrit un contrôle, lui
+    soumettre l'incident exact qu'il est censé attraper — et n'y croire que
+    lorsqu'il est passé au rouge.
+72. **Rassembler les garde-fous derrière une commande unique** (`trames.sh
+    controles`) : dispersés, on en lance deux sur cinq et c'est le troisième qui
+    aurait parlé. Chacun annonce CE QU'IL PROTÈGE, et un contrôle qui ne peut
+    pas s'exécuter s'affiche « sauté » — sauté en silence, il se confond avec un
+    contrôle réussi. Les quatre premiers sont nés d'incidents datés : listes
+    blanches divergentes, colonnes décalées, secret publié, alias figé.

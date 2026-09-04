@@ -2,6 +2,7 @@
 
 import { useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
+import { BoutonFaceId } from "@ville/core/ui/passkeys";
 
 function Formulaire() {
   const params = useSearchParams();
@@ -38,6 +39,7 @@ function Formulaire() {
         <span className="marque-logo" style={{ width: 40, height: 40, fontSize: 18, margin: "0 auto" }} aria-hidden>V</span>
         <h1>Cockpit Ville</h1>
         <p className="muted">Cadrage, backlog et décisions du projet — depuis n'importe où.</p>
+        {etape === "email" && <BoutonFaceId suite={suite.startsWith("/") ? suite : "/"} />}
         {etape === "email" ? (
           <>
             <input type="email" inputMode="email" autoComplete="email" placeholder="ton e-mail" value={email} onChange={(e) => setEmail(e.target.value)} autoFocus />

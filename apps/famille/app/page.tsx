@@ -3,11 +3,13 @@ import { redirect } from "next/navigation";
 import { familleCourante } from "@/lib/session";
 import { lundiDe, semaineDe } from "@/lib/semaine";
 import { euros, tarif, trancheDe } from "@ville/core/donnees/regles";
+import { Creneau } from "@/components/creneau";
+
+import { ActiverFaceId } from "@ville/core/ui/passkeys";
 
 export const dynamic = "force-dynamic";
 const fmtJour = new Intl.DateTimeFormat("fr-FR", { weekday: "short", timeZone: "Europe/Paris" });
 const fmtSemaine = new Intl.DateTimeFormat("fr-FR", { day: "numeric", month: "long", timeZone: "Europe/Paris" });
-const LIBELLE: Record<string, string> = { reservee: "Réservé", presence: "Présent", absence: "Absent", libre: "Libre", ferme: "—" };
 
 export default async function MaSemaine({ searchParams }: { searchParams: Promise<{ s?: string }> }) {
   const f = await familleCourante();
@@ -35,6 +37,8 @@ export default async function MaSemaine({ searchParams }: { searchParams: Promis
           <a className="bouton bouton-sm" href={`/?s=${prec}`}>← Semaine précédente</a>
           <a className="bouton bouton-sm" href={`/?s=${suiv}`}>Semaine suivante →</a>
         </div>
+
+      <ActiverFaceId cle="famille-passkey" />
       </div>
 
       {verdictCantine && (
@@ -62,17 +66,13 @@ export default async function MaSemaine({ searchParams }: { searchParams: Promis
                       <div className="jour-nom">{fmtJour.format(d)}</div>
                       <div className="jour-num">{d.getUTCDate()}</div>
                       {j.creneaux.length === 0 ? <div className="creneau" data-etat="ferme">pas d'accueil</div> : j.creneaux.map((c) => (
-                        <div key={c.activite.id} className="creneau" data-etat={c.etat} title={`${c.activite.libelle} — ${c.verdict.libelle}`}>
-                          <strong>{LIBELLE[c.etat]}</strong>
-                          <span>{c.activite.type === "cantine" ? "repas" : c.activite.type === "accueil_matin" ? "matin" : c.activite.type === "accueil_soir" ? "soir" : c.activite.type === "etude" ? "étude" : "loisirs"}</span>
-                          <span>{euros(tarif(c.activite, tranche))}</span>
-                        </div>
+                        <Creneau key={c.activite.id} enfantId={enfant.id} activiteId={c.activite.id} date={j.date} etat={c.etat === "ferme" ? "libre" : c.etat} type={c.activite.type === "cantine" ? "repas" : c.activite.type === "accueil_matin" ? "matin" : c.activite.type === "accueil_soir" ? "soir" : c.activite.type === "etude" ? "étude" : "loisirs"} tarif={euros(tarif(c.activite, tranche))} possible={c.verdict.possible} verdict={c.verdict.libelle} reservable={c.activite.prevenance.joursAvant > 0} />
                       ))}
                     </div>
                   );
                 })}
               </div>
-              <p className="tiny">Un créneau « Libre » se réserve d'un tap tant que le délai court ; le verdict de délai est calculé par le code, jamais deviné. (Réservation : prochain maillon.)</p>
+              <p className="tiny">Un tap réserve ou annule tant que le délai court ; hors délai le créneau est grisé et dit jusqu'à quand c'était possible. Matin, soir et étude sont sans réservation.</p>
             </section>
           ))}
         </div>

@@ -5,7 +5,7 @@ import { poserAlerte, resoudreAlerte } from "./alertes";
 
 // Push web : clés VAPID auto-générées (table parametres), un abonnement par
 // appareil, envoi best-effort, purge des abonnements morts (404/410).
-const CONTACT = process.env.PUSH_CONTACT ?? "mailto:admin@delivup.io";
+const CONTACT = process.env.PUSH_CONTACT ?? "mailto:mehdi.stark@gmail.com";
 
 export async function clesVapid(): Promise<{ publicKey: string; privateKey: string }> {
   const [l] = await db.select().from(schema.parametres).where(eq(schema.parametres.code, "vapid")).limit(1);

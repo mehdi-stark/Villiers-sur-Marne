@@ -39,6 +39,7 @@ export function Coquille({ children, commune }: { children: React.ReactNode; com
                   </div>
                   {liens(() => setOuvert(false))}
                   <div className="tiroir-pied">
+                    <Link href="/appareils" className="nav-item" onClick={() => setOuvert(false)}>Appareils de confiance</Link>
                     <p className="tiny">Espace Accueil et Facturation : {commune.telephone}</p>
                     <button className="bouton" data-variant="discret" onClick={deconnecter}><LogOut size={15} aria-hidden /> Se déconnecter</button>
                   </div>

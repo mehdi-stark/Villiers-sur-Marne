@@ -6,6 +6,8 @@ import { compteurs, decisionsPrises } from "@/lib/decisions";
 import { backlogOuvert, extraireBacklog, extraireDecisions, lireDoc } from "@/lib/docs";
 import { analyse } from "@/lib/marche";
 
+import { ActiverFaceId } from "@ville/core/ui/passkeys";
+
 export const dynamic = "force-dynamic";
 
 // Les 8 étapes de la trame (0 → 7) et leur état — c'est la « page pipeline »
@@ -46,6 +48,8 @@ export default async function Accueil() {
           <p className="muted">Ville — portail famille de nouvelle génération pour Villiers-sur-Marne. Étapes 1-2/7 : cadrage et marché à trancher.</p>
         </div>
       </div>
+
+      <ActiverFaceId cle="ville-passkey" />
 
       {alertes.map((a) => (
         <div key={a.id} className="bandeau" data-tone={a.niveau === "critique" ? "danger" : "warn"} role="alert">

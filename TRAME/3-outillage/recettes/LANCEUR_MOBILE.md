@@ -408,3 +408,65 @@ La page Comptes classe chaque compte par le nombre de projets **vivants** (« ac
 candidat à la résiliation — utile même sans connaître son prix. Et le verdict ne se rend
 que si TOUS ses projets sont qualifiés : sinon l'écran dit « statut des projets inconnu »
 et propose la qualification en masse, au lieu d'accuser un compte sain.
+
+## Le trousseau — choisir son compte, ne plus chercher sa clé (03/09/2026)
+
+**Le besoin** (Mehdi) : « tous les comptes sur les applications sont MES comptes. Quand on
+crée un projet, on choisit lequel utiliser — ça évite d'aller chercher à chaque fois les
+clés et les tokens. »
+
+**La décision de sécurité, prise explicitement** : les valeurs ne quittent pas le Mac. Le
+*choix* voyage, le secret reste. Trois conséquences de conception :
+
+1. `app/trousseau.py recolter` regroupe, par service et par `.env`, les variables qui
+   constituent UN compte (`STRIPE_SECRET_KEY` + `STRIPE_WEBHOOK_SECRET` : poser l'une sans
+   l'autre donne un projet à moitié branché). Deux projets portant la même clé partagent
+   le compte ; deux clés différentes du même service sont deux comptes.
+   Fichier `~/.config/trames/trousseau.json`, 0600.
+2. `trousseau.py index` publie service, libellé, e-mail/organisation, projets, validité et
+   **noms** des variables. La publication côté app ne recopie pas l'objet : elle le
+   reconstruit champ par champ, et `variables` n'accepte que `[A-Z0-9_]{2,60}` — une garde
+   CODÉE, qui survit à un refactor distrait.
+3. `trousseau.py injecter <dossier> <ids>` écrit les variables dans `.env.local` (0600,
+   ajouté au `.gitignore`), **sans jamais écraser** une variable déjà présente, et rend un
+   résumé qui va dans le prompt : « COMPTES DÉJÀ BRANCHÉS : … ne me les redemande pas ».
+
+Sur le téléphone, le sélecteur est un composant CLIENT : les comptes suggérés dépendent du
+type de projet, et le type se choisit dans le même formulaire — rendu côté serveur, la
+liste conseillait le type par défaut même après en avoir choisi un autre.
+
+## Les trois gisements du trousseau (03/09/2026, complément)
+
+Une première version ne lisait que les `.env` : on choisissait Stripe et Resend, mais pas
+Vercel ni la base — la moitié du projet restait à brancher à la main, donc la corvée
+survivait. La récolte couvre désormais :
+
+1. **les `.env` des projets** — clé reconnue par sa valeur ET par le nom de sa variable ;
+2. **les sessions des CLI et les clés de la trame** — `com.vercel.cli/auth.json`,
+   `~/.config/trames/neon.env`, `supabase.env`, `github.env` ; l'identité du compte est
+   résolue par l'API du fournisseur (`/v2/user`, `/users/me`) et mise en cache 7 jours ;
+3. **la saisie à la main** — `trousseau.py ajouter <service> <libellé> VAR=valeur …`, pour
+   ce qu'aucune API ne donne. La valeur n'est ni affichée ni journalisée.
+
+`brancherComptes` (type de demande `comptes`) pose un compte sur un projet **existant**
+depuis sa fiche du parc : c'est le cas d'usage le plus fréquent, une clé manque toujours
+au milieu d'une session. L'injection n'écrase jamais une variable déjà là.
+
+
+## Les deux pièges qui ont coûté une soirée (04/09/2026)
+
+**Une liste d'action qui exclut ce sur quoi elle agit.** L'écran « Adopter la trame » ne
+listait que les dossiers ayant `CLAUDE.md` ou `.trame.json` — ceux qui ont DÉJÀ la trame.
+Le filtre venait de « lister les projets de la trame » et avait été réutilisé tel quel pour
+« proposer l'adoption ». Quand une liste sert à deux usages opposés (ce qui est fait / ce
+qui reste à faire), relire sa condition pour CHACUN.
+
+**Deux URL, un seul Mac.** L'écouteur interrogeait `lanceur-usine.vercel.app`, resté figé
+sur un déploiement de quatre jours, pendant que `vercel --prod` publiait sur
+`lanceur-three.vercel.app`. Les nouvelles actions de l'API répondaient « action inconnue »
+et le trousseau ne se publiait jamais. Après tout déploiement, vérifier que **l'URL
+configurée dans `~/.config/trames/lanceur.env` sert bien le déploiement courant** — un
+alias Vercel pointé à la main ne suit pas les mises en production.
+
+`trames.sh cle github <PAT>` complète `neon` et `supabase` : c'est le dernier accès que le
+trousseau ne peut pas récolter seul (la CLI `gh` n'est pas installée sur cette machine).
