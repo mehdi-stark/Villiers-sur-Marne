@@ -2,6 +2,10 @@ import type { Activite, Enfant, Facture, Famille, Reservation, SourceDonnees } f
 import { tarif, trancheDe } from "./regles";
 import { fusionner, reservationsPersistees } from "./reservations";
 
+// La couche persistée (base) se remplace en test unitaire : la fixture reste pure, la base reste vraie ailleurs.
+let persistance: (enfantId: string, du: string, au: string) => Promise<Reservation[]> = reservationsPersistees;
+export function definirPersistance(fn: typeof persistance) { persistance = fn; }
+
 // SOURCE FICTIVE — le démonstrateur tourne dessus tant qu'aucune interop Agora+ n'existe.
 // RÉEL (sources datées) : écoles et accueils (villiers94.fr, accueils périscolaires, 04/09/2026),
 // grille tarifaire 2025-2026 (PDF du 01/07/2025), délais (Guide du périscolaire 2025-2026).
@@ -79,7 +83,7 @@ export const sourceFictive: SourceDonnees = {
   enfants: async (familleId) => ENFANTS.filter((e) => e.familleId === familleId),
   activites: async () => ACTIVITES,
   // Fixture + écritures persistées (réservations du parent, pointages de l'agent).
-  reservations: async (enfantId, du, au) => fusionner(reservationsFictives(enfantId).filter((r) => r.date >= du && r.date <= au), await reservationsPersistees(enfantId, du, au)),
+  reservations: async (enfantId, du, au) => fusionner(reservationsFictives(enfantId).filter((r) => r.date >= du && r.date <= au), await persistance(enfantId, du, au)),
   factures: async (familleId) => facturesFictives(familleId),
 };
 

@@ -1,6 +1,9 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { ACTIVITES, ECOLES, sourceFictive } from "../src/donnees/fictif";
+import { ACTIVITES, definirPersistance, ECOLES, sourceFictive } from "../src/donnees/fictif";
+
+// Test UNITAIRE : pas de base — la couche persistée est vide ici (elle est testée en réel par tap-reservation.mjs).
+definirPersistance(async () => []);
 import { SOURCES } from "../src/donnees/index";
 
 test("chaque activité porte 10 tarifs (tranches 1-9 + extérieurs) et une source", () => {
