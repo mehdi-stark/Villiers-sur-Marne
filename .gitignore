@@ -13,3 +13,7 @@ captures/
 *.tsbuildinfo
 next-env.d.ts
 .vercel
+apps/*/.next/
+apps/*/.vercel/
+apps/*/next-env.d.ts
+apps/*/captures/

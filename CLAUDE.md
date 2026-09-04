@@ -11,8 +11,14 @@ conditionnel dégradé à NO-GO** tant que la faille « pas d'API Agora+ » n'es
 cockpit (table `decisions`) ; les reporter dans le document canonique avec la
 date, puis `pnpm decisions --reporter <id,…>`. Puis relire `.claude-consignes.md`.
 
+**Structure (monorepo pnpm, 04/09/2026)** : `apps/cockpit` (pilotage, port 3000) · `apps/famille` (portail famille PWA, 3001) ·
+`apps/agents` (back-office agents PWA, 3002) · `packages/core` (`db/schema.ts` + migrations, `src/auth.ts` `creerAuth` PAR app,
+`src/donnees/` adaptateur + règles réelles, `src/communes.ts` thème par commune, e-mail, alertes, push). Les documents
+canoniques restent à la racine (`docs/planning`), lus par le cockpit via `../../docs/planning`. **Trois déploiements séparés,
+trois cookies/secrets** (`ville_session`/`AUTH_SECRET`, `famille_session`/`FAMILLE_AUTH_SECRET`, `agents_session`/`AGENTS_AUTH_SECRET`).
+
 **Ce qui existe et est PROUVÉ** (maillon 0, recette `TRAME/3-outillage/recettes/COCKPIT_SQUELETTE.md`) :
-- Cockpit Next.js 15 (App Router, TS strict) à la racine : `/` pilotage, `/pilotage/cadrage`
+- Cockpit Next.js 15 (App Router, TS strict) dans `apps/cockpit` : `/` pilotage, `/pilotage/cadrage`
   (décisions en un tap), `/pilotage/decisions` (tout ce qui attend, badge PWA), `/pilotage/marche` (verdict par code), `/pilotage/backlog`, `/connexion`
   (OTP e-mail, whitelist `ADMIN_EMAILS`). PWA (manifest, `public/sw.js` push-only, icônes `pnpm icones`),
   push web (`lib/push.ts`, `pnpm notifier "Titre" "Corps" /url` → l'opérateur).
@@ -31,8 +37,9 @@ date, puis `pnpm decisions --reporter <id,…>`. Puis relire `.claude-consignes.
 `RESEND_API_KEY` en prod (sans elle aucun code ne part — alerte affichée), passkeys/appareils,
 cron, file de jobs, thème par commune, tout le métier (réservations, factures…).
 
-**Commandes** : `pnpm dev` · `pnpm typecheck` · `pnpm build` · `pnpm db:generate` /
-`db:migrate` / `db:check` · `pnpm test` · `pnpm decisions` · `pnpm notifier` · `pnpm capturer --forger admin@delivup.io --viewport 390x844`.
+**Commandes (racine)** : `pnpm dev` (cockpit) · `pnpm -r typecheck` · `pnpm -r build` · `pnpm -r test` · `pnpm db:generate` /
+`db:migrate` / `db:check` (core) · `pnpm decisions` · `pnpm notifier` · captures : `cd apps/<app> && node ../cockpit/scripts/capturer.mjs --base http://localhost:<port> --app famille|agents --forger <email> --viewport 390x844 [--dark]`.
+Secrets locaux : `apps/*/.env.local` et `packages/core/.env.local` (jamais commités).
 
 ---
 

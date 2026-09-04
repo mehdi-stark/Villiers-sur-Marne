@@ -10,17 +10,23 @@ jobs:
       - uses: actions/setup-node@v4
         with: { node-version: 22, cache: pnpm }
       - run: pnpm install --frozen-lockfile
-      - name: Typecheck
-        run: pnpm typecheck
+      - name: Typecheck (core + 3 apps)
+        run: pnpm -r typecheck
+      - name: Tests (core + cockpit)
+        run: pnpm -r test
+        env: { DATABASE_URL: "postgresql://ci:ci@localhost:5432/ci" }
       - name: Schéma ↔ migrations en phase (une migration manquante = échec)
         run: |
-          pnpm db:check
-          pnpm db:generate
-          if [ -n "$(git status --porcelain db/migrations)" ]; then echo "::error::db/schema.ts a divergé des migrations — lancer pnpm db:generate et committer"; git status --porcelain db/migrations; exit 1; fi
+          pnpm --filter @ville/core db:check
+          pnpm --filter @ville/core db:generate
+          if [ -n "$(git status --porcelain packages/core/db/migrations)" ]; then echo "::error::packages/core/db/schema.ts a divergé des migrations — lancer pnpm db:generate et committer"; git status --porcelain packages/core/db/migrations; exit 1; fi
         env: { DATABASE_URL: "postgresql://ci:ci@localhost:5432/ci" }
-      - name: Build
-        run: pnpm build
+      - name: Build (3 apps)
+        run: pnpm -r build
         env:
           DATABASE_URL: "postgresql://ci:ci@localhost:5432/ci"
           AUTH_SECRET: "ci-secret-non-utilise"
+          FAMILLE_AUTH_SECRET: "ci-secret-non-utilise"
+          AGENTS_AUTH_SECRET: "ci-secret-non-utilise"
           ADMIN_EMAILS: "ci@example.invalid"
+          AGENT_EMAILS: "ci@example.invalid"

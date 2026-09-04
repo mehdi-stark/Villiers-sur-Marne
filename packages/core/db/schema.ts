@@ -1,0 +1,95 @@
+import { index, integer, jsonb, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
+
+// ---- Pilotage : les décisions tranchées DEPUIS le cockpit -------------------
+// Le document canonique (docs/planning/*.md) reste la source de vérité relue à
+// froid ; cette table est le CANAL : chaque tap écrit une ligne, l'agent la relit
+// au début de chaque session (`pnpm decisions`) et reporte le choix dans le doc.
+export const decisions = pgTable(
+  "decisions",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    sujet: text("sujet").notNull(), // "cadrage" | "backlog" | "marche" | …
+    cle: text("cle").notNull(), // ex. "cadrage:1", "backlog:simulateur-qf"
+    libelle: text("libelle").notNull(), // le titre lisible au moment du tap
+    choix: text("choix").notNull(), // l'option choisie (texte exact du bouton)
+    note: text("note"), // condition, précision, contre-proposition
+    acteur: text("acteur").notNull(), // e-mail de l'opérateur
+    trancheLe: timestamp("tranche_le", { withTimezone: true }).notNull().defaultNow(),
+    reporteLe: timestamp("reporte_le", { withTimezone: true }), // quand l'agent l'a reporté dans le doc
+  },
+  (t) => [index("decisions_cle_idx").on(t.sujet, t.cle, t.trancheLe)],
+);
+
+// ---- Connexion : OTP (hash seulement), débit d'envoi, journal ---------------
+export const otpCodes = pgTable(
+  "otp_codes",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    app: text("app").notNull().default("cockpit"), // cockpit | famille | agents — un OTP ne vaut que pour SON application
+    email: text("email").notNull(),
+    hash: text("hash").notNull(), // HMAC(email|code) — jamais le code
+    expireLe: timestamp("expire_le", { withTimezone: true }).notNull(),
+    essais: integer("essais").notNull().default(0),
+    consommeLe: timestamp("consomme_le", { withTimezone: true }),
+    creeLe: timestamp("cree_le", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("otp_email_idx").on(t.email, t.creeLe)],
+);
+
+export const journalConnexions = pgTable("journal_connexions", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  app: text("app").notNull().default("cockpit"),
+  email: text("email").notNull(),
+  evenement: text("evenement").notNull(), // otp_envoye | otp_refuse | connexion | envoi_echec
+  detail: jsonb("detail").$type<Record<string, unknown>>(),
+  creeLe: timestamp("cree_le", { withTimezone: true }).notNull().defaultNow(),
+});
+
+// ---- Alertes : tout échec d'envoi sortant pose une ligne (le silence ment) ---
+export const alertes = pgTable(
+  "alertes",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    niveau: text("niveau").notNull(), // info | warn | critique
+    code: text("code").notNull(), // ex. "otp_envoi_echec"
+    message: text("message").notNull(), // la CAUSE, jamais la citation d'un fournisseur (leçon 58)
+    contexte: jsonb("contexte").$type<Record<string, unknown>>(),
+    creeLe: timestamp("cree_le", { withTimezone: true }).notNull().defaultNow(),
+    resolueLe: timestamp("resolue_le", { withTimezone: true }),
+  },
+  // Dédup des alertes OUVERTES en code (select puis insert) : une colonne NULL
+  // échappe à un index unique (CONVENTIONS_TECHNIQUES).
+  (t) => [index("alertes_code_idx").on(t.code, t.resolueLe)],
+);
+
+// ---- Paramètres techniques (clés VAPID générées, etc.) — jamais de secret produit ---
+export const parametres = pgTable("parametres", {
+  code: text("code").primaryKey(),
+  valeur: jsonb("valeur").$type<Record<string, unknown>>().notNull(),
+  description: text("description"),
+  majLe: timestamp("maj_le", { withTimezone: true }).notNull().defaultNow(),
+});
+
+// ---- Push web : un abonnement par appareil, purgé quand le navigateur répond 404/410 ---
+export const pushAbonnements = pgTable("push_abonnements", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  email: text("email").notNull(),
+  endpoint: text("endpoint").notNull().unique(),
+  p256dh: text("p256dh").notNull(),
+  auth: text("auth").notNull(),
+  agent: text("agent"),
+  creeLe: timestamp("cree_le", { withTimezone: true }).notNull().defaultNow(),
+  dernierEnvoiLe: timestamp("dernier_envoi_le", { withTimezone: true }),
+});
+
+// ---- Portail famille : qui a le droit d'entrer, et pour quelle famille de la source ----
+// Un compte = un e-mail → une famille (id de la source active) dans une commune.
+// Aucun mot de passe : OTP seulement. Seed de démo : scripts/seed-familles.mjs.
+export const comptesFamilles = pgTable("comptes_familles", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  email: text("email").notNull().unique(),
+  familleId: text("famille_id").notNull(),
+  communeId: text("commune_id").notNull().default("villiers-sur-marne"),
+  creeLe: timestamp("cree_le", { withTimezone: true }).notNull().defaultNow(),
+  derniereConnexionLe: timestamp("derniere_connexion_le", { withTimezone: true }),
+});

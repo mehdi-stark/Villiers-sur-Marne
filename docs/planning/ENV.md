@@ -1,6 +1,8 @@
 # Inventaire des variables d'environnement — ville (AUCUNE valeur ici)
 
-## Cockpit (Next.js, racine du repo)
+> Monorepo (04/09/2026) : `apps/cockpit` (pilotage), `apps/famille` (portail famille, PWA), `apps/agents` (back-office agents, PWA), `packages/core` (schéma, migrations, auth par application, adaptateur de données, thème par commune). **Trois déploiements, trois domaines, trois secrets de session — jamais partagés.** Base Neon unique « ville » (une base par PROJET).
+
+## Cockpit (`apps/cockpit`)
 | Variable | Rôle | Où elle vit (hébergeur / VPS / CI) | Obligatoire |
 |---|---|---|---|
 | `DATABASE_URL` | Base Neon « ville » (une base PAR projet, id `crimson-band-15200530`, eu-central-1) | Vercel (prod) · `.env.local` (dev) · CI : URL factice (build seulement) | oui |
@@ -16,6 +18,24 @@
 | `EMAIL_FROM` | Expéditeur (`Ville <…@domaine-vérifié>`) ; défaut `onboarding@resend.dev` (tests seulement) | Vercel | non |
 
 Modèle : `.env.example`. Le test `scripts/tests/tap-decision.mjs` exige `test@ville.local` dans `ADMIN_EMAILS` du serveur visé — **dev uniquement**, jamais en prod.
+
+## Portail famille (`apps/famille`, port 3001 en dev)
+| Variable | Rôle | Où elle vit | Obligatoire |
+|---|---|---|---|
+| `DATABASE_URL` | même base Neon (tables `comptes_familles`, `otp_codes.app='famille'`) | Vercel · `.env.local` | oui |
+| `FAMILLE_AUTH_SECRET` | secret de session PROPRE au portail | Vercel · `.env.local` | oui |
+| `COMMUNE_ID` | thème et coordonnées de la commune (`packages/core/src/communes.ts`) | Vercel | non (défaut villiers-sur-marne) |
+| `SOURCE_DONNEES` | `fictif` (défaut) · `export-agora` · `api-agora` | Vercel | non |
+| `RESEND_API_KEY` / `EMAIL_FROM` | codes OTP des familles | Vercel | oui en prod |
+Comptes : table `comptes_familles` (e-mail → famille de la source) — seed de démo `apps/famille/scripts/seed-familles.mjs email=familleId`.
+
+## Back-office agents (`apps/agents`, port 3002 en dev)
+| Variable | Rôle | Où elle vit | Obligatoire |
+|---|---|---|---|
+| `DATABASE_URL` | même base Neon | Vercel · `.env.local` | oui |
+| `AGENTS_AUTH_SECRET` | secret de session PROPRE au back-office | Vercel · `.env.local` | oui |
+| `AGENT_EMAILS` | liste blanche des agents (virgules) | Vercel · `.env.local` | oui |
+| `COMMUNE_ID`, `SOURCE_DONNEES`, `RESEND_API_KEY` | comme ci-dessus | Vercel | — |
 
 ## Accès & comptes — qui possède quoi
 | Service | Compte | Propriétaire | Récupération |

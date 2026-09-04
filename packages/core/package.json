@@ -1,0 +1,39 @@
+{
+  "name": "@ville/core",
+  "private": true,
+  "version": "0.2.0",
+  "type": "module",
+  "exports": {
+    "./db": "./src/db.ts",
+    "./schema": "./db/schema.ts",
+    "./auth": "./src/auth.ts",
+    "./email": "./src/email.ts",
+    "./alertes": "./src/alertes.ts",
+    "./push": "./src/push.ts",
+    "./donnees": "./src/donnees/index.ts",
+    "./donnees/types": "./src/donnees/types.ts",
+    "./donnees/regles": "./src/donnees/regles.ts",
+    "./donnees/fictif": "./src/donnees/fictif.ts",
+    "./communes": "./src/communes.ts"
+  },
+  "scripts": {
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:check": "drizzle-kit check",
+    "typecheck": "tsc --noEmit",
+    "test": "node --import tsx --test tests/*.test.ts"
+  },
+  "dependencies": {
+    "drizzle-orm": "^0.45.2",
+    "postgres": "^3.4.9",
+    "web-push": "^3.6.7"
+  },
+  "devDependencies": {
+    "drizzle-kit": "^0.31.10",
+    "typescript": "^5.9.3",
+    "@types/node": "^26.4.1",
+    "@types/web-push": "^3.6.4",
+    "tsx": "^4.23.13",
+    "dotenv": "^17.4.2"
+  }
+}
