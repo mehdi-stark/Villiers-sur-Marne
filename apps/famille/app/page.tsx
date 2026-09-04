@@ -4,6 +4,8 @@ import { familleCourante } from "@/lib/session";
 import { lundiDe, semaineDe } from "@/lib/semaine";
 import { euros, tarif, trancheDe } from "@ville/core/donnees/regles";
 import { Creneau } from "@/components/creneau";
+import { Cascade, EtatVide, IlluCalendrier } from "@ville/ui";
+import { SemaineType } from "@/components/semaine-type";
 
 import { ActiverFaceId } from "@ville/core/ui/passkeys";
 
@@ -30,39 +32,48 @@ export default async function MaSemaine({ searchParams }: { searchParams: Promis
     <>
       <div className="page-tete">
         <div>
+          <span className="salut">Bonjour, {f.famille.nom}</span>
           <h1>Ma semaine</h1>
-          <p className="muted">Du {fmtSemaine.format(lundi)} au {fmtSemaine.format(vendredi)} · {f.famille.nom} · tranche {tranche}{f.famille.quotientFamilial === null ? " (quotient non calculé)" : ""}</p>
+          <p className="petit t-2">Du {fmtSemaine.format(lundi)} au {fmtSemaine.format(vendredi)} · tranche {tranche}{f.famille.quotientFamilial === null ? " (quotient non calculé)" : ""}</p>
         </div>
         <div className="rangee">
-          <a className="bouton bouton-sm" href={`/?s=${prec}`}>← Semaine précédente</a>
-          <a className="bouton bouton-sm" href={`/?s=${suiv}`}>Semaine suivante →</a>
+          <a className="bouton bouton-sm" href={`/?s=${prec}`} aria-label="Semaine précédente">← Précédente</a>
+          <a className="bouton bouton-sm" href={`/?s=${suiv}`} aria-label="Semaine suivante">Suivante →</a>
         </div>
-
-      <ActiverFaceId cle="famille-passkey" />
       </div>
+      {(() => { const total = semaines.reduce((s, x) => s + x.jours.reduce((a, j) => a + j.creneaux.filter((c) => c.etat === "reservee" || c.etat === "presence").reduce((b, c) => b + tarif(c.activite, tranche), 0), 0), 0); const nb = semaines.reduce((s, x) => s + x.jours.reduce((a, j) => a + j.creneaux.filter((c) => c.etat === "reservee" || c.etat === "presence").length, 0), 0); return (
+        <div className="carte carte-accent resume-semaine">
+          <span className="petit t-2">Cette semaine, pour {enfants.length} enfant{enfants.length > 1 ? "s" : ""}</span>
+          <strong>{nb} créneau{nb > 1 ? "x" : ""} réservé{nb > 1 ? "s" : ""} · {euros(total)}</strong>
+          <span className="petit t-2">Facturé à terme échu, payable par PayFIP.</span>
+        </div>
+      ); })()}
+      <div className="legende" aria-hidden><span style={{ "--x": "var(--accent-soft)" } as React.CSSProperties}>Réservé</span><span style={{ "--x": "var(--chaud-soft)" } as React.CSSProperties}>Repas libre</span><span style={{ "--x": "var(--loisir-soft)" } as React.CSSProperties}>Loisirs libre</span><span style={{ "--x": "var(--ok-soft)" } as React.CSSProperties}>Présent</span></div>
+      <ActiverFaceId cle="famille-passkey" />
+      <SemaineType />
 
       {verdictCantine && (
         <div className="bandeau" data-tone={verdictCantine.possible ? "accent" : "warn"} role="status">
           {verdictCantine.possible ? <Clock size={16} aria-hidden /> : <Info size={16} aria-hidden />}
-          <div><strong>Repas de cette semaine : {verdictCantine.possible ? "encore modifiables" : "délai dépassé"}</strong><div className="tiny">{verdictCantine.libelle}</div></div>
+          <div><strong>Repas de cette semaine : {verdictCantine.possible ? "encore modifiables" : "délai dépassé"}</strong><div className="mini t-2">{verdictCantine.libelle}</div></div>
         </div>
       )}
 
       {enfants.length === 0 ? (
-        <div className="carte vide"><strong>Aucun enfant sur ce dossier</strong><span>L'Espace Accueil et Facturation peut rattacher vos enfants au {f.commune.telephoneAccueil}.</span></div>
+        <EtatVide illustration={<IlluCalendrier />} titre="Aucun enfant sur ce dossier" enfants={<>L'Espace Accueil et Facturation peut rattacher vos enfants au {f.commune.telephoneAccueil}.</>} />
       ) : (
-        <div className="semaine">
+        <Cascade className="semaine">
           {semaines.map(({ enfant, jours }) => (
             <section key={enfant.id} className="carte enfant-carte" aria-label={`Semaine de ${enfant.prenom}`}>
               <div className="enfant-tete">
                 <span className="avatar" aria-hidden>{enfant.prenom.slice(0, 1)}</span>
-                <div style={{ minWidth: 0 }}><strong>{enfant.prenom}</strong><div className="tiny">{enfant.ecole} · {enfant.classe}</div></div>
+                <div style={{ minWidth: 0 }}><strong>{enfant.prenom}</strong><div className="mini t-3">{enfant.ecole} · {enfant.classe}</div></div>
               </div>
               <div className="jours">
                 {jours.map((j) => {
                   const d = new Date(`${j.date}T12:00:00Z`);
                   return (
-                    <div key={j.date} className="jour">
+                    <div key={j.date} className="jour" data-aujourdhui={j.date === new Intl.DateTimeFormat("sv-SE", { timeZone: "Europe/Paris" }).format(maintenant) || undefined}>
                       <div className="jour-nom">{fmtJour.format(d)}</div>
                       <div className="jour-num">{d.getUTCDate()}</div>
                       {j.creneaux.length === 0 ? <div className="creneau" data-etat="ferme">pas d'accueil</div> : j.creneaux.map((c) => (
@@ -72,10 +83,10 @@ export default async function MaSemaine({ searchParams }: { searchParams: Promis
                   );
                 })}
               </div>
-              <p className="tiny">Un tap réserve ou annule tant que le délai court ; hors délai le créneau est grisé et dit jusqu'à quand c'était possible. Matin, soir et étude sont sans réservation.</p>
+              <p className="mini t-3">Un tap réserve ou annule tant que le délai court ; hors délai le créneau est grisé et dit jusqu'à quand c'était possible. Matin, soir et étude sont sans réservation.</p>
             </section>
           ))}
-        </div>
+        </Cascade>
       )}
     </>
   );

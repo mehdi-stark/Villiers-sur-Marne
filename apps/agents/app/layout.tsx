@@ -18,7 +18,7 @@ export const viewport: Viewport = { width: "device-width", initialScale: 1, view
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="fr" className={`${inter.variable} ${display.variable}`}>
+    <html lang="fr" data-registre="admin" className={`${inter.variable} ${display.variable}`}>
       <head><style dangerouslySetInnerHTML={{ __html: jetonsCommune(c) }} /></head>
       <body><Coquille commune={{ nom: c.nom, courte: c.courte, initiale: c.logoInitiale, telephone: c.telephoneAccueil }}>{children}</Coquille></body>
     </html>

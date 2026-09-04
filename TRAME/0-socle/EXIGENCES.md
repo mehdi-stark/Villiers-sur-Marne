@@ -53,6 +53,11 @@
   vides EXPLIQUÉS (pourquoi vide, qui débloque).
 - **Toute action > 10 s = arrière-plan + état visible** (en cours / erreur /
   terminé) ; un bouton muet est un bouton cassé.
+- **Direction artistique AVANT le code** (recette `3-outillage/recettes/DIRECTION_ARTISTIQUE.md`,
+  payé sur `ville`) : références réelles du segment, maquette validée par l'opérateur
+  (skill `design`), système de design partagé en paquet (`packages/ui`, jetons complets +
+  primitives), navigation par registre (onglets bas en produit client, barre latérale en admin),
+  identité + illustrations d'états vides + micro-interactions `motion`, rubrique /5 par écran.
 - **La capture prouve, l'intuition ment** : audit visuel outillé (script de
   capture multi-écrans, desktop + mobile, détection de débordement),
   bissection mesurée, re-capture après correction.

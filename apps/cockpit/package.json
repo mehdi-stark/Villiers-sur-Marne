@@ -23,7 +23,9 @@
     "next": "^15.5.25",
     "postgres": "^3.4.9",
     "react": "^19.2.8",
-    "react-dom": "^19.2.8"
+    "react-dom": "^19.2.8",
+    "@ville/ui": "workspace:*",
+    "motion": "^12.23.0"
   },
   "devDependencies": {
     "@types/node": "^26.4.1",

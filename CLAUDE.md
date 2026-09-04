@@ -12,7 +12,7 @@ cockpit (table `decisions`) ; les reporter dans le document canonique avec la
 date, puis `pnpm decisions --reporter <id,…>`. Puis relire `.claude-consignes.md`.
 
 **Structure (monorepo pnpm, 04/09/2026)** : `apps/cockpit` (pilotage, port 3000) · `apps/famille` (portail famille PWA, 3001) ·
-`apps/agents` (back-office agents PWA, 3002) · `packages/core` (`db/schema.ts` + migrations, `src/auth.ts` `creerAuth` PAR app,
+`apps/agents` (back-office agents PWA, 3002) · **`packages/ui`** (jetons `tokens.css` + `base.css` + primitives React — SEULE source de style, aucune app ne redéfinit de jetons) · `packages/core` (`db/schema.ts` + migrations, `src/auth.ts` `creerAuth` PAR app,
 `src/donnees/` adaptateur + règles réelles, `src/communes.ts` thème par commune, e-mail, alertes, push). Les documents
 canoniques restent à la racine (`docs/planning`), lus par le cockpit via `../../docs/planning`. **Trois déploiements séparés,
 trois cookies/secrets** (`ville_session`/`AUTH_SECRET`, `famille_session`/`FAMILLE_AUTH_SECRET`, `agents_session`/`AGENTS_AUTH_SECRET`).
@@ -32,6 +32,7 @@ trois cookies/secrets** (`ville_session`/`AUTH_SECRET`, `famille_session`/`FAMIL
 
 **Déployé (3 projets Vercel mehdi-starks-projects, sans SSO)** : cockpit `https://villiers-sur-marne.vercel.app` · famille `https://villiers-famille.vercel.app` · agents `https://villiers-agents.vercel.app` — `pnpm deployer cockpit|famille|agents` (depuis la racine). GitHub `mehdi-stark/Villiers-sur-Marne`.
 **Données** : adaptateur `packages/core/src/donnees/` (`SOURCE_DONNEES=fictif`), règles réelles de Villiers sourcées, écritures persistées (`reservations.ts` : réserver/annuler avec verdict, pointer), page `/pilotage/donnees`.
+**Design** : recette `TRAME/3-outillage/recettes/DIRECTION_ARTISTIQUE.md` — références, maquette validée AVANT tout nouvel écran (skill `design`, décision `design:*`), rubrique /5 par capture (`docs/planning/REFERENTIEL_DESIGN.md`).
 **Auth (3 apps)** : OTP + passkeys (`packages/core/src/passkeys.ts`, `/api/passkey`, `/appareils`) ; identité `mehdi.stark@gmail.com` (JAMAIS `admin@delivup.io`, réservé à Delivup).
 **Tests réels** : `apps/cockpit/scripts/tests/*` (tap décision, consigne Lanceur), `apps/famille/scripts/tests/*` (réservation, passkey), `apps/agents/scripts/tests/tap-pointage.mjs` — tous auto-purgés, acteur `test@ville.local` (à mettre dans la liste blanche du serveur de dev).
 

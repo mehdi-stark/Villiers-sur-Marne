@@ -180,6 +180,12 @@ Gravité : 🔴 bloquant (prod, argent, sécurité) · 🟠 important (qualité,
     Règle Mehdi : `admin@delivup.io` = Delivup (équipe) seulement ; tout projet personnel
     = `mehdi.stark@gmail.com`. Contrôle : `git grep admin@delivup.io` vide (04/09/2026).
 
+65. **Propre n'est pas beau** : trois apps responsives, sans débordement, en jetons —
+    et « affreuses » (Mehdi, `ville`, 04/09/2026). Il manquait la DIRECTION : références
+    réelles, maquette validée avant le code, système de design partagé, navigation par
+    registre (onglets bas en grand public), identité et mouvement, et une note /5 par
+    écran. Recette `DIRECTION_ARTISTIQUE.md` ; étape 4bis du prompt de démarrage.
+
 ## E. Chaînes, contrôles et instruments (usine mobile, 09/2026)
 42. **Une chaîne qui exige un clic humain à un maillon s'ARRÊTE à ce maillon** :
     99 entrées en attente en amont, zéro en aval, un cron qui tournait chaque
@@ -401,3 +407,44 @@ tests, les linters, les alertes et les sondes de supervision.
     pas s'exécuter s'affiche « sauté » — sauté en silence, il se confond avec un
     contrôle réussi. Les quatre premiers sont nés d'incidents datés : listes
     blanches divergentes, colonnes décalées, secret publié, alias figé.
+73. **« Un projet » n'est pas « un package.json »** : sur 71 dossiers de
+    `~/code`, 39 seulement étaient vus. Les absents étaient du Flutter
+    (`pubspec.yaml`), du Spring (`pom.xml`), du Terraform (`main.tf`), des
+    contrats Solidity — et surtout des **dossiers conteneurs** dont les vrais
+    projets vivent un niveau plus bas (`ambassy/ambassy-next`,
+    `muslimcitadel/2nd_chance`). On cherchait une application qu'aucun écran ne
+    montrait, et on finissait par poser la trame à la main. Une détection de
+    projet se teste contre le VRAI répertoire de travail, pas contre l'idée
+    qu'on s'en fait ; et l'imbrication d'UN niveau suffit (au-delà, on liste des
+    dépendances). Après correction : 90 projets, dont 45 imbriqués.
+74. **Deux inventaires du même monde doivent partager leur définition** : la
+    liste du Lanceur et le scan du parc avaient chacun leur filtre. Un projet vu
+    par l'une et pas par l'autre donne un lien qui mène à une fiche inexistante.
+    Même table de marques, même profondeur, des deux côtés.
+75. **Une liste qui dépasse l'écran a besoin d'INTENTIONS, pas de pagination** :
+    89 projets ne se parcourent pas, ils se cherchent. Un champ de filtre (ce
+    qu'on fait quand on sait ce qu'on veut), trois vues qui correspondent à trois
+    intentions réelles (en cours / sous trame / à adopter) et un plafond de 12
+    avec « afficher les N autres ». Numéroter des pages n'aurait fait que
+    découper le scroll infini en tranches.
+76. **Un déploiement lancé depuis le mauvais dossier ne dit pas qu'il s'est
+    trompé** : `vercel --prod` exécuté à la racine du dépôt au lieu du dossier
+    de l'app a rendu une URL parfaitement crédible (`lanceur-…vercel.app`) et
+    une page qui s'affichait — mais l'action ajoutée dix minutes plus tôt
+    répondait « action inconnue ». Le succès apparent d'un déploiement ne prouve
+    rien : la vérification est de demander à l'URL DE PRODUCTION quelque chose
+    que SEULE la nouvelle version sait faire.
+77. **Un mock-up dit l'intention mieux qu'un paragraphe** : décrire une
+    interface au clavier depuis un téléphone est perdu d'avance. Le chemin
+    inverse du trousseau (le fichier doit ALLER du téléphone à la machine)
+    passe forcément par la base — mais il n'y RESTE PAS : le contenu est effacé
+    dès qu'il est écrit dans le projet. Une pièce jointe est un colis, pas un
+    archivage ; la source de vérité est le dépôt. Deux garde-fous nés du même
+    raisonnement : les images sont réduites côté navigateur (1600 px) avant
+    l'envoi — une base n'est pas un entrepôt photo — et une pièce déposée puis
+    jamais rattachée est purgée à 48 h.
+78. **Une pièce jointe ne sert que si le prompt la nomme** : un fichier posé
+    dans `docs/mockups/` qu'aucune consigne ne mentionne ne sera pas ouvert. Le
+    prompt de démarrage dit qu'elles existent, où elles sont, qu'il faut les
+    REGARDER d'abord — et laquelle fait foi en cas de contradiction avec le
+    texte. Poser un artefact sans dire qu'il existe, c'est ne pas l'avoir posé.

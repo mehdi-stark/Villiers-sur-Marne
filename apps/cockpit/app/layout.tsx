@@ -26,7 +26,7 @@ export const viewport: Viewport = {
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="fr" className={`${inter.variable} ${display.variable}`}>
+    <html lang="fr" data-registre="admin" className={`${inter.variable} ${display.variable}`}>
       <body>
         <Coquille>{children}</Coquille>
       </body>

@@ -81,3 +81,41 @@ export function ListeAppareils({ appareils }: { appareils: AppareilClient[] }) {
     </div>
   );
 }
+
+
+/** Verrou au retour : sur un appareil à passkey, > 1 h hors de l'app → voile « verrouillé »,
+ *  déverrouillage par Face ID (qui réémet la session) ; repli : le code par e-mail. */
+export function VerrouBiometrique({ cle, seuilMs = 3600_000 }: { cle: string; seuilMs?: number }) {
+  const [verrouille, setVerrouille] = useState(false);
+  const [msg, setMsg] = useState<string | null>(null);
+  useEffect(() => {
+    let actif = false;
+    try { actif = localStorage.getItem(cle) === "1"; } catch { /* stockage indisponible */ }
+    if (!actif) return;
+    const noter = () => { try { localStorage.setItem(`${cle}-depart`, String(Date.now())); } catch { /* plein */ } };
+    try { const d = Number(localStorage.getItem(`${cle}-depart`) ?? 0); if (d && Date.now() - d > seuilMs) setVerrouille(true); } catch { /* rien */ }
+    window.addEventListener("pagehide", noter);
+    document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden") noter(); });
+    return () => window.removeEventListener("pagehide", noter);
+  }, [cle, seuilMs]);
+  if (!verrouille) return null;
+  const deverrouiller = async () => {
+    try {
+      const r0 = await fetch("/api/passkey?etape=options-connexion");
+      const reponse = await startAuthentication({ optionsJSON: await r0.json() });
+      const r = await fetch("/api/passkey", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ etape: "connecter", reponse }) });
+      if (r.ok) { try { localStorage.removeItem(`${cle}-depart`); } catch { /* rien */ } setVerrouille(false); window.location.reload(); } else setMsg("Face ID refusé.");
+    } catch { setMsg("Face ID annulé."); }
+  };
+  return (
+    <div role="dialog" aria-modal="true" aria-label="Verrouillé" style={{ position: "fixed", inset: 0, zIndex: 50, display: "grid", placeItems: "center", background: "color-mix(in srgb, var(--fond, #f4f5f9) 70%, transparent)", backdropFilter: "blur(18px)", WebkitBackdropFilter: "blur(18px)" }}>
+      <div className="carte" style={{ width: "min(360px, 90vw)", display: "grid", gap: 12, textAlign: "center" }}>
+        <strong>Verrouillé après une heure d'absence</strong>
+        <p className="petit t-2">Déverrouille avec Face ID / Touch ID, ou reconnecte-toi par code.</p>
+        <button type="button" className="bouton bouton-lg" data-variant="primaire" onClick={deverrouiller}>Déverrouiller</button>
+        <a className="bouton" data-variant="discret" href="/connexion">Code par e-mail</a>
+        {msg && <p className="mini" role="status">{msg}</p>}
+      </div>
+    </div>
+  );
+}

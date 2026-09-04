@@ -1,7 +1,11 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": false,
     "skipLibCheck": true,
     "strict": true,
@@ -14,9 +18,40 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
-    "plugins": [{ "name": "next" }],
-    "paths": { "@/*": ["./*"], "@ville/core/*": ["../../packages/core/src/*"], "@ville/core/schema": ["../../packages/core/db/schema.ts"], "@ville/core/donnees": ["../../packages/core/src/donnees/index.ts"] }
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "paths": {
+      "@/*": [
+        "./*"
+      ],
+      "@ville/core/*": [
+        "../../packages/core/src/*"
+      ],
+      "@ville/core/schema": [
+        "../../packages/core/db/schema.ts"
+      ],
+      "@ville/core/donnees": [
+        "../../packages/core/src/donnees/index.ts"
+      ],
+      "@ville/ui": [
+        "../../packages/ui/src/index.tsx"
+      ],
+      "@ville/ui/*": [
+        "../../packages/ui/src/*"
+      ]
+    }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules", "scripts"]
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "scripts"
+  ]
 }

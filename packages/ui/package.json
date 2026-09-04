@@ -1,0 +1,11 @@
+{
+  "name": "@ville/ui",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "exports": { "./tokens.css": "./tokens.css", "./base.css": "./base.css", ".": "./src/index.tsx", "./illustrations": "./src/illustrations.tsx" },
+  "scripts": { "typecheck": "tsc --noEmit" },
+  "dependencies": { "motion": "^12.23.0", "lucide-react": "^1.40.0", "@radix-ui/react-dialog": "^1.1.23" },
+  "peerDependencies": { "react": "*", "react-dom": "*", "next": "*" },
+  "devDependencies": { "typescript": "^5", "@types/react": "^19.2.18", "@types/react-dom": "^19.2.7", "@types/node": "^26.4.1" }
+}

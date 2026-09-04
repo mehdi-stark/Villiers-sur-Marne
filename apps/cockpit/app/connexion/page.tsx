@@ -28,9 +28,10 @@ function Formulaire() {
   };
 
   return (
-    <div className="connexion">
+    <div className="connexion" style={{ minHeight: "calc(100dvh - 140px)", display: "grid", placeItems: "center" }}>
       <form
         className="carte"
+        style={{ width: "min(400px, 100%)", display: "grid", gap: 14, textAlign: "center", padding: 24 }}
         onSubmit={(e) => {
           e.preventDefault();
           if (etape === "email") envoyer();

@@ -34,6 +34,9 @@ projet vend). Le niveau attendu est celui d'EXIGENCES.md, sans exception.
    BENCHMARK_OUTILS.md daté avec quotas ; CARTE_AUTOMATISATION.md ;
    PROCESS_METIERS.md. ⏸ STOP : je valide les décisions et les outils.
 4. CLAUDE.md complété (état courant, stack, structure, invariants) ;
+   4bis. DIRECTION ARTISTIQUE (recette DIRECTION_ARTISTIQUE) : références réelles du
+   segment, maquettes canvas (skill design) validées depuis le cockpit, packages/ui
+   (jetons complets + primitives), REFERENTIEL_DESIGN rempli — AUCUN écran avant.
    PLAN_EXECUTION.md par maillons ordonnés par ce qu'ils débloquent.
 5. Squelette du projet au niveau attendu : repo, CI (typecheck, build, tests,
    schéma ↔ migrations), charte en tokens, auth (magic-link + OTP si

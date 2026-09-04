@@ -3,6 +3,7 @@ import { agentCourant } from "@/lib/session";
 import { sourceFictive } from "@ville/core/donnees/fictif";
 import type { EtatReservation } from "@ville/core/donnees/types";
 import { Pointage } from "@/components/pointage";
+import { Cascade, EtatVide, IlluFile, TuileChiffre } from "@ville/ui";
 
 import { ActiverFaceId } from "@ville/core/ui/passkeys";
 
@@ -37,34 +38,35 @@ export default async function FileDuJour({ searchParams }: { searchParams: Promi
   return (
     <>
       <div className="page-tete">
-        <div><h1>File du jour</h1><p className="muted">{fmt.format(new Date(`${jour}T12:00:00Z`))} · {a.commune.nom} · source {a.source.nom}</p></div>
-        <div className="rangee"><a className="bouton bouton-sm" href={`/?d=${prec}`}>← Veille</a><a className="bouton bouton-sm" href={`/?d=${suiv}`}>Lendemain →</a></div>
+        <div><h1>File du jour</h1><p className="petit t-2">{fmt.format(new Date(`${jour}T12:00:00Z`))} · {a.commune.nom} · source {a.source.nom}</p></div>
+        <div className="segment"><a href={`/?d=${prec}`}>← Veille</a><a href={`/?d=${jour}`} data-actif>{jour}</a><a href={`/?d=${suiv}`}>Lendemain →</a></div>
 
       <ActiverFaceId cle="agents-passkey" />
       </div>
       {lignes.length > 0 && (
-        <div className="rangee">
-          <span className="badge" data-tone="accent">{reserves} à pointer</span>
-          <span className="badge" data-tone="ok">{presents} présent{presents > 1 ? "s" : ""}</span>
-          <span className="badge" data-tone={absents ? "warn" : undefined}>{absents} absent{absents > 1 ? "s" : ""}</span>
+        <div className="tuiles">
+          <TuileChiffre libelle="À pointer" valeur={reserves} tone={reserves ? "accent" : undefined} detail="réservés, pas encore pointés" />
+          <TuileChiffre libelle="Présents" valeur={presents} tone="ok" />
+          <TuileChiffre libelle="Absents" valeur={absents} tone={absents ? "warn" : undefined} detail="réservé non consommé : ×2" />
+          <TuileChiffre libelle="Réservations" valeur={lignes.length} detail={`${groupes.size} groupe${groupes.size > 1 ? "s" : ""}`} />
         </div>
       )}
       {lignes.length === 0 ? (
-        <div className="carte vide"><strong>Rien à pointer ce jour</strong><span>Aucune réservation sur les familles connues de la source « {a.source.nom} ». Un jour d'école de septembre 2026 en montre.</span></div>
-      ) : [...groupes].map(([titre, lot]) => (
+        <EtatVide illustration={<IlluFile />} titre="Rien à pointer ce jour" enfants={<>Aucune réservation sur les familles connues de la source « {a.source.nom} ». Un jour d'école de septembre 2026 en montre.</>} />
+      ) : <Cascade className="pile">{[...groupes].map(([titre, lot]) => (
         <section key={titre} className="carte pile">
-          <div className="rangee" style={{ justifyContent: "space-between" }}><h2>{titre}</h2><span className="tiny">{lot.length} enfant{lot.length > 1 ? "s" : ""}</span></div>
+          <div className="rangee" style={{ justifyContent: "space-between" }}><h2>{titre}</h2><span className="mini t-3">{lot.length} enfant{lot.length > 1 ? "s" : ""}</span></div>
           <div className="file">
             {lot.map((l) => (
-              <div key={l.enfantId + l.activiteId} className="file-ligne">
-                <div><strong>{l.prenom}</strong><div className="muted">{l.etat === "reservee" ? "réservé — à pointer" : l.etat === "presence" ? "présent" : "absent (réservé non consommé : ×2 selon la grille)"}</div></div>
+              <div key={l.enfantId + l.activiteId} className="file-ligne" data-etat={l.etat}>
+                <div><strong>{l.prenom}</strong><div className="petit t-2">{l.etat === "reservee" ? "réservé — à pointer" : l.etat === "presence" ? "présent" : "absent (réservé non consommé : ×2 selon la grille)"}</div></div>
                 <Pointage enfantId={l.enfantId} prenom={l.prenom} activiteId={l.activiteId} date={jour} etat={l.etat} />
               </div>
             ))}
           </div>
         </section>
-      ))}
-      <p className="tiny">Chaque tap est journalisé (agent, avant → après) ; le pointage nourrit la facture sans ressaisie. Une date future est refusée par le code.</p>
+      ))}</Cascade>}
+      <p className="mini t-3">Chaque tap est journalisé (agent, avant → après) ; le pointage nourrit la facture sans ressaisie. Une date future est refusée par le code.</p>
     </>
   );
 }

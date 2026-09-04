@@ -15,7 +15,7 @@ export function Creneau(p: { enfantId: string; activiteId: string; date: string;
   const actuel: EtatReservation | null = p.etat === "libre" ? null : p.etat;
   const taper = () => demarrer(async () => { const r = await basculerCreneau({ enfantId: p.enfantId, activiteId: p.activiteId, date: p.date, actuel }); setMessage(r.message); setTimeout(() => setMessage(null), 4000); });
   return (
-    <button type="button" className="creneau" data-etat={p.etat} disabled={!tapable || enAttente} onClick={taper} title={p.reservable ? p.verdict : "Sans réservation : l'inscription annuelle suffit"} aria-label={`${p.type} ${p.date} : ${LIBELLE[p.etat]} — ${p.verdict}`} aria-busy={enAttente}>
+    <button type="button" className="creneau" data-etat={p.etat} data-type={p.type} disabled={!tapable || enAttente} onClick={taper} title={p.reservable ? p.verdict : "Sans réservation : l'inscription annuelle suffit"} aria-label={`${p.type} ${p.date} : ${LIBELLE[p.etat]} — ${p.verdict}`} aria-busy={enAttente}>
       <strong>{message ?? LIBELLE[p.etat]}</strong>
       <span>{p.type}</span>
       <span>{p.tarif}</span>

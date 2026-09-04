@@ -15,18 +15,18 @@ export default async function Familles() {
   const enfants = await Promise.all(familles.map((f) => sourceFictive.enfants(f.id)));
   return (
     <>
-      <div className="page-tete"><div><h1>Familles</h1><p className="muted">{familles.length} dossiers (fictifs — source « {a.source.nom} »)</p></div></div>
+      <div className="page-tete"><div><h1>Familles</h1><p className="petit t-2">{familles.length} dossiers (fictifs — source « {a.source.nom} »)</p></div></div>
       <div className="file">
         {familles.map((f, i) => (
           <div key={f.id} className="file-ligne">
-            <div><strong>{f.nom}</strong><div className="muted">{f.email} · {enfants[i]!.map((e) => `${e.prenom} (${e.ecole})`).join(", ")}</div></div>
+            <div><strong>{f.nom}</strong><div className="petit t-2">{f.email} · {enfants[i]!.map((e) => `${e.prenom} (${e.ecole})`).join(", ")}</div></div>
             <div className="rangee" style={{ justifyContent: "flex-end" }}>
               <span className="badge" data-tone={f.quotientFamilial === null ? "warn" : "accent"}>{f.quotientFamilial === null ? "QF non calculé → T9" : `QF ${f.quotientFamilial} · T${trancheDe(f.quotientFamilial, f.exterieur)}`}</span>
             </div>
           </div>
         ))}
       </div>
-      <p className="tiny">Recherche, dossier complet, démarches à valider, régularisations : prochains maillons.</p>
+      <p className="mini t-3">Recherche, dossier complet, démarches à valider, régularisations : prochains maillons.</p>
     </>
   );
 }

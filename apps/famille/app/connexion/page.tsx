@@ -28,29 +28,30 @@ function Formulaire() {
   };
 
   return (
-    <div className="connexion">
+    <div className="connexion" style={{ minHeight: "calc(100dvh - 140px)", display: "grid", placeItems: "center" }}>
       <form
         className="carte"
+        style={{ width: "min(400px, 100%)", display: "grid", gap: 14, textAlign: "center", padding: 24 }}
         onSubmit={(e) => {
           e.preventDefault();
           if (etape === "email") envoyer();
         }}
       >
-        <span className="marque-logo" style={{ width: 40, height: 40, fontSize: 18, margin: "0 auto" }} aria-hidden>V</span>
+        <span className="marque-logo" style={{ width: 56, height: 56, fontSize: 26, margin: "0 auto", borderRadius: 18 }} aria-hidden>V</span>
         <h1>Portail Famille</h1>
-        <p className="muted">Réserver, payer, suivre — pour vos enfants, depuis votre téléphone.</p>
+        <p className="petit t-2">Réserver, payer, suivre — pour vos enfants, depuis votre téléphone.</p>
         {etape === "email" && <BoutonFaceId suite={suite.startsWith("/") ? suite : "/"} />}
         {etape === "email" ? (
           <>
             <input type="email" inputMode="email" autoComplete="email" placeholder="ton e-mail" value={email} onChange={(e) => setEmail(e.target.value)} autoFocus />
-            <button type="submit" className="bouton" data-variant="primaire" disabled={!email.includes("@") || occupe}>
+            <button type="submit" className="bouton bouton-lg bouton-pleine" data-variant="primaire" disabled={!email.includes("@") || occupe}>
               {occupe ? "Envoi…" : "Recevoir un code"}
             </button>
-            <p className="tiny">Un code à 6 chiffres, valable 10 minutes. L'adresse doit être celle de votre dossier famille.</p>
+            <p className="mini t-3">Un code à 6 chiffres, valable 10 minutes. L'adresse doit être celle de votre dossier famille.</p>
           </>
         ) : (
           <>
-            <p className="muted">Code envoyé à <strong>{email}</strong>. Il expire dans 10 minutes.</p>
+            <p className="petit t-2">Code envoyé à <strong>{email}</strong>. Il expire dans 10 minutes.</p>
             <input
               className="code-input"
               inputMode="numeric"
@@ -71,7 +72,7 @@ function Formulaire() {
             </div>
           </>
         )}
-        {msg && <p className="muted" role="alert" style={{ color: "var(--danger)" }}>{msg}</p>}
+        {msg && <p className="petit t-2" role="alert" style={{ color: "var(--danger)" }}>{msg}</p>}
       </form>
     </div>
   );

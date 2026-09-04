@@ -17,7 +17,9 @@
     "./communes": "./src/communes.ts",
     "./donnees/reservations": "./src/donnees/reservations.ts",
     "./passkeys": "./src/passkeys.ts",
-    "./ui/passkeys": "./src/ui/passkeys.tsx"
+    "./ui/passkeys": "./src/ui/passkeys.tsx",
+    "./donnees/facturation": "./src/donnees/facturation.ts",
+    "./paiement/payfip": "./src/paiement/payfip.ts"
   },
   "scripts": {
     "db:generate": "drizzle-kit generate",

@@ -1,0 +1,42 @@
+/* @ville/ui — JETONS COMPLETS, source unique des trois apps (registre choisi par data-registre sur <html>).
+   Rôles de couleur clair/sombre · échelle typographique · espacement 4 pt · rayons · élévations · durées.
+   L'accent de la COMMUNE est injecté par le layout (--accent, --accent-fort, --accent-soft) et prime. */
+:root {
+  /* Surfaces et texte */
+  --fond: #f4f5f9; --surface: #ffffff; --surface-2: #f6f7fb; --surface-3: #eceef5;
+  --bord: #e4e6ef; --bord-fort: #cdd1de;
+  --texte: #12131a; --texte-2: #555a6b; --texte-3: #8b90a3; --texte-inverse: #ffffff;
+  /* Accent (surchargé par la commune) */
+  --accent: #2456d6; --accent-fort: #1a45b3; --accent-soft: #e6ecfc; --accent-texte: #ffffff;
+  /* Rôles sémantiques */
+  --ok: #157f4a; --ok-soft: #dff5e8; --warn: #b3600a; --warn-soft: #fdefd8; --danger: #c62f2f; --danger-soft: #fce4e4;
+  --info: #1f6fb2; --info-soft: #e3f0fb;
+  /* Chaleur : un second ton pour la vie (repas, loisirs) */
+  --chaud: #d9772a; --chaud-soft: #fdebdc; --loisir: #7a3fbf; --loisir-soft: #eee4fb;
+  /* Typographie */
+  --police-corps: var(--font-inter), -apple-system, "SF Pro Text", system-ui, sans-serif;
+  --police-titre: var(--font-display), var(--police-corps);
+  --t-12: 12px; --t-13: 13px; --t-14: 14px; --t-16: 16px; --t-18: 18px; --t-22: 22px; --t-28: 28px; --t-36: 36px;
+  /* Espacement 4 pt */
+  --e-1: 4px; --e-2: 8px; --e-3: 12px; --e-4: 16px; --e-6: 24px; --e-8: 32px; --e-12: 48px;
+  /* Rayons et élévations */
+  --r-1: 8px; --r-2: 12px; --r-3: 16px; --r-4: 24px; --r-pill: 999px;
+  --el-1: 0 1px 2px rgb(18 19 26 / 0.05), 0 1px 1px rgb(18 19 26 / 0.03);
+  --el-2: 0 4px 12px rgb(18 19 26 / 0.08), 0 1px 3px rgb(18 19 26 / 0.05);
+  --el-3: 0 16px 40px rgb(18 19 26 / 0.14), 0 4px 12px rgb(18 19 26 / 0.06);
+  /* Mouvement */
+  --d-1: 120ms; --d-2: 200ms; --d-3: 320ms; --ease: cubic-bezier(.2,.8,.2,1);
+  --entete-h: 56px; --onglets-h: 64px; --largeur: 760px;
+}
+[data-registre="admin"] { --fond: #f7f7f9; --r-3: 12px; --largeur: 1180px; }
+@media (prefers-color-scheme: dark) {
+  :root {
+    --fond: #0d0e14; --surface: #15161e; --surface-2: #1c1d27; --surface-3: #242633;
+    --bord: #272935; --bord-fort: #383b4b;
+    --texte: #f3f4f8; --texte-2: #a7abbd; --texte-3: #6e7386;
+    --accent: #6f8cff; --accent-fort: #8ea3ff; --accent-soft: #1d2650; --accent-texte: #0d0e14;
+    --ok: #4bd58a; --ok-soft: #12321f; --warn: #f0b24a; --warn-soft: #3a2a0c; --danger: #ff7b7b; --danger-soft: #3f1616;
+    --info: #6cb4f0; --info-soft: #12283a; --chaud: #f0a05a; --chaud-soft: #3a2413; --loisir: #b58cf0; --loisir-soft: #2a1d3f;
+    --el-1: 0 1px 2px rgb(0 0 0 / 0.5); --el-2: 0 6px 16px rgb(0 0 0 / 0.5); --el-3: 0 20px 48px rgb(0 0 0 / 0.6);
+  }
+}

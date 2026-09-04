@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { DUREE_SESSION_MS } from "@ville/core/auth";
 import { db, schema } from "@ville/core/db";
 import { connecter, enregistrer, optionsConnexion, optionsEnregistrement, revoquer, type ConfigPasskeys } from "@ville/core/passkeys";
+import { envoyerEmail } from "@ville/core/email";
 import { auth } from "@/lib/auth";
 
 export const runtime = "nodejs";
@@ -28,7 +29,13 @@ export async function POST(req: NextRequest) {
   if (b.etape === "enregistrer") {
     const s = await session(); if (!s) return NextResponse.json({ ok: false }, { status: 401 });
     const r = await enregistrer(cfg(req), s.email, b.reponse!, ua);
-    if (r.ok) await db.insert(schema.journalConnexions).values({ app: auth.app, email: s.email, evenement: "passkey_activee", detail: { appareil: r.appareil } });
+    if (r.ok) {
+      await db.insert(schema.journalConnexions).values({ app: auth.app, email: s.email, evenement: "passkey_activee", detail: { appareil: r.appareil } });
+      // Protection standard dès que la biométrie existe : un e-mail à chaque nouvel appareil, avec le lien de révocation. Échec = alerte, jamais avalé.
+      const quand = new Intl.DateTimeFormat("fr-FR", { dateStyle: "long", timeStyle: "short", timeZone: "Europe/Paris" }).format(new Date());
+      const lien = `${cfg(req).origine}/appareils`;
+      await envoyerEmail({ a: s.email, sujet: `Nouvel appareil de confiance — Back-office agents`, texte: `Face ID / Touch ID vient d'être activé sur un appareil (${r.appareil}) le ${quand} (heure de Paris).\nSi ce n'est pas vous, révoquez-le ici : ${lien}`, html: `<p>Face ID / Touch ID vient d'être activé sur un appareil <strong>${r.appareil}</strong> le ${quand} (heure de Paris).</p><p>Si ce n'est pas vous, <a href="${lien}">révoquez cet appareil</a> dès maintenant — le code par e-mail reste votre accès de secours.</p>` });
+    }
     return r.ok ? NextResponse.json({ ok: true }) : NextResponse.json({ ok: false, cause: r.cause }, { status: 400 });
   }
   if (b.etape === "connecter") {

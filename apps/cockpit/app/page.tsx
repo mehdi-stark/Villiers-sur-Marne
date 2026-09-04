@@ -7,6 +7,7 @@ import { backlogOuvert, extraireBacklog, extraireDecisions, lireDoc } from "@/li
 import { analyse } from "@/lib/marche";
 
 import { ActiverFaceId } from "@ville/core/ui/passkeys";
+import { TuileChiffre } from "@ville/ui";
 
 export const dynamic = "force-dynamic";
 
@@ -62,26 +63,10 @@ export default async function Accueil() {
       ))}
 
       <div className="tuiles">
-        <Link href="/pilotage/cadrage" className="tuile">
-          <span className="muted">Cadrage</span>
-          <span className="tuile-chiffre">{restCadrage}</span>
-          <span className="tiny">{restCadrage ? "décisions à trancher" : "tout est tranché"} · {dCadrage.length - restCadrage}/{dCadrage.length} prises</span>
-        </Link>
-        <Link href="/pilotage/marche" className="tuile">
-          <span className="muted">Marché</span>
-          <span className="tuile-chiffre">{marche.score}<span className="muted" style={{ fontSize: 14 }}>/100</span></span>
-          <span className="tiny">{marche.final}{marcheTranche ? " · tranché" : " · à trancher"}</span>
-        </Link>
-        <Link href="/pilotage/backlog" className="tuile">
-          <span className="muted">Backlog</span>
-          <span className="tuile-chiffre">{restBacklog}</span>
-          <span className="tiny">{restBacklog ? "items à trancher" : "rien en attente"} · {dBacklog.length} au total</span>
-        </Link>
-        <Link href="/pilotage/decisions" className="tuile">
-          <span className="muted">À reporter par l'agent</span>
-          <span className="tuile-chiffre">{cpt.aReporter}</span>
-          <span className="tiny">décisions prises ici, pas encore dans les documents</span>
-        </Link>
+        <TuileChiffre href="/pilotage/cadrage" libelle="Cadrage" valeur={restCadrage} tone={restCadrage ? "warn" : "ok"} detail={`${restCadrage ? "décisions à trancher" : "tout est tranché"} · ${dCadrage.length - restCadrage}/${dCadrage.length} prises`} />
+        <TuileChiffre href="/pilotage/marche" libelle="Marché" valeur={marche.score} suffixe="/100" tone={marche.final === "GO" ? "ok" : marche.final === "NO-GO" ? "danger" : "warn"} detail={`${marche.final}${marcheTranche ? " · tranché" : " · à trancher"}`} />
+        <TuileChiffre href="/pilotage/backlog" libelle="Backlog" valeur={restBacklog} detail={`${restBacklog ? "items à trancher" : "rien en attente"} · ${dBacklog.length} au total`} />
+        <TuileChiffre href="/pilotage/decisions" libelle="À reporter par l'agent" valeur={cpt.aReporter} detail="prises ici, pas encore dans les documents" />
       </div>
 
       <section className="carte">

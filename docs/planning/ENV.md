@@ -27,7 +27,9 @@ Modèle : `.env.example`. Le test `scripts/tests/tap-decision.mjs` exige `test@v
 | `FAMILLE_AUTH_SECRET` | secret de session PROPRE au portail | Vercel · `.env.local` | oui |
 | `COMMUNE_ID` | thème et coordonnées de la commune (`packages/core/src/communes.ts`) | Vercel | non (défaut villiers-sur-marne) |
 | `SOURCE_DONNEES` | `fictif` (défaut) · `export-agora` · `api-agora` | Vercel | non |
-| `RESEND_API_KEY` / `EMAIL_FROM` | codes OTP des familles | Vercel | oui en prod |
+| `RESEND_API_KEY` / `EMAIL_FROM` | codes OTP des familles, e-mail « nouvel appareil » | Vercel | oui en prod |
+| `FAMILLE_URL` | URL publique du portail (retour PayFIP) | Vercel | avec PayFIP |
+| `PAYFIP_NUMCLI` / `PAYFIP_MODE` | numéro client de la régie (DGFiP) ; `T` test (défaut) ou `M` | Vercel | pour payer |
 Comptes : table `comptes_familles` (e-mail → famille de la source) — seed de démo `apps/famille/scripts/seed-familles.mjs email=familleId`.
 
 ## Back-office agents (`apps/agents`, port 3002 en dev)
