@@ -17,6 +17,7 @@
 - Vercel : `vercel rollback` (ou promouvoir le déploiement précédent) ; les migrations sont additives — ne jamais dropper une colonne dans la même version que le code qui cesse de la lire.
 
 ## Pièges payés
+- **Protection SSO Vercel de l'équipe `yuqots-projects`** : au 04/09/2026 elle renvoie `/connexion` vers `vercel.com/sso-api` — le cockpit est injoignable depuis un téléphone. À retirer sur CE projet (Vercel → ville → Settings → Deployment Protection → « Only Preview Deployments » ou Off ; ou ajouter un domaine de production, non protégé par défaut). La lecture du jeton CLI pour le faire par l'API a été refusée par le garde-fou de la session : geste opérateur.
 - Vercel Hobby : 100 déploiements/jour (annulés compris), 300 s/fonction → pousser en lot.
 - Auteur de commit : `cartcallai-lab` (config locale du repo) — à confirmer avant d'ajouter un remote.
 - Le script `creer-base-neon.sh` créait une base puis plantait à l'affichage (f-string avec `\"`, Python 3.14) : corrigé et rendu idempotent le 04/09/2026.
