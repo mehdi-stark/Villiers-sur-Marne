@@ -1,7 +1,7 @@
 "use client";
 
 import * as Dialog from "@radix-ui/react-dialog";
-import { BarChart3, CheckSquare, ClipboardList, Compass, LayoutDashboard, LogOut, Menu, X } from "lucide-react";
+import { BarChart3, CheckSquare, ClipboardList, Compass, Database, LayoutDashboard, LogOut, Menu, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
@@ -15,6 +15,7 @@ const DESTINATIONS = [
   { href: "/pilotage/cadrage", label: "Cadrage", Icone: Compass },
   { href: "/pilotage/marche", label: "Marché", Icone: BarChart3 },
   { href: "/pilotage/backlog", label: "Backlog", Icone: ClipboardList },
+  { href: "/pilotage/donnees", label: "Données", Icone: Database },
 ];
 
 export function Coquille({ children }: { children: React.ReactNode }) {

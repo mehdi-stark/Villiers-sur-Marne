@@ -16,8 +16,16 @@ try {
   const ids = arg("reporter");
   if (typeof ids === "string") {
     const liste = ids.split(",").map((s) => s.trim()).filter(Boolean);
-    const r = await sql`UPDATE decisions SET reporte_le = now() WHERE id IN ${sql(liste)} AND reporte_le IS NULL RETURNING id`;
+    const r = await sql`UPDATE decisions SET reporte_le = now() WHERE id IN ${sql(liste)} AND reporte_le IS NULL RETURNING libelle, choix`;
     console.log(`${r.length} décision(s) marquée(s) reportée(s).`);
+    // Accusé vers le téléphone : la boucle se ferme sans rouvrir l'écran (push best-effort, dit s'il n'est pas parti).
+    if (r.length && process.env.AGENT_SECRET) {
+      const base = process.env.COCKPIT_URL ?? "http://localhost:3000";
+      const corps = r.map((d) => `${d.libelle} → ${d.choix}`).join(" · ").slice(0, 200);
+      const rep = await fetch(`${base}/api/agent`, { method: "POST", headers: { "Content-Type": "application/json", "x-agent-secret": process.env.AGENT_SECRET }, body: JSON.stringify({ titre: r.length === 1 ? "Décision reportée dans le document" : `${r.length} décisions reportées dans les documents`, corps, url: "/pilotage/decisions" }) }).catch(() => null);
+      const d = rep ? await rep.json().catch(() => ({})) : {};
+      console.log(rep?.ok ? `push : ${d.envoyes}/${d.abonnes} appareil(s)` : "push : non envoyé (cockpit injoignable ou secret refusé)");
+    }
   } else {
     const toutes = arg("toutes");
     const lignes = toutes

@@ -9,11 +9,12 @@
 - Cockpit : `pnpm typecheck && pnpm build` (local, doit passer) → `vercel --prod` → **vérifier READY** (`vercel ls` ou `vercel inspect <url>`), jamais supposer → smoke test : `/connexion` en 200, `/` redirige vers `/connexion` hors session, OTP reçu en réel.
 - Captures après déploiement : `node scripts/capturer.mjs --base https://<url> --forger <email whitelisté> --viewport 390x844` (la session forgée exige `AUTH_SECRET` de prod dans l'env local — sinon capturer la page de connexion seulement).
 
-## Cible demandée : GitHub `mehdi-stark/ville` + Vercel (compte mehdi-stark)
-1. Opérateur : jeton GitHub fine-grained (Administration + Contents : write) → `~/.config/trames/github.env` (`GITHUB_TOKEN=…`, chmod 600).
-2. `~/code/trames/3-outillage/scripts/creer-depot-github.sh mehdi-stark ville` → dépôt créé + push (idempotent).
-3. Vercel : `vercel login` (compte mehdi-stark) puis `vercel link` + `vercel env add` ×6 (`ENV.md`) + `vercel --prod` ; ou importer le dépôt depuis le dashboard (Git integration : chaque push déploie). Retirer la Deployment Protection sur le projet.
-4. Le déploiement actuel (`yuqots-projects/ville`) reste en place jusqu'à la bascule, puis se supprime (`vercel remove ville`).
+## Cible en place (04/09/2026) : GitHub `mehdi-stark/Villiers-sur-Marne` + Vercel `mehdi-starks-projects/villiers-sur-marne`
+- Déployer : `T="$(grep '^VERCEL_ACCESS_TOKEN=' .env.local | cut -d= -f2-)"; vercel deploy --prod --yes --token "$T" > /tmp/deploy.log 2>&1` puis `vercel ls --token "$T"` → **READY**, puis `curl -I https://villiers-sur-marne.vercel.app/connexion` → 200.
+- Toujours citer le jeton (`--token "$T"`) : non cité, la CLI l'AFFICHE dans son message d'erreur (payé le 04/09/2026 → jeton à révoquer).
+- Deployment Protection : retirée par l'API (`PATCH /v9/projects/{id} {"ssoProtection":null}`) — le cockpit a son OTP.
+- Connexion GitHub → Vercel (déploiement à chaque push) : `vercel link` a échoué (« Failed to connect ») car l'app GitHub de Vercel n'est pas installée sur le compte mehdi-stark — un clic dashboard (Settings → Git → Connect). En attendant, déployer par la CLI ci-dessus.
+- Ancien projet `yuqots-projects/ville` : à supprimer par Mehdi (`vercel remove ville --scope yuqots-projects`) — non fait, c'est destructif.
 
 ## Migrations
 - Générées depuis `db/schema.ts` (`pnpm db:generate`), jamais écrites à la main ; appliquées AVANT le code qui s'en sert : `pnpm db:migrate` avec `DATABASE_URL` de la cible, par l'agent lui-même.

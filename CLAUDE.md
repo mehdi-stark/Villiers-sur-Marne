@@ -24,8 +24,10 @@ date, puis `pnpm decisions --reporter <id,…>`. Puis relire `.claude-consignes.
   test réel du tap `scripts/tests/tap-decision.mjs` (auto-purgé), CI `.github/workflows/ci.yml`.
 - Convention du §7 du cadrage : dernière ligne `Options : A · B — Recommandation : A` (parsée par `lib/docs.ts`).
 
-**Ce qui n'existe PAS encore** : déploiement sur le compte Vercel mehdi-stark (GitHub `mehdi-stark/Villiers-sur-Marne`
-est poussé ; actuel : `yuqots-projects`, protégé par SSO, derniers déploiements UNKNOWN),
+**Déployé** : `https://villiers-sur-marne.vercel.app` (Vercel `mehdi-starks-projects/villiers-sur-marne`, sans SSO ; déploiement par `vercel deploy --prod --token "$VERCEL_ACCESS_TOKEN"` — voir DEPLOIEMENT.md). GitHub `mehdi-stark/Villiers-sur-Marne`.
+**Données** : adaptateur `lib/donnees/` (`SOURCE_DONNEES=fictif`), règles réelles de Villiers sourcées (`regles.ts`, `fictif.ts`), page `/pilotage/donnees`.
+
+**Ce qui n'existe PAS encore** : connexion GitHub → Vercel (app GitHub à installer),
 `RESEND_API_KEY` en prod (sans elle aucun code ne part — alerte affichée), passkeys/appareils,
 cron, file de jobs, thème par commune, tout le métier (réservations, factures…).
 
