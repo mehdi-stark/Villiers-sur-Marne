@@ -30,7 +30,7 @@ trois cookies/secrets** (`ville_session`/`AUTH_SECRET`, `famille_session`/`FAMIL
   test réel du tap `scripts/tests/tap-decision.mjs` (auto-purgé), CI `.github/workflows/ci.yml`.
 - Convention du §7 du cadrage : dernière ligne `Options : A · B — Recommandation : A` (parsée par `lib/docs.ts`).
 
-**Déployé** : `https://villiers-sur-marne.vercel.app` (Vercel `mehdi-starks-projects/villiers-sur-marne`, sans SSO ; déploiement par `vercel deploy --prod --token "$VERCEL_ACCESS_TOKEN"` — voir DEPLOIEMENT.md). GitHub `mehdi-stark/Villiers-sur-Marne`.
+**Déployé (3 projets Vercel mehdi-starks-projects, sans SSO)** : cockpit `https://villiers-sur-marne.vercel.app` · famille `https://villiers-famille.vercel.app` · agents `https://villiers-agents.vercel.app` — `pnpm deployer cockpit|famille|agents` (depuis la racine). GitHub `mehdi-stark/Villiers-sur-Marne`.
 **Données** : adaptateur `lib/donnees/` (`SOURCE_DONNEES=fictif`), règles réelles de Villiers sourcées (`regles.ts`, `fictif.ts`), page `/pilotage/donnees`.
 
 **Ce qui n'existe PAS encore** : connexion GitHub → Vercel (app GitHub à installer),

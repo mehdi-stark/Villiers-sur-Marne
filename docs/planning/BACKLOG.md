@@ -22,3 +22,8 @@
 | Trancher avec la ville l'écart de délai du mercredi (page web : 7 jours francs · guide 2025-2026 : 24 h / 48 h) | Une règle de délai juste sur l'ALSH | 1 question à l'EAF (01 49 41 28 00) | Go — à poser au premier contact mairie (décision 6) |
 | Supprimer l'ancien projet Vercel `yuqots-projects/ville` et révoquer le jeton Vercel affiché | Un seul déploiement vivant, aucun secret compromis | 2 clics opérateur | Go — opérateur |
 | Installer l'app GitHub de Vercel sur le compte mehdi-stark et connecter le dépôt | Chaque push déploie, plus de CLI | 1 clic opérateur | Go — opérateur |
+| Écran famille « Ma semaine » sur la source fictive (proposé 04/09/2026, Feature) | La démo montre le geste n° 1 du parent avec verdict de délai et tarif par créneau | ~1 j | **Fait le 04/09/2026** (`apps/famille`, PWA déployée) |
+| Thème par commune en jetons (proposé 04/09/2026, Design) | Pitch « 13 communes » : une commune = une entrée dans `communes.ts` | ~2 h | **Fait le 04/09/2026** (`jetonsCommune`, manifest et icônes à la couleur de la commune ; couleur de Villiers PROVISOIRE, charte officielle à demander) |
+| Simulateur de quotient familial (proposé 04/09/2026, UX) | Un argument chiffré pour l'élu, même fonction que le portail | ~½ j | **Fait le 04/09/2026** (page Données du cockpit) |
+| Réservation d'un créneau « Libre » d'un tap (portail famille) → écriture dans la source + verdict | Le geste n° 1 devient réel sur la démo | ~1 j | En attente — prochain maillon métier après le verdict |
+| Pointage tactile dans la file du jour (agents) → présence/absence → facturation | Le pointage nourrit la facture sans ressaisie | ~1 j | En attente |

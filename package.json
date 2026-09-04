@@ -12,7 +12,8 @@
     "db:check": "pnpm --filter @ville/core db:check",
     "decisions": "pnpm --filter cockpit decisions",
     "notifier": "pnpm --filter cockpit notifier",
-    "capturer": "pnpm --filter cockpit capturer"
+    "capturer": "pnpm --filter cockpit capturer",
+    "deployer": "bash scripts/deployer.sh"
   },
   "devDependencies": {
     "typescript": "^5.9.3",

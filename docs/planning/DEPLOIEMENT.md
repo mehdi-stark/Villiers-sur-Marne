@@ -9,6 +9,15 @@
 - Cockpit : `pnpm typecheck && pnpm build` (local, doit passer) → `vercel --prod` → **vérifier READY** (`vercel ls` ou `vercel inspect <url>`), jamais supposer → smoke test : `/connexion` en 200, `/` redirige vers `/connexion` hors session, OTP reçu en réel.
 - Captures après déploiement : `node scripts/capturer.mjs --base https://<url> --forger <email whitelisté> --viewport 390x844` (la session forgée exige `AUTH_SECRET` de prod dans l'env local — sinon capturer la page de connexion seulement).
 
+## Trois déploiements (monorepo, 04/09/2026)
+| App | Projet Vercel (mehdi-starks-projects) | Root Directory | URL |
+|---|---|---|---|
+| cockpit | `villiers-sur-marne` | `apps/cockpit` | https://villiers-sur-marne.vercel.app |
+| famille | `villiers-famille` | `apps/famille` | https://villiers-famille.vercel.app |
+| agents | `villiers-agents` | `apps/agents` | https://villiers-agents.vercel.app |
+
+`pnpm deployer cockpit|famille|agents` (scripts/deployer.sh) : relie le projet, déploie DEPUIS LA RACINE (obligatoire avec un Root Directory : lancée dans `apps/x`, la CLI cherche `apps/x/apps/x` et échoue — payé le 04/09/2026), vérifie `/connexion` → 200. Deployment Protection retirée sur les trois (OTP propre à chaque app).
+
 ## Cible en place (04/09/2026) : GitHub `mehdi-stark/Villiers-sur-Marne` + Vercel `mehdi-starks-projects/villiers-sur-marne`
 - Déployer : `T="$(grep '^VERCEL_ACCESS_TOKEN=' .env.local | cut -d= -f2-)"; vercel deploy --prod --yes --token "$T" > /tmp/deploy.log 2>&1` puis `vercel ls --token "$T"` → **READY**, puis `curl -I https://villiers-sur-marne.vercel.app/connexion` → 200.
 - Toujours citer le jeton (`--token "$T"`) : non cité, la CLI l'AFFICHE dans son message d'erreur (payé le 04/09/2026 → jeton à révoquer).
