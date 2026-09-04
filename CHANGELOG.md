@@ -1,0 +1,4 @@
+# Changelog — ville
+
+- 2026-09-04 — **Maillon 0 : le cockpit existe** — connexion par code OTP (hash, 5 essais, 10 min, 5 envois/h, session glissante), pages Pilotage / Cadrage / Backlog qui rendent les documents canoniques et enregistrent chaque décision en base d'un tap (note facultative, historique conservé), alertes visibles quand un e-mail ne part pas, charte en jetons clair/sombre, header collant + drawer mobile, captures desktop + 390 px sans débordement, test réel du tap auto-purgé, CI (typecheck, schéma ↔ migrations, build). Ce que ça débloque : le cadrage se tranche depuis le téléphone, l'agent relit les décisions (`pnpm decisions`) au début de chaque session.
+- 2026-09-04 — **Cadrage rédigé** (`docs/planning/CADRAGE.md`) : portail actuel = Agora+ via Infocom'94, stack AngularJS 1.x / Oracle PL/SQL constatée, projet B2G (pilote < 60 k€ HT, PayFIP obligatoire), recommandation A (démonstrateur → pilote → 13 communes), 7 décisions à trancher.

@@ -1,0 +1,13 @@
+{
+  "trame": "compose",
+  "source": "git@github.com:mehdi-stark/trames.git",
+  "version": "2026-09-04",
+  "plateformes": [
+    "web"
+  ],
+  "domaines": [
+    "saas"
+  ],
+  "skills": "liens",
+  "outils": "voir TRAME/3-outillage/OUTILS.md — écrire les choix et quotas ici"
+}

@@ -1,0 +1,14 @@
+.claude-session.pid
+.claude-prompt.txt
+LANCER_CLAUDE.command
+.claude-fin.txt
+.claude-fin-envoye
+.claude-consignes.md
+.claude-resume.txt
+node_modules/
+.next/
+.env*
+!.env.example
+captures/
+*.tsbuildinfo
+next-env.d.ts
