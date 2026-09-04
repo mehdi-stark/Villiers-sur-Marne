@@ -7,7 +7,7 @@ import { deposerConsigne } from "@/lib/lanceur";
 import { nombreOuvertes } from "@/lib/ouvertes";
 
 /** Un tap = une ligne dans `decisions`. L'acteur vient de la session, jamais du client. */
-export async function trancher(p: { sujet: "cadrage" | "backlog" | "marche"; cle: string; libelle: string; choix: string; note?: string }) {
+export async function trancher(p: { sujet: "cadrage" | "design" | "backlog" | "marche"; cle: string; libelle: string; choix: string; note?: string }) {
   const acteur = await acteurRequis();
   if (!p.cle || !p.choix) throw new Error("Décision incomplète");
   await enregistrerDecision({ ...p, acteur });

@@ -44,4 +44,4 @@ capture ne part pas au niveau.
 `0-socle/EXIGENCES.md` — expertise, business, produit (cockpit premium,
 responsive, actions longues, capture qui prouve), automatisation/IA, qualité,
 méthode. Skills globaux : doctrine-commerce, graver-lecon, nouveau-chantier,
-revue-hebdo.
+revue-hebdo, directeur-artistique (la direction visuelle AVANT le code).

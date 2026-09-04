@@ -37,6 +37,10 @@ ressembler, ni mesuré l'écart avec les meilleurs du segment.
    erreur, disabled). Moins de 4 sur un axe = pas livrable. La note s'écrit à côté de
    la capture, avec ce qui la fait monter.
 
+## Qui la porte
+Le skill global `directeur-artistique` (méthode en 8 points, refus, livrables) — chargé avant
+toute création ou refonte d'écran.
+
 ## Où ça s'insère dans le déroulé
 - Étape 0 (cockpit squelette) : `packages/ui` naît ici, avec les jetons complets.
 - **Étape 4bis — direction artistique** (nouvelle) : références, maquettes canvas,

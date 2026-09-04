@@ -17,7 +17,7 @@
 - **Mehdi (cockpit)** : « je sais ce qui m'attend et ce que ça bloque » — chiffres, badges, décisions en cartes.
 
 ## Tokens (source unique : `packages/ui/tokens.css`)
-Rôles de couleur clair/sombre (fond, surfaces 1-3, bords, texte 1-3, accent/soft/fort, ok/warn/danger/info + soft, **chaud** pour la restauration, **loisir** pour l'ALSH) ; échelle typographique 12 → 36 ; espacement 4 pt ; rayons 8/12/16/24/pill ; élévations 1-3 ; durées 120/200/320 ms. L'accent de la commune (`packages/core/src/communes.ts`) est injecté par le layout et prime.
+Rôles de couleur clair/sombre (fond, surfaces 1-3, bords, texte 1-3, accent/soft/fort = **bleu Villiers `#015f89`** extrait du site officiel, secondaire vert `#71b21a`, appel orange `#ff6600`, ok/warn/danger/info + soft, **chaud** pour la restauration, **loisir** pour l'ALSH) ; titres en **Exo** (police du site) ; échelle typographique 12 → 36 ; espacement 4 pt ; rayons 8/12/16/24/pill ; élévations 1-3 ; durées 120/200/320 ms. L'accent de la commune (`packages/core/src/communes.ts`) est injecté par le layout et prime.
 
 ## Primitives (`packages/ui`)
 `CoquilleClient` (onglets bas + liens desktop), `CoquilleAdmin` (barre latérale + tiroir mobile), `EtatVide` illustré (`IlluCalendrier`, `IlluFacture`, `IlluFile`, `IlluAppareil`), `TuileChiffre` (compteur animé), `Cascade` (apparition en cascade), `BoutonTap` (spring) ; classes : `.bouton` (primaire/discret/danger, sm/lg/pleine), `.carte`, `.carte-accent`, `.badge[data-tone]`, `.bandeau`, `.ligne`, `.icone-ronde`, `.tableau-defile`.

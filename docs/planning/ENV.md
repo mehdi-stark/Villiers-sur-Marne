@@ -11,6 +11,7 @@
 | `RESEND_API_KEY` | Envoi des codes OTP (Resend, seul fournisseur). Absente → alerte « email_cle_absente », aucun code ne part | Vercel | oui en prod |
 | `SOURCE_DONNEES` | Source de l'adaptateur : `fictif` (défaut) · `export-agora` · `api-agora` (non branchées, elles le disent) | Vercel · `.env.local` | non |
 | `VERCEL_ACCESS_TOKEN` | Jeton de déploiement du compte mehdi-stark — lu par les commandes `vercel … --token`, jamais dans le code | `.env.local` seulement | pour déployer |
+| `MAQUETTES_URL` | Lien du canvas de maquettes (Claude Design) affiché dans `/pilotage/design` | Vercel · `.env.local` | non |
 | `AGENT_SECRET` | Autorise `POST /api/agent` (l'agent notifie l'opérateur, `pnpm notifier`) | Vercel · `.env.local` | oui pour les notifications |
 | `COCKPIT_URL` | URL du cockpit visée par `pnpm notifier` | `.env.local` (Mac) | non (défaut localhost) |
 | `PUSH_CONTACT` | Contact VAPID (`mailto:`) | Vercel | non |

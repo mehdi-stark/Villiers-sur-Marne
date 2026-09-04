@@ -46,3 +46,19 @@ export async function appliquerSemaineType(p: { semaines: number; jours: number[
   revalidatePath("/");
   return { ok: true, message: `${reservees} repas réservé${reservees > 1 ? "s" : ""}${deja ? `, ${deja} déjà réservé${deja > 1 ? "s" : ""}` : ""}${refusees ? `, ${refusees} refusé${refusees > 1 ? "s" : ""} (délai dépassé)` : ""}.`, reservees, refusees, dejaReservees: deja };
 }
+
+/** Attestation de paiement : données + PDF figé stockés ensemble, servis par /attestations/[id]. */
+export async function genererAttestation(factureId: string): Promise<{ ok: true; id: string } | { ok: false; message: string }> {
+  const f = await familleCourante();
+  if (!f) return { ok: false, message: "Session expirée." };
+  const [factures, enfants, activites] = await Promise.all([f.source.factures(f.famille.id), f.source.enfants(f.famille.id), f.source.activites()]);
+  const fa = factures.find((x) => x.id === factureId);
+  if (!fa) return { ok: false, message: "Facture introuvable." };
+  const { genererEtStockerAttestation } = await import("@ville/core/documents/attestation");
+  const r = await genererEtStockerAttestation("famille", {
+    familleId: f.famille.id, famille: f.famille.nom, email: f.email, periode: fa.periode, commune: f.commune,
+    lignes: fa.lignes.map((l) => ({ date: l.date, enfant: enfants.find((e) => e.id === l.enfantId)?.prenom ?? l.enfantId, prestation: activites.find((a) => a.id === l.activiteId)?.libelle ?? l.activiteId, montant: l.montant })),
+    total: fa.montant, paye: fa.etat === "payee" ? fa.montant : 0, etat: fa.etat, genereLe: new Date().toISOString(),
+  });
+  return { ok: true, id: r.id };
+}

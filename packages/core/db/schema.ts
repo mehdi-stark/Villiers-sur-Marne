@@ -156,3 +156,15 @@ export const defisWebauthn = pgTable("defis_webauthn", {
   expireLe: timestamp("expire_le", { withTimezone: true }).notNull(),
   creeLe: timestamp("cree_le", { withTimezone: true }).notNull().defaultNow(),
 });
+
+// ---- Documents générés : TOUJOURS les données structurées ET le rendu figé (attestations, reçus).
+export const documents = pgTable("documents", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  app: text("app").notNull(),
+  type: text("type").notNull(), // attestation_paiement | …
+  familleId: text("famille_id").notNull(),
+  periode: text("periode"),
+  donnees: jsonb("donnees").$type<Record<string, unknown>>().notNull(),
+  pdfBase64: text("pdf_base64").notNull(), // le rendu réellement montré (petit : quelques Ko)
+  creeLe: timestamp("cree_le", { withTimezone: true }).notNull().defaultNow(),
+});

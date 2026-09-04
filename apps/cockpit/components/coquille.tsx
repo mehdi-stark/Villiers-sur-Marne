@@ -1,6 +1,6 @@
 "use client";
 
-import { BarChart3, CheckSquare, ClipboardList, Compass, Database, LayoutDashboard, Smartphone } from "lucide-react";
+import { BarChart3, CheckSquare, ClipboardList, Compass, Database, LayoutDashboard, Palette, Smartphone } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { VerrouBiometrique } from "@ville/core/ui/passkeys";
 import { CoquilleAdmin } from "@ville/ui";
@@ -10,6 +10,7 @@ const DESTINATIONS = [
   { href: "/", label: "Pilotage", Icone: LayoutDashboard },
   { href: "/pilotage/decisions", label: "Décisions", Icone: CheckSquare },
   { href: "/pilotage/cadrage", label: "Cadrage", Icone: Compass },
+  { href: "/pilotage/design", label: "Design", Icone: Palette },
   { href: "/pilotage/marche", label: "Marché", Icone: BarChart3 },
   { href: "/pilotage/backlog", label: "Backlog", Icone: ClipboardList },
   { href: "/pilotage/donnees", label: "Données", Icone: Database },

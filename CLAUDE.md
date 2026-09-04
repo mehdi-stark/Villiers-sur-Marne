@@ -32,7 +32,7 @@ trois cookies/secrets** (`ville_session`/`AUTH_SECRET`, `famille_session`/`FAMIL
 
 **Déployé (3 projets Vercel mehdi-starks-projects, sans SSO)** : cockpit `https://villiers-sur-marne.vercel.app` · famille `https://villiers-famille.vercel.app` · agents `https://villiers-agents.vercel.app` — `pnpm deployer cockpit|famille|agents` (depuis la racine). GitHub `mehdi-stark/Villiers-sur-Marne`.
 **Données** : adaptateur `packages/core/src/donnees/` (`SOURCE_DONNEES=fictif`), règles réelles de Villiers sourcées, écritures persistées (`reservations.ts` : réserver/annuler avec verdict, pointer), page `/pilotage/donnees`.
-**Design** : recette `TRAME/3-outillage/recettes/DIRECTION_ARTISTIQUE.md` — références, maquette validée AVANT tout nouvel écran (skill `design`, décision `design:*`), rubrique /5 par capture (`docs/planning/REFERENTIEL_DESIGN.md`).
+**Design** : skill `directeur-artistique` + recette `DIRECTION_ARTISTIQUE.md` — `docs/planning/DIRECTION_ARTISTIQUE.md` (identité Villiers extraite du site : bleu #015f89, Exo), maquettes canvas (`MAQUETTES_URL`, page `/pilotage/design`), 5 décisions `design:*` à trancher AVANT tout nouvel écran, rubrique /5 par capture (`REFERENTIEL_DESIGN.md`).
 **Auth (3 apps)** : OTP + passkeys (`packages/core/src/passkeys.ts`, `/api/passkey`, `/appareils`) ; identité `mehdi.stark@gmail.com` (JAMAIS `admin@delivup.io`, réservé à Delivup).
 **Tests réels** : `apps/cockpit/scripts/tests/*` (tap décision, consigne Lanceur), `apps/famille/scripts/tests/*` (réservation, passkey), `apps/agents/scripts/tests/tap-pointage.mjs` — tous auto-purgés, acteur `test@ville.local` (à mettre dans la liste blanche du serveur de dev).
 

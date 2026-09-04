@@ -5,6 +5,7 @@ import { calculerFacture } from "@ville/core/donnees/facturation";
 import { euros } from "@ville/core/donnees/regles";
 import { payfipDisponible, refdetPour, urlPayfip } from "@ville/core/paiement/payfip";
 import { EtatVide, IlluFacture } from "@ville/ui";
+import { BoutonAttestation } from "@/components/attestation";
 
 export const metadata: Metadata = { title: "Factures" };
 export const dynamic = "force-dynamic";
@@ -63,7 +64,7 @@ export default async function Factures() {
             ) : (
               <div className="bandeau" data-tone="warn"><div><strong>Paiement PayFIP pas encore ouvert</strong><div className="mini t-2">{payfip.ok ? lien && !lien.ok ? lien.cause : "" : payfip.cause}</div></div></div>
             ))}
-            <button className="bouton bouton-pleine" disabled title="Attestation PDF : prochain maillon">Attestation de paiement</button>
+            <BoutonAttestation factureId={fa.id} />
             <p className="mini t-3">Le paiement passe par PayFIP (Trésor public) : aucun autre moyen n'est légal pour une régie.</p>
           </section>
         );

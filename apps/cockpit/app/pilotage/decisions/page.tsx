@@ -1,14 +1,16 @@
 import type { Metadata } from "next";
 import { Decision, type PriseClient } from "@/components/decision";
 import { toutesLesDecisions } from "@/lib/ouvertes";
+import { AssistantDecisions } from "@/components/assistant-decisions";
 
 export const metadata: Metadata = { title: "Décisions" };
 export const dynamic = "force-dynamic";
 
 const BLOCS: { rang: number; titre: string; pourquoi: string }[] = [
   { rang: 1, titre: "Cadrage", pourquoi: "bloque l'analyse de marché et l'architecture" },
-  { rang: 2, titre: "Marché", pourquoi: "bloque l'architecture et tout code métier" },
-  { rang: 3, titre: "Backlog", pourquoi: "ne bloque rien aujourd'hui — chaque item attend son maillon" },
+  { rang: 2, titre: "Design", pourquoi: "bloque les écrans suivants — aucun écran sans direction validée" },
+  { rang: 3, titre: "Marché", pourquoi: "bloque l'architecture et tout code métier" },
+  { rang: 4, titre: "Backlog", pourquoi: "ne bloque rien aujourd'hui — chaque item attend son maillon" },
 ];
 
 export default async function PageDecisions() {
@@ -33,6 +35,7 @@ export default async function PageDecisions() {
           <span>L'agent relit tes décisions au début de sa prochaine session (`pnpm decisions`) et les reporte dans les documents. Les décisions prises restent consultables ci-dessous.</span>
         </div>
       )}
+      <AssistantDecisions dejaPrises={toutes.length - ouvertes.length} ouvertes={ouvertes.map((d) => ({ sujet: d.sujet, cle: d.cle, titre: d.titre, texte: d.texte, options: d.options, recommandation: d.recommandation, bloque: d.bloque, groupe: BLOCS.find((b) => b.rang === d.rang)?.titre ?? "" }))} enfants={<>
       {BLOCS.map((b) => {
         const lot = toutes.filter((d) => d.rang === b.rang);
         const restantes = lot.filter(estOuverte).length;
@@ -63,6 +66,7 @@ export default async function PageDecisions() {
           </section>
         );
       })}
+      </>} />
     </>
   );
 }
