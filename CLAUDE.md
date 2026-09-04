@@ -3,7 +3,7 @@
 **Projet** : portail famille de nouvelle génération pour Villiers-sur-Marne (B2G :
 client = mairie / Infocom'94, paiement famille = PayFIP). Cadrage rédigé
 (`docs/planning/CADRAGE.md`), **en attente des décisions de l'opérateur**.
-Étapes 1-2/7 : cadrage (7 décisions) et **verdict marché calculé : 65/100, GO
+Étapes 1-2/7 : cadrage (7 décisions) et **verdict marché calculé : 68/100, GO
 conditionnel dégradé à NO-GO** tant que la faille « pas d'API Agora+ » n'est pas parée
 (`lib/marche.ts`, `/pilotage/marche`) — **aucun code MÉTIER avant** que l'opérateur tranche.
 
@@ -13,7 +13,7 @@ date, puis `pnpm decisions --reporter <id,…>`. Puis relire `.claude-consignes.
 
 **Ce qui existe et est PROUVÉ** (maillon 0, recette `TRAME/3-outillage/recettes/COCKPIT_SQUELETTE.md`) :
 - Cockpit Next.js 15 (App Router, TS strict) à la racine : `/` pilotage, `/pilotage/cadrage`
-  (décisions en un tap), `/pilotage/marche` (verdict par code), `/pilotage/backlog`, `/connexion`
+  (décisions en un tap), `/pilotage/decisions` (tout ce qui attend, badge PWA), `/pilotage/marche` (verdict par code), `/pilotage/backlog`, `/connexion`
   (OTP e-mail, whitelist `ADMIN_EMAILS`). PWA (manifest, `public/sw.js` push-only, icônes `pnpm icones`),
   push web (`lib/push.ts`, `pnpm notifier "Titre" "Corps" /url` → l'opérateur).
 - Base Neon « ville » (une base par projet) ; schéma `db/schema.ts` (Drizzle, migrations
@@ -24,10 +24,10 @@ date, puis `pnpm decisions --reporter <id,…>`. Puis relire `.claude-consignes.
   test réel du tap `scripts/tests/tap-decision.mjs` (auto-purgé), CI `.github/workflows/ci.yml`.
 - Convention du §7 du cadrage : dernière ligne `Options : A · B — Recommandation : A` (parsée par `lib/docs.ts`).
 
-**Ce qui n'existe PAS encore** : dépôt GitHub `mehdi-stark/ville` (remote posé, jeton manquant),
-déploiement sur le compte Vercel mehdi-stark (actuel : `yuqots-projects`, protégé par SSO),
+**Ce qui n'existe PAS encore** : déploiement sur le compte Vercel mehdi-stark (GitHub `mehdi-stark/Villiers-sur-Marne`
+est poussé ; actuel : `yuqots-projects`, protégé par SSO, derniers déploiements UNKNOWN),
 `RESEND_API_KEY` en prod (sans elle aucun code ne part — alerte affichée), passkeys/appareils,
-cron, file de jobs, thème par commune, HHI mesuré, tout le métier (réservations, factures…).
+cron, file de jobs, thème par commune, tout le métier (réservations, factures…).
 
 **Commandes** : `pnpm dev` · `pnpm typecheck` · `pnpm build` · `pnpm db:generate` /
 `db:migrate` / `db:check` · `pnpm test` · `pnpm decisions` · `pnpm notifier` · `pnpm capturer --forger admin@delivup.io --viewport 390x844`.

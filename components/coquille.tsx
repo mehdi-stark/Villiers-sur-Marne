@@ -1,7 +1,7 @@
 "use client";
 
 import * as Dialog from "@radix-ui/react-dialog";
-import { BarChart3, ClipboardList, Compass, LayoutDashboard, LogOut, Menu, X } from "lucide-react";
+import { BarChart3, CheckSquare, ClipboardList, Compass, LayoutDashboard, LogOut, Menu, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
@@ -11,6 +11,7 @@ import { Pwa } from "./pwa";
 // drawer mobile (Radix Dialog : focus trap, Échap, aria — jamais une modale maison).
 const DESTINATIONS = [
   { href: "/", label: "Pilotage", Icone: LayoutDashboard },
+  { href: "/pilotage/decisions", label: "Décisions", Icone: CheckSquare },
   { href: "/pilotage/cadrage", label: "Cadrage", Icone: Compass },
   { href: "/pilotage/marche", label: "Marché", Icone: BarChart3 },
   { href: "/pilotage/backlog", label: "Backlog", Icone: ClipboardList },

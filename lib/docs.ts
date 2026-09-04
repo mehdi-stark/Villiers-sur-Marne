@@ -82,3 +82,9 @@ export function extraireBacklog(md: string): LigneBacklog[] {
 }
 
 export const OPTIONS_BACKLOG = ["Go", "Plus tard", "Non"] as const;
+
+/** Une ligne de backlog est OUVERTE seulement si le document dit « En attente » ;
+ *  « Fait », « Go — opérateur », « Non »… sont des décisions déjà écrites. */
+export function backlogOuvert(l: LigneBacklog): boolean {
+  return /^en attente/i.test(l.decisionDoc);
+}

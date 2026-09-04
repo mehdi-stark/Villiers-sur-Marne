@@ -27,9 +27,13 @@ gratuit pour la collectivité (collectivites-locales.gouv.fr).
 - **Leaders** : Arpège (Concerto / Espace Citoyens), Berger-Levrault (BL.enfance / BL.citoyens,
   app « BL Portail Famille » : 4,35/5 sur 1 057 avis App Store), Abelium (Domino), Ciril,
   Agora Plus (Agora Famille, app store sortie 26/03/2026 : 0 avis), Docaposte (Axel),
-  Technocarte (250 collectivités), Aiga (6 000 clients), Sigec. **Part du leader et HHI :
-  NON mesurés** → dimension « compétition » plafonnée à 3 par code. À mesurer à l'étape 3
-  sur les DECP (titulaires par SIRET : deux SIRET concentrent 19 des 45 marchés relevés).
+  Technocarte (250 collectivités), Aiga (6 000 clients), Sigec. **Part du leader et HHI MESURÉS** (`scripts/mesurer-hhi.mjs`, DECP + Sirene, 2026-09-04) :
+  43 marchés, 18 titulaires distincts, **HHI 1228** (nb de marchés) / 2089 (montants)
+  → marché **fragmenté** (seuils DOJ : < 1 500 fragmenté, > 2 500 concentré). Tête : ARPEGE 23.3 % des marchés (25.2 % des montants) ; TEAMNET (SA) 20.9 % des marchés (34 % des montants) ; FAMILEA (ABELIUM) 7 % des marchés (9.5 % des montants) ; TECHNOCARTE 7 % des marchés (5.4 % des montants) ; MUSHROOM SOFTWARE (MUSHROOM SOFTWARE) 7 % des marchés (12.2 % des montants).
+  Lecture : deux éditeurs (Arpège, Teamnet/Docaposte) prennent ~44 % des marchés, chacun en vendant
+  gestion + portail ; les 16 autres se partagent le reste — un nouvel entrant n'affronte pas un
+  winner-take-all, mais il n'entre pas par appel d'offres sans back-office : il entre par la porte
+  d'un syndicat ou d'une commune sponsor.
 - **Plaintes minées** : côté Villiers, constats directs (AngularJS EOL, franglais en prod,
   zoom interdit, cookies non conformes — plainte Services Publics+ 2023 sans réponse).
   Côté national : l'App Store ne renvoie aucun avis récent exploitable via le flux RSS
@@ -46,13 +50,13 @@ gratuit pour la collectivité (collectivites-locales.gouv.fr).
 | Willingness-to-pay | 15 | 8 | DECP : médiane 64 800 € HT / 48 mois, 26 880 € HT/an annualisé | Montants = gestion + portail ; un front seul vaut moins |
 | Moat / différenciation | 10 | 5 | Défauts d'Agora+ constatés ; API Particulier | Une UX se copie ; le moat réel = interop signée |
 | Économie unitaire (P&L net) | 15 | 9 (dérivée du P&L) | marge nette 17 144 € (64 %) sur 26 880 € HT/an | Coûts = hypothèses tant qu'aucun pilote n'a tourné |
-| Compétition & saturation | 10 | **3 (plafonnée)** | aucune part/HHI mesurée | Forme du moat inconnue |
+| Compétition & saturation | 10 | 6 | DECP : 18 titulaires, HHI 1228 (fragmenté), leader Arpège 23.3 % | Deux titulaires ≈ 44 % ; chacun vend gestion + portail |
 | Opérations & risque | 10 | 4 | commande publique, PayFIP, RGAA/RGPD, dépendance interop | Sans interop = démonstrateur |
 | Récurrence / LTV | 10 | 9 | marchés de 48 mois, renouvellements négociés | La même inertie protège l'incumbent |
 | Saisonnalité & fenêtre | 5 | 6 | mandat 2026-2032, rentrée, budgets en fin d'année | Fin du marché Infocom'94 inconnue |
 | Accès au décideur / tête de pont (B2G) | 10 | **3 (plafonnée)** | décision 6 du cadrage non tranchée | Sans porte d'entrée, cycle indéfini |
 
-**Score : 65/100** (calibration `v1-2026-09-04` ; GO ≥ 70, GO conditionnel ≥ 55).
+**Score : 68/100** (calibration `v1-2026-09-04` ; GO ≥ 70, GO conditionnel ≥ 55).
 
 ## 4 · P&L par code (par commune et par an — `pnlCommuneAn`, testé)
 prix HT annuel **26 880 €** (médiane annualisée mesurée) → hébergement 723 € (HYPOTHÈSE :
@@ -71,17 +75,18 @@ Doctrine commerce : aucun pilote rentable refusé, même < 60 k€ ; avance 30 %
 | Marché fragmenté sans mesure de parts | moyenne | Mesurer sur les DECP avant l'architecture |
 
 ## 6 · Verdict (calculé) et fenêtre de lancement
-**Score 65/100 · verdict brut GO conditionnel · dégradé à NO-GO** par la faille haute non parée.
+**Score 68/100 · verdict brut GO conditionnel · dégradé à NO-GO** par la faille haute non parée.
 Lecture honnête : **le marché existe et paie (demande, WTP, LTV prouvées) ; ce qui manque
 n'est pas le marché, c'est la PORTE** — l'accès au décideur et l'interopérabilité. Dès que la
 faille est parée (`paree: true` quand l'interop est écrite dans un pilote signé) le calcul,
-sans changer une note, rend **GO conditionnel** ; avec les parts de marché mesurées et un
-contact nommé (deux notes déplafonnées), il peut atteindre GO. Conditions à remplir : voir
+sans changer une note, rend **GO conditionnel** ; avec un contact nommé (dernière note
+plafonnée, « accès au décideur »), il atteint GO (≥ 70). Conditions à remplir : voir
 le cockpit. Fenêtre : budgets 2027 votés en décembre 2026 ; rentrée = pic d'usage.
 
 ## Sources (datées, péremption)
 - `mesurer-demande.mjs` — 9 requêtes, hl=fr gl=fr, 04/09/2026 (péremption 6 mois).
 - data.economie.gouv.fr, jeu `decp-v3-marches-valides`, `search(objet,"portail famille")`, 52 marchés dont 45 exploitables, relevés le 04/09/2026 (montants HT notifiés 2021-2023).
+- `scripts/mesurer-hhi.mjs` — DECP + recherche-entreprises.api.gouv.fr (noms par SIRET), 04/09/2026.
 - itunes.apple.com/lookup — BL Portail Famille id1497351725 (4,35 / 1 057 avis) ; Agora Portail Famille id6758836291 (sortie 26/03/2026, 0 avis) — 04/09/2026.
 - particulier.api.gouv.fr — cas d'usage « tarification municipale enfance » (habilitation ~14 j, gratuit).
 - Légifrance décret 2018-689 ; collectivites-locales.gouv.fr (PayFiP) ; francemarches.com (seuil 60 k€ HT au 01/04/2026).

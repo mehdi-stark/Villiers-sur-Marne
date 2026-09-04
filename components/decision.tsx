@@ -2,7 +2,7 @@
 
 import { Check, Clock } from "lucide-react";
 import { useState, useTransition } from "react";
-import { trancher } from "@/app/pilotage/actions";
+import { prevenirAgent, trancher } from "@/app/pilotage/actions";
 
 export type PriseClient = { choix: string; note: string | null; acteur: string; trancheLe: string; reporteLe: string | null };
 
@@ -25,6 +25,8 @@ export function Decision(p: {
   const [enAttente, demarrer] = useTransition();
   const [erreur, setErreur] = useState<string | null>(null);
   const [ouvrirNote, setOuvrirNote] = useState(false);
+  const [prevenu, setPrevenu] = useState<string | null>(null);
+  const prevenir = () => demarrer(async () => { const r = await prevenirAgent(); setPrevenu(r.message); });
 
   const choisir = (choix: string) => {
     setErreur(null);
@@ -75,6 +77,7 @@ export function Decision(p: {
           </span>
           <span>{p.prise.choix} · {fmt.format(new Date(p.prise.trancheLe))} (Paris)</span>
           {p.prise.note && <span className="tiny" style={{ flexBasis: "100%", whiteSpace: "pre-line" }}>« {p.prise.note} »</span>}
+          {!p.prise.reporteLe && (prevenu ? <span className="tiny" style={{ flexBasis: "100%" }}>{prevenu}</span> : <button className="bouton bouton-sm" data-variant="discret" disabled={enAttente} onClick={prevenir}>Prévenir l'agent maintenant</button>)}
         </div>
       ) : (
         <p className="tiny">Pas encore tranchée. Un tap suffit ; tu peux changer d'avis, l'historique est conservé.</p>

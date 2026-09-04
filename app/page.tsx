@@ -3,7 +3,7 @@ import Link from "next/link";
 import { alertesOuvertes } from "@/lib/alertes";
 import { origineBase } from "@/lib/db";
 import { compteurs, decisionsPrises } from "@/lib/decisions";
-import { extraireBacklog, extraireDecisions, lireDoc } from "@/lib/docs";
+import { backlogOuvert, extraireBacklog, extraireDecisions, lireDoc } from "@/lib/docs";
 import { analyse } from "@/lib/marche";
 
 export const dynamic = "force-dynamic";
@@ -35,7 +35,7 @@ export default async function Accueil() {
   const dCadrage = extraireDecisions(cadrageMd);
   const dBacklog = extraireBacklog(backlogMd);
   const restCadrage = dCadrage.filter((d) => !prisesCadrage.has(d.cle)).length;
-  const restBacklog = dBacklog.filter((d) => !prisesBacklog.has(d.cle)).length;
+  const restBacklog = dBacklog.filter((d) => !prisesBacklog.has(d.cle) && backlogOuvert(d)).length;
   const base = origineBase();
 
   return (
@@ -73,11 +73,11 @@ export default async function Accueil() {
           <span className="tuile-chiffre">{restBacklog}</span>
           <span className="tiny">{restBacklog ? "items à trancher" : "rien en attente"} · {dBacklog.length} au total</span>
         </Link>
-        <div className="tuile">
+        <Link href="/pilotage/decisions" className="tuile">
           <span className="muted">À reporter par l'agent</span>
           <span className="tuile-chiffre">{cpt.aReporter}</span>
           <span className="tiny">décisions prises ici, pas encore dans les documents</span>
-        </div>
+        </Link>
       </div>
 
       <section className="carte">

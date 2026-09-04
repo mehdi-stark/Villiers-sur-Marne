@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Decision, type PriseClient } from "@/components/decision";
 import { decisionsPrises } from "@/lib/decisions";
-import { extraireBacklog, lireDoc, OPTIONS_BACKLOG } from "@/lib/docs";
+import { backlogOuvert, extraireBacklog, lireDoc, OPTIONS_BACKLOG } from "@/lib/docs";
 
 export const metadata: Metadata = { title: "Backlog" };
 export const dynamic = "force-dynamic";
@@ -10,7 +10,7 @@ export default async function PageBacklog() {
   const md = await lireDoc("BACKLOG.md");
   const lignes = extraireBacklog(md);
   const prises = await decisionsPrises("backlog");
-  const restantes = lignes.filter((l) => !prises.has(l.cle)).length;
+  const restantes = lignes.filter((l) => !prises.has(l.cle) && backlogOuvert(l)).length;
   const vers = (c: string): PriseClient | null => {
     const p = prises.get(c);
     return p ? { choix: p.choix, note: p.note, acteur: p.acteur, trancheLe: p.trancheLe.toISOString(), reporteLe: p.reporteLe?.toISOString() ?? null } : null;

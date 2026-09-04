@@ -32,6 +32,16 @@ export function Pwa() {
     }
   }, []);
 
+  // Badge de l'icône PWA = décisions ouvertes (setAppBadge : Chrome/Android, iOS ≥ 16.4 installé).
+  useEffect(() => {
+    if (!("setAppBadge" in navigator)) return;
+    fetch("/api/decisions").then((r) => (r.ok ? r.json() : null)).then((d) => {
+      if (!d) return;
+      const n = navigator as Navigator & { setAppBadge: (n?: number) => Promise<void>; clearAppBadge: () => Promise<void> };
+      (d.ouvertes > 0 ? n.setAppBadge(d.ouvertes) : n.clearAppBadge()).catch(() => {});
+    }).catch(() => {});
+  }, [chemin]);
+
   const fermer = () => { setBandeau(false); try { localStorage.setItem("ville-pwa-bandeau", "ferme"); } catch { /* plein */ } };
 
   const activer = async () => {
@@ -46,7 +56,7 @@ export function Pwa() {
     } catch { setNotif("off"); }
   };
 
-  // Le service worker s'enregistre partout ; l'interface (bandeau, notifications) ne vit que sur l'accueil.
+  // Le service worker et le badge vivent partout ; l'interface (bandeau, notifications) ne vit que sur l'accueil.
   if (chemin !== "/") return null;
   return (
     <>

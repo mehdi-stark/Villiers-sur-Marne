@@ -10,6 +10,7 @@
 | `AGENT_SECRET` | Autorise `POST /api/agent` (l'agent notifie l'opérateur, `pnpm notifier`) | Vercel · `.env.local` | oui pour les notifications |
 | `COCKPIT_URL` | URL du cockpit visée par `pnpm notifier` | `.env.local` (Mac) | non (défaut localhost) |
 | `PUSH_CONTACT` | Contact VAPID (`mailto:`) | Vercel | non |
+| `LANCEUR_URL` / `LANCEUR_SECRET` / `LANCEUR_DOSSIER` | « Prévenir l'agent maintenant » dépose une consigne au Lanceur (même secret que l'écouteur du Mac, `~/.config/trames/lanceur.env`) | Vercel · `.env.local` | non (sans elles, le bouton le dit) |
 | `EMAIL_FROM` | Expéditeur (`Ville <…@domaine-vérifié>`) ; défaut `onboarding@resend.dev` (tests seulement) | Vercel | non |
 
 Modèle : `.env.example`. Le test `scripts/tests/tap-decision.mjs` exige `test@ville.local` dans `ADMIN_EMAILS` du serveur visé — **dev uniquement**, jamais en prod.
@@ -20,7 +21,7 @@ Modèle : `.env.example`. Le test `scripts/tests/tap-decision.mjs` exige `test@v
 | Neon (base) | organisation `org-square-star-05491818`, projet `ville` | Mehdi | clé API `~/.config/trames/neon.env` ; URI via `creer-base-neon.sh ville` (idempotent) |
 | Vercel (hébergement) | compte `contact-6950` (CLI connectée sur le Mac) | Mehdi | `vercel whoami` |
 | Resend (e-mail) | **à créer / clé à poser** pour ce projet — un service ≠ un compte : ne pas réutiliser la clé d'un autre projet | Mehdi | dashboard Resend → API Keys |
-| GitHub (CI) | `mehdi-stark/ville` — remote posé, dépôt À CRÉER (jeton `~/.config/trames/github.env` puis `creer-depot-github.sh mehdi-stark ville`) | Mehdi (mehdi-stark) | SSH du Mac authentifié comme mehdi-stark |
+| GitHub (CI) | `mehdi-stark/Villiers-sur-Marne` — créé par Mehdi le 04/09/2026, `main` poussée | Mehdi (mehdi-stark) | SSH du Mac authentifié comme mehdi-stark |
 | Vercel cible | compte **mehdi-stark** demandé le 04/09/2026 — la CLI du Mac est connectée à `contact-6950` / équipe `yuqots-projects` (déploiement actuel) | Mehdi | `vercel login` (mehdi-stark) ou import du dépôt GitHub depuis le dashboard |
 
 Règles : jamais de `NEXT_PUBLIC_*` pour un secret ; `.env*` jamais commité (`.gitignore`) ; fichier append-only si plusieurs mains.

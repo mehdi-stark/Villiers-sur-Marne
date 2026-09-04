@@ -7,7 +7,7 @@
 > vide dans le prompt — voir point ouvert 7).
 
 ## 0 · Verdict de viabilité (après l'analyse de marché)
-**Score 65/100 (calculé, calibration v1-2026-09-04) → GO conditionnel, dégradé à
+**Score 68/100 (calculé, calibration v1-2026-09-04) → GO conditionnel, dégradé à
 NO-GO tant que la faille haute « aucune API/export Agora+ » n'est pas parée.** Le
 marché existe et paie (demande FORTE, médiane 64 800 € HT / 48 mois sur 45 marchés
 DECP, marge nette calculée 64 %) ; ce qui manque est la porte : accès au décideur et

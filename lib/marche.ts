@@ -94,6 +94,83 @@ export const DEMANDE = [
  *  45 marchés exploitables sur 52, relevés le 04/09/2026. */
 export const MARCHES_DECP = { n: 45, minHT: 5835, q1HT: 35774, medianeHT: 64800, q3HT: 200000, maxHT: 648415, dureeMedianeMois: 48, annualiseMedianeHT: 26880, annualiseQ1HT: 8040, annualiseQ3HT: 50000 } as const;
 
+/** Parts de marché et HHI sur les mêmes DECP (`scripts/mesurer-hhi.mjs`, titulaires par SIRET nommés via Sirene). */
+export const CONCURRENCE_DECP = {
+  "releveLe": "2026-09-04",
+  "exploitables": 43,
+  "titulaires": 18,
+  "hhiMarches": 1228,
+  "hhiMontants": 2089,
+  "forme": "fragmenté",
+  "partLeaderMarches": 23.3,
+  "tete": [
+    {
+      "siret": "35142130000036",
+      "nom": "ARPEGE",
+      "marches": 10,
+      "partMarches": 23.3,
+      "montant": 1393840,
+      "partMontant": 25.2
+    },
+    {
+      "siret": "33922000600078",
+      "nom": "TEAMNET (SA)",
+      "marches": 9,
+      "partMarches": 20.9,
+      "montant": 1885520,
+      "partMontant": 34
+    },
+    {
+      "siret": "42172024400050",
+      "nom": "FAMILEA (ABELIUM)",
+      "marches": 3,
+      "partMarches": 7,
+      "montant": 526864,
+      "partMontant": 9.5
+    },
+    {
+      "siret": "38873581300056",
+      "nom": "TECHNOCARTE",
+      "marches": 3,
+      "partMarches": 7,
+      "montant": 301277,
+      "partMontant": 5.4
+    },
+    {
+      "siret": "81122842800017",
+      "nom": "MUSHROOM SOFTWARE (MUSHROOM SOFTWARE)",
+      "marches": 3,
+      "partMarches": 7,
+      "montant": 675051,
+      "partMontant": 12.2
+    },
+    {
+      "siret": "59205230201514",
+      "nom": "KONE",
+      "marches": 2,
+      "partMarches": 4.7,
+      "montant": 21666,
+      "partMontant": 0.4
+    },
+    {
+      "siret": "42145531200056",
+      "nom": "STRATIS",
+      "marches": 2,
+      "partMarches": 4.7,
+      "montant": 29434,
+      "partMontant": 0.5
+    },
+    {
+      "siret": "39825361700045",
+      "nom": "AIGA",
+      "marches": 1,
+      "partMarches": 2.3,
+      "montant": 94034,
+      "partMontant": 1.7
+    }
+  ]
+} as const;
+
 export const ENTREES_PNL_PILOTE: EntreesPnl = {
   prixAnnuelHT: MARCHES_DECP.annualiseMedianeHT, // mesuré : médiane annualisée des 45 marchés
   hebergementAnnuel: 12 * (20 + 19 + 20) + 15, // HYPOTHÈSE tarifs publics 09/2026 : Vercel Pro 20 $/mois, Neon Launch 19 $/mois, Resend Pro 20 $/mois, domaine ~15 €/an — à re-vérifier
@@ -110,7 +187,7 @@ export const GRILLE: Critere[] = [
   { cle: "wtp", dimension: "Willingness-to-pay", poids: 15, note: 8, preuve: "DECP : médiane 64 800 € HT / 48 mois (Q1 35 774 · Q3 200 000), soit 26 880 € HT/an annualisé ; procédure adaptée majoritaire", source: "data.economie.gouv.fr decp-v3-marches-valides, 04/09/2026", faille: "Les montants incluent le logiciel de GESTION ; un front seul se vend moins cher" },
   { cle: "moat", dimension: "Moat / différenciation", poids: 10, note: 5, preuve: "Défauts d'Agora+ constatés (AngularJS EOL, franglais en prod, zoom interdit, cookies non conformes) ; API Particulier (QF CAF/MSA, habilitation ~14 j, gratuite) comme brique d'État sous-exploitée", source: "Cadrage §1 · particulier.api.gouv.fr", faille: "Une UX se copie ; le moat réel serait l'interop signée avec Infocom'94 — pas encore acquise" },
   { cle: "unit", dimension: "Économie unitaire (P&L net)", poids: 15, note: 0, preuve: "Calculée par pnlCommuneAn() — voir §4 (note dérivée du P&L)", source: "lib/marche.ts", faille: "Hypothèses de coûts (support, dev) non encore mesurées sur un vrai pilote" },
-  { cle: "competition", dimension: "Compétition & saturation", poids: 10, note: 6, preuve: null, source: "≥ 9 éditeurs identifiés (Arpège, Berger-Levrault, Abelium, Ciril, Agora Plus, Docaposte/Axel, Technocarte 250 collectivités, Aiga 6 000 clients, Sigec) — parts de marché et HHI NON mesurés", faille: "Sans HHI, la forme du moat est inconnue : note plafonnée par code" },
+  { cle: "competition", dimension: "Compétition & saturation", poids: 10, note: 6, preuve: `DECP : ${CONCURRENCE_DECP.titulaires} titulaires distincts sur ${CONCURRENCE_DECP.exploitables} marchés ; HHI ${CONCURRENCE_DECP.hhiMarches} (nb) / ${CONCURRENCE_DECP.hhiMontants} (montants) = marché ${CONCURRENCE_DECP.forme} ; leader ${CONCURRENCE_DECP.tete[0]?.nom} ${CONCURRENCE_DECP.partLeaderMarches} % des marchés, ${CONCURRENCE_DECP.tete[1]?.nom} ${CONCURRENCE_DECP.tete[1]?.partMarches} %`, source: "scripts/mesurer-hhi.mjs, DECP + Sirene, " + CONCURRENCE_DECP.releveLe, faille: "Deux titulaires prennent ~44 % des marchés ; chacun vend gestion + portail — un front seul entre par la porte du syndicat, pas par appel d'offres" },
   { cle: "ops", dimension: "Opérations & risque (plateforme, réglementation)", poids: 10, note: 4, preuve: "Commande publique (< 60 k€ HT sans procédure depuis 01/04/2026) ; PayFIP obligatoire ; RGAA + RGPD mineurs ; dépendance à un accord d'interopérabilité Agora+/Infocom'94", source: "Cadrage §5", faille: "Sans interop, le produit reste un démonstrateur : risque HAUTE (contre-analyse)" },
   { cle: "ltv", dimension: "Récurrence / LTV", poids: 10, note: 9, preuve: "Durée médiane des marchés : 48 mois ; renouvellement par marché négocié sans publicité fréquent (titulaire en place)", source: "DECP 04/09/2026", faille: "La même inertie protège l'incumbent : sortir Agora+ demande une fenêtre" },
   { cle: "saison", dimension: "Saisonnalité & fenêtre de lancement", poids: 5, note: 6, preuve: "Mandat municipal 2026-2032 (élection mars 2026) ; pic d'usage à la rentrée (inscriptions du 01/06 au 31/08) ; budgets votés en fin d'année", source: "resultats-elections.interieur.gouv.fr · villiers94.fr", faille: "Date de fin du marché Infocom'94 M2015/02-Enf inconnue (backlog)" },
@@ -137,7 +214,6 @@ export function analyse() {
   const conditions = [
     "Décision 6 du cadrage tranchée avec un contact NOMMÉ (mairie, Infocom'94 ou parent d'élève)",
     "Interopérabilité (API ou export Agora+) écrite dans le périmètre du pilote, ou date de fin du marché Infocom'94 connue",
-    "Parts de marché mesurées sur les DECP (titulaires par SIRET) avant l'architecture",
   ];
   return { calibration: CALIBRATION, seuils: SEUILS, grille, pnl, failles: FAILLES, demande: DEMANDE, marches: MARCHES_DECP, ...v, conditions };
 }
