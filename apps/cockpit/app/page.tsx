@@ -49,7 +49,6 @@ export default async function Accueil() {
           <p className="muted">Ville — portail famille de nouvelle génération pour Villiers-sur-Marne. Étapes 1-2/7 : cadrage et marché à trancher.</p>
         </div>
       </div>
-
       <ActiverFaceId cle="ville-passkey" />
 
       {alertes.map((a) => (

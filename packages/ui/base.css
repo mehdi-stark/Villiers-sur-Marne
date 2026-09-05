@@ -1,15 +1,17 @@
 /* @ville/ui — base et primitives (classes), au-dessus des jetons. Aucune couleur en dur ici. */
 * { box-sizing: border-box; margin: 0; }
 html { -webkit-text-size-adjust: 100%; color-scheme: light dark; }
-body { background: var(--fond); color: var(--texte); font: var(--t-14)/1.5 var(--police-corps); -webkit-font-smoothing: antialiased; min-height: 100dvh; }
+body { background: var(--fond); color: var(--texte); font: var(--t-14)/1.55 var(--police-corps); -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; min-height: 100dvh; }
+p { text-wrap: pretty; }
 a { color: var(--accent); text-decoration: none; }
-h1, h2, h3 { font-family: var(--police-titre); letter-spacing: -0.02em; line-height: 1.2; font-weight: 700; }
+h1, h2, h3 { font-family: var(--police-titre); letter-spacing: var(--serre); line-height: 1.15; font-weight: 700; text-wrap: balance; }
+h1 { letter-spacing: var(--tres-serre); }
 h1 { font-size: var(--t-28); } h2 { font-size: var(--t-18); } h3 { font-size: var(--t-16); }
 [data-registre="admin"] h1 { font-size: var(--t-22); }
-.t-2 { color: var(--texte-2); } .t-3 { color: var(--texte-3); } .petit { font-size: var(--t-13); } .mini { font-size: var(--t-12); }
+.t-2 { color: var(--texte-2); } .t-3 { color: var(--texte-3); } .petit { font-size: var(--t-13); line-height: 1.5; } .mini { font-size: var(--t-12); line-height: 1.45; }
 .tabulaire { font-variant-numeric: tabular-nums; }
 code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: var(--t-13); }
-:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+:focus-visible { outline: none; box-shadow: var(--anneau); border-radius: var(--r-1); }
 
 /* Coquille */
 .coquille { min-height: 100dvh; display: flex; flex-direction: column; }
@@ -32,10 +34,12 @@ button.onglet { border: 0; background: transparent; font: inherit; font-size: 11
 .nav-desktop { display: none; gap: var(--e-1); }
 .nav-lien { display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px; border-radius: var(--r-pill); font-size: var(--t-13); font-weight: 600; color: var(--texte-2); transition: background var(--d-2), color var(--d-2); }
 .nav-lien:hover { background: var(--surface-2); color: var(--texte); }
-.nav-lien[data-actif] { background: var(--accent-soft); color: var(--accent); }
+.nav-lien[data-actif] { background: var(--surface); color: var(--accent); box-shadow: var(--el-1); }
+[data-registre="admin"] .nav-lien[data-actif] { position: relative; }
+[data-registre="admin"] .nav-lien[data-actif]::before { content: ""; position: absolute; left: -12px; top: 50%; transform: translateY(-50%); width: 3px; height: 18px; border-radius: 0 3px 3px 0; background: var(--accent); }
 @media (min-width: 760px) { .nav-desktop { display: flex; } }
 [data-registre="admin"] .coquille { flex-direction: row; }
-[data-registre="admin"] .laterale { display: none; width: 232px; flex: 0 0 auto; position: sticky; top: 0; height: 100dvh; padding: var(--e-4) var(--e-3); border-right: 1px solid var(--bord); background: var(--surface); flex-direction: column; gap: var(--e-1); }
+[data-registre="admin"] .laterale { display: none; width: 244px; flex: 0 0 auto; position: sticky; top: 0; height: 100dvh; padding: var(--e-4) var(--e-3) var(--e-3); border-right: 1px solid color-mix(in srgb, var(--bord) 70%, transparent); background: color-mix(in srgb, var(--surface) 70%, var(--fond)); flex-direction: column; gap: var(--e-1); }
 [data-registre="admin"] .laterale .nav-lien { border-radius: var(--r-1); }
 [data-registre="admin"] .principal { flex: 1; min-width: 0; display: flex; flex-direction: column; }
 @media (min-width: 900px) { [data-registre="admin"] .laterale { display: flex; } [data-registre="admin"] .entete-mobile { display: none; } }
@@ -56,12 +60,15 @@ button.onglet { border: 0; background: transparent; font: inherit; font-size: 11
 .bouton-icone:hover { background: var(--surface-2); }
 
 /* En-tête de page, salut */
-.page-tete { display: flex; align-items: flex-end; justify-content: space-between; gap: var(--e-3); flex-wrap: wrap; padding-top: var(--e-2); }
-.salut { font-size: var(--t-13); color: var(--texte-2); font-weight: 500; }
+.page-tete { display: flex; align-items: flex-end; justify-content: space-between; gap: var(--e-3); flex-wrap: wrap; padding: var(--e-3) 0 var(--e-1); }
+.page-tete > div > p { max-width: 62ch; }
+.salut { font-size: var(--t-12); color: var(--texte-3); font-weight: 600; letter-spacing: 0.02em; text-transform: uppercase; }
 .page-tete h1 { margin-top: 2px; }
 
 /* Cartes, tuiles, rangées */
-.carte { background: var(--surface); border: 1px solid var(--bord); border-radius: var(--r-3); padding: var(--e-4); box-shadow: var(--el-1); }
+.carte { background: var(--surface); border: 0; border-radius: var(--r-3); padding: var(--e-4); box-shadow: var(--el-1); }
+.carte-plate { background: transparent; box-shadow: none; padding: 0; }
+.carte-haut { padding: var(--e-6); box-shadow: var(--el-2); }
 .carte > * { min-width: 0; }
 .carte-accent { background: linear-gradient(135deg, var(--institutionnel), color-mix(in srgb, var(--institutionnel) 78%, black)); color: #fff; border: 0; box-shadow: var(--el-2); }
 .carte-accent .t-2, .carte-accent .t-3 { color: rgb(255 255 255 / 0.78); }
@@ -70,9 +77,10 @@ button.onglet { border: 0; background: transparent; font: inherit; font-size: 11
 .rangee { display: flex; align-items: center; gap: var(--e-2); flex-wrap: wrap; }
 .tuiles { display: grid; gap: var(--e-3); grid-template-columns: repeat(2, minmax(0, 1fr)); }
 @media (min-width: 760px) { .tuiles { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
-.tuile { display: grid; gap: 2px; padding: var(--e-4); border: 1px solid var(--bord); border-radius: var(--r-3); background: var(--surface); color: inherit; box-shadow: var(--el-1); transition: transform var(--d-2) var(--ease), box-shadow var(--d-2); }
-a.tuile:hover { transform: translateY(-1px); box-shadow: var(--el-2); }
-.tuile-chiffre { font-family: var(--police-titre); font-size: var(--t-28); font-weight: 700; letter-spacing: -0.02em; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.tuile { display: grid; gap: 3px; padding: var(--e-4); border: 0; border-radius: var(--r-3); background: var(--surface); color: inherit; box-shadow: var(--el-1); transition: transform var(--d-2) var(--ease), box-shadow var(--d-2); }
+a.tuile:hover { transform: translateY(-2px); box-shadow: var(--el-2); }
+.tuile-chiffre + .mini, .tuile .mini { margin-top: 1px; }
+.tuile-chiffre { font-family: var(--police-titre); font-size: var(--t-28); font-weight: 700; letter-spacing: var(--tres-serre); line-height: 1.05; font-variant-numeric: tabular-nums; }
 .ligne { display: grid; grid-template-columns: auto 1fr auto; gap: var(--e-3); align-items: center; padding: var(--e-3) 0; border-top: 1px solid var(--bord); }
 .ligne:first-child { border-top: 0; padding-top: 0; }
 .ligne > * { min-width: 0; }
@@ -80,10 +88,10 @@ a.tuile:hover { transform: translateY(-1px); box-shadow: var(--el-2); }
 .icone-ronde[data-tone="ok"] { background: var(--ok-soft); color: var(--ok); } .icone-ronde[data-tone="warn"] { background: var(--warn-soft); color: var(--warn); } .icone-ronde[data-tone="chaud"] { background: var(--chaud-soft); color: var(--chaud); } .icone-ronde[data-tone="loisir"] { background: var(--loisir-soft); color: var(--loisir); }
 
 /* Boutons */
-.bouton { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: 1px solid var(--bord-fort); border-radius: var(--r-2); padding: 10px 16px; min-height: 44px; font: inherit; font-size: var(--t-14); font-weight: 600; background: var(--surface); color: var(--texte); cursor: pointer; transition: background var(--d-2), border-color var(--d-2), transform var(--d-1), box-shadow var(--d-2); }
+.bouton { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: 1px solid color-mix(in srgb, var(--bord-fort) 80%, transparent); border-radius: var(--r-2); padding: 10px 16px; min-height: 44px; font: inherit; font-size: var(--t-14); font-weight: 600; background: var(--surface); color: var(--texte); cursor: pointer; transition: background var(--d-2), border-color var(--d-2), transform var(--d-1), box-shadow var(--d-2); }
 .bouton:hover { background: var(--surface-2); }
 .bouton:active { transform: scale(0.98); }
-.bouton[data-variant="primaire"] { background: var(--accent); border-color: var(--accent); color: var(--accent-texte); box-shadow: 0 6px 16px color-mix(in srgb, var(--accent) 28%, transparent); }
+.bouton[data-variant="primaire"] { background: var(--accent); border-color: transparent; color: #fff; box-shadow: 0 1px 2px rgb(18 19 26 / .12), 0 6px 16px -6px color-mix(in srgb, var(--accent) 55%, transparent); }
 .bouton[data-variant="primaire"]:hover { background: var(--accent-fort); }
 .bouton[data-variant="discret"] { border-color: transparent; background: transparent; color: var(--texte-2); }
 .bouton[data-variant="discret"]:hover { background: var(--surface-2); color: var(--texte); }
@@ -142,7 +150,7 @@ details[open] > summary::before { transform: rotate(90deg); }
 /* ---- Navigation par SECTIONS : un menu qui s'empile ne dit plus quoi fait quoi ---- */
 .nav-section { display: grid; gap: 2px; }
 .nav-section + .nav-section { margin-top: var(--e-3); }
-.nav-titre { font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--texte-3); padding: 4px 12px 2px; }
+.nav-titre { font-size: 10.5px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--texte-3); padding: 6px 12px 4px; opacity: 0.85; }
 .nav-lien { justify-content: flex-start; }
 .nav-lien .nav-compteur { margin-left: auto; font-size: 11px; font-weight: 700; padding: 1px 7px; border-radius: var(--r-pill); background: var(--surface-3); color: var(--texte-2); }
 .nav-lien[data-actif] .nav-compteur { background: color-mix(in srgb, var(--accent) 18%, transparent); color: var(--accent); }
@@ -179,3 +187,22 @@ details[open] > summary::before { transform: rotate(90deg); }
   .entete-inner .profil-bouton .profil-ident, .entete-inner .profil-bouton svg { display: none; }
   .marque small { display: none; }
 }
+
+/* ---- Contrôle segmenté : deux boutons collés valent mieux qu'une paire flottante ---- */
+.segmente { display: inline-flex; align-items: stretch; border-radius: var(--r-pill); background: var(--surface-3); padding: 3px; gap: 2px; }
+.segmente > * { display: inline-flex; align-items: center; gap: 5px; padding: 6px 12px; border: 0; border-radius: var(--r-pill); background: transparent; color: var(--texte-2); font: inherit; font-size: var(--t-13); font-weight: 600; cursor: pointer; text-decoration: none; min-height: 34px; }
+.segmente > *:hover { color: var(--texte); }
+.segmente > *[data-actif] { background: var(--surface); color: var(--texte); box-shadow: var(--el-1); }
+
+/* ---- Bandeaux discrets : une ligne, pas un pavé ---- */
+.bandeau-fin { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: var(--r-2); background: var(--surface); box-shadow: var(--el-1); font-size: var(--t-13); color: var(--texte-2); }
+.bandeau-fin .bouton { margin-left: auto; }
+
+/* ---- Squelettes de chargement : la page ne doit jamais sauter ---- */
+.squelette { border-radius: var(--r-1); background: linear-gradient(90deg, var(--surface-2) 25%, var(--surface-3) 37%, var(--surface-2) 63%); background-size: 400% 100%; animation: chargement 1.4s ease infinite; }
+@keyframes chargement { from { background-position: 100% 50% } to { background-position: 0 50% } }
+
+/* ---- Séparateurs et détails ---- */
+hr, .filet { border: 0; height: 1px; background: color-mix(in srgb, var(--bord) 75%, transparent); margin: var(--e-3) 0; }
+.badge { line-height: 1.35; }
+::selection { background: color-mix(in srgb, var(--accent) 25%, transparent); }

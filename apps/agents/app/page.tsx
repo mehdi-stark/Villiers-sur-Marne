@@ -40,10 +40,9 @@ export default async function FileDuJour({ searchParams }: { searchParams: Promi
     <>
       <div className="page-tete">
         <div><h1>File du jour</h1><p className="petit t-2">{fmt.format(new Date(`${jour}T12:00:00Z`))} · {a.commune.nom} · source {a.source.nom}</p></div>
-        <div className="segment"><a href={`/?d=${prec}`}>← Veille</a><a href={`/?d=${jour}`} data-actif>{jour}</a><a href={`/?d=${suiv}`}>Lendemain →</a></div>
-
-      <ActiverFaceId cle="agents-passkey" />
+        <div className="segmente"><a href={`/?d=${prec}`}>← Veille</a><span data-actif>{fmt.format(new Date(`${jour}T12:00:00Z`))}</span><a href={`/?d=${suiv}`}>Lendemain →</a></div>
       </div>
+      <ActiverFaceId cle="agents-passkey" />
       {lignes.length > 0 && (
         <div className="tuiles">
           <TuileChiffre libelle="À pointer" valeur={reserves} tone={reserves ? "accent" : undefined} detail="réservés, pas encore pointés" />

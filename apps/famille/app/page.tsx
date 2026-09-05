@@ -50,13 +50,14 @@ export default async function MaSemaine({ searchParams }: { searchParams: Promis
           <h1>Ma semaine</h1>
           <p className="petit t-2">Du {fmtSemaine.format(lundi)} au {fmtSemaine.format(vendredi)} · tranche {tranche}{f.famille.quotientFamilial === null ? " (quotient non calculé)" : ""}</p>
         </div>
-        <div className="rangee">
-          <a className="bouton bouton-sm" href={`/?s=${prec}`} aria-label="Semaine précédente">← Précédente</a>
-          <a className="bouton bouton-sm" href={`/?s=${suiv}`} aria-label="Semaine suivante">Suivante →</a>
+        <div className="segmente">
+          <a href={`/?s=${prec}`} aria-label="Semaine précédente">←</a>
+          <span data-actif>{fmtSemaine.format(lundi).replace(/ \d{4}$/, "")}</span>
+          <a href={`/?s=${suiv}`} aria-label="Semaine suivante">→</a>
         </div>
       </div>
 
-      <div className="carte carte-accent resume-semaine">
+      <div className="carte carte-haut carte-accent resume-semaine">
         <span className="petit t-2">Cette semaine, pour {enfants.length} enfant{enfants.length > 1 ? "s" : ""}</span>
         {parService.size === 0 ? (
           <strong>Rien de réservé pour l'instant</strong>
@@ -71,9 +72,10 @@ export default async function MaSemaine({ searchParams }: { searchParams: Promis
         <span className="petit t-2">Facturé à terme échu, payable par PayFIP. Les services « inscrit à l'année » sont facturés à la fréquentation réelle.</span>
       </div>
 
-      <ActiverFaceId cle="famille-passkey" />
-      <ActiverNotifications texte="Me rappeler les créneaux encore réservables" muetSiRefus />
-      <SemaineType />
+      <div className="pile" style={{ gap: 8 }}>
+        <ActiverFaceId cle="famille-passkey" />
+        <SemaineType />
+      </div>
 
       {verdictCantine && (
         <div className="bandeau" data-tone={verdictCantine.possible ? "accent" : "warn"} role="status">

@@ -45,15 +45,10 @@ export function ActiverFaceId({ cle }: { cle: string }) {
   };
   const refuser = () => { try { localStorage.setItem(`${cle}-non`, "1"); } catch { /* plein */ } setEtat("cache"); };
   return (
-    <div className="bandeau" data-tone="accent" role="status">
-      <div style={{ flex: 1 }}>
-        <strong>Activer Face ID / Touch ID sur cet appareil ?</strong>
-        <div className="tiny">Plus de code à taper ici ; le code par e-mail reste toujours possible. Révocable depuis « Appareils ».</div>
-        <div className="rangee" style={{ marginTop: 8 }}>
-          <button type="button" className="bouton bouton-sm" data-variant="primaire" onClick={activer}>Activer</button>
-          <button type="button" className="bouton bouton-sm" data-variant="discret" onClick={refuser}>Pas sur cet appareil</button>
-        </div>
-      </div>
+    <div className="bandeau-fin" role="status">
+      <span>Se connecter avec Face ID la prochaine fois ?</span>
+      <button type="button" className="bouton bouton-sm" data-variant="primaire" onClick={activer}>Activer</button>
+      <button type="button" className="bouton bouton-sm" data-variant="discret" onClick={refuser} aria-label="Ne pas activer Face ID sur cet appareil">Non</button>
     </div>
   );
 }

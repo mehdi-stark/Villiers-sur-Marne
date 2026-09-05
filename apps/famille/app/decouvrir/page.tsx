@@ -5,6 +5,7 @@ import { commune } from "@ville/core/communes";
 import { ACTIVITES, ECOLES } from "@ville/core/donnees/fictif";
 import { euros, tarif } from "@ville/core/donnees/regles";
 import { service } from "@ville/core/donnees/services";
+import { VisiteGuidee } from "@/components/visite";
 
 // PAGE PUBLIQUE de démonstration — le support de vente : ce que la commune verrait.
 // Aucune donnée réelle de famille, et une mention sans ambiguïté sur son caractère non officiel.
@@ -25,6 +26,7 @@ export default function Decouvrir() {
   const cantine = ACTIVITES.find((a) => a.type === "cantine")!;
   return (
     <div className="vitrine">
+      <VisiteGuidee />
       <div className="bandeau" data-tone="warn" role="note">
         <div><strong>Démonstration</strong><div className="mini t-2">Proposition indépendante présentée à la Ville de Villiers-sur-Marne. Ce site n'est pas un service officiel de la commune ; les familles et les réservations affichées sont fictives.</div></div>
       </div>
@@ -35,7 +37,8 @@ export default function Decouvrir() {
         <p className="vitrine-accroche">Réserver la cantine, payer, suivre un dossier : trois gestes, pas trois appels à l'accueil. Conçu sur les tarifs et les délais réels de la commune.</p>
         <div className="rangee">
           <Link className="bouton bouton-lg" data-variant="primaire" href="/connexion">Ouvrir la démonstration</Link>
-          <a className="bouton bouton-lg" href={c.siteUrl} target="_blank" rel="noopener">Le site de la ville</a>
+          <a className="bouton bouton-lg" href="/decouvrir/dossier.pdf" target="_blank" rel="noopener">Le dossier (PDF, 2 pages)</a>
+          <a className="bouton bouton-lg" data-variant="discret" href={c.siteUrl} target="_blank" rel="noopener">Le site de la ville</a>
         </div>
         <div className="vitrine-chiffres">
           <div><b>{ECOLES.length}</b><span>écoles et leurs accueils</span></div>

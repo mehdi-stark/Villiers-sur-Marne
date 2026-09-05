@@ -29,6 +29,9 @@ pleins qui parlent au nom de la commune ; crème `#f4f0eb` (43) = **fond** de l'
 `#ef984b` (24) = **appel** (restauration) ; police **Exo** pour les titres. Logo officiel dans l'en-tête
 des trois apps et sur la vitrine, avec sa mention de propriété.
 
+## Passe premium (05/09/2026) — ce qui sépare « propre » de « produit »
+Typographie : échelle rehaussée (14,5 / 19 / 23 / 30), interlettre serrée sur les titres (−0,022 em, −0,032 em sur h1), `text-wrap: balance` sur les titres et `pretty` sur les paragraphes, chiffres tabulaires. Profondeur : ombres en TROIS couches (filet net + ombre proche + ombre portée large) au lieu d'une bordure grise — les cartes n'ont plus de `border`. Focus : anneau d'accent 3 px au lieu d'un contour. Contrôles : segmenté (navigation de semaine et de jour) plutôt que deux boutons flottants ; bandeaux d'une seule ligne (« Se connecter avec Face ID la prochaine fois ? ») au lieu de pavés ; squelettes de chargement disponibles. Barre latérale : fond légèrement retiré du blanc, filet d'accent sur l'item actif, titres de section plus discrets.
+
 ## Coquille standard (recette `COQUILLE_APPLICATION`, 05/09/2026)
 - **Sections de navigation** : cockpit « Pilotage / Le projet / Le produit » · agents « Aujourd'hui / Dossiers / Référentiel » · famille = onglets bas. Chaque entrée porte son compteur (décisions à trancher, démarches à traiter) — la couleur `warn` signale ce qui bloque.
 - **Menu profil** (bas de barre latérale, en-tête à droite côté client) : identité, apparence **clair / sombre / système**, réglages, appareils et sécurité, déconnexion en dernier. Plus aucun « Quitter » isolé.
@@ -58,7 +61,9 @@ Safe areas, inputs ≥ 16 px, `min-width: 0`, onglets fixes avec `env(safe-area-
 | Agents · Démarches à traiter (1440 + 390) | 5 | 5 | 5 | 5 | 4 | 3 | 5 | oui — refus impossible sans motif |
 | Toutes · Coquille (sections + menu profil, 1280) | 5 | 5 | 5 | 5 | 5 | 4 | 5 | oui — charte de la ville + logo officiel |
 | Famille · Vitrine publique `/decouvrir` (1440 + 390) | 5 | 5 | 4 | 5 | 5 | 3 | 5 | oui — support de vente, mention « non officiel » |
-| Famille · Ma semaine, charte ville (390 clair + sombre) | 5 | 5 | 4 | 5 | 5 | 4 | 5 | oui |
+| Famille · Ma semaine, charte ville (390 clair + sombre) | 5 | 5 | 5 | 5 | 5 | 4 | 5 | oui — passe premium 05/09 |
+| Famille · Vitrine + visite guidée + dossier PDF (1440 + 390) | 5 | 5 | 5 | 5 | 5 | 4 | 5 | oui |
+| Agents · File du jour premium (1440) | 5 | 5 | 5 | 5 | 5 | 4 | 5 | oui |
 | Famille · Réglages (390) | 5 | 5 | 5 | 5 | 4 | 3 | 5 | oui |
 
 ### Correctif du 04/09/2026 (retour : « on ne comprend pas les services réservés »)

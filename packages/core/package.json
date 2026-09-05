@@ -26,7 +26,9 @@
     "./runs": "./src/runs.ts",
     "./ui/push": "./src/ui/push.tsx",
     "./demarches": "./src/demarches.ts",
-    "./demarches-definitions": "./src/demarches-definitions.ts"
+    "./demarches-definitions": "./src/demarches-definitions.ts",
+    "./documents/proposition": "./src/documents/proposition.ts",
+    "./marche": "./src/marche.ts"
   },
   "scripts": {
     "db:generate": "drizzle-kit generate",

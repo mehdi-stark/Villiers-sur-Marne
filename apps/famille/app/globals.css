@@ -3,24 +3,24 @@
 
 /* ---- Portail famille : la semaine PAR SERVICE (une ligne = un service, 5 colonnes = les jours) ---- */
 .semaine { display: grid; gap: var(--e-4); }
-.enfant-carte { display: grid; gap: var(--e-3); }
+.enfant-carte { display: grid; gap: var(--e-3); padding: var(--e-4) var(--e-4) var(--e-3); }
 .enfant-tete { display: flex; align-items: center; gap: 10px; }
-.avatar { width: 40px; height: 40px; border-radius: 14px; background: linear-gradient(135deg, var(--accent-soft), var(--surface)); color: var(--accent); display: grid; place-items: center; font-weight: 800; font-family: var(--police-titre); flex: 0 0 auto; border: 1px solid color-mix(in srgb, var(--accent) 25%, transparent); }
+.avatar { width: 42px; height: 42px; border-radius: 14px; background: linear-gradient(135deg, var(--accent-soft), var(--surface)); color: var(--accent); display: grid; place-items: center; font-weight: 800; font-family: var(--police-titre); flex: 0 0 auto; border: 1px solid color-mix(in srgb, var(--accent) 25%, transparent); }
 
 /* En-tête des jours : posé UNE fois, les cellules de chaque service s'alignent dessous. */
 .entete-jours { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 5px; padding: 0 0 2px 0; }
 .entete-jour { display: grid; justify-items: center; gap: 0; padding: 4px 2px; border-radius: 10px; font-size: 11px; color: var(--texte-3); font-weight: 600; text-transform: capitalize; }
-.entete-jour b { font-family: var(--police-titre); font-size: 17px; color: var(--texte); font-weight: 700; }
+.entete-jour b { font-family: var(--police-titre); font-size: 18px; color: var(--texte); font-weight: 700; letter-spacing: var(--serre); }
 .entete-jour[data-aujourdhui] { background: var(--accent-soft); color: var(--accent); }
 .entete-jour[data-aujourdhui] b { color: var(--accent); }
 
 .services { display: grid; gap: var(--e-2); }
-.service { display: grid; gap: 8px; padding: 10px; border-radius: 14px; background: var(--surface-2); border: 1px solid transparent; }
+.service { display: grid; gap: 9px; padding: 12px; border-radius: var(--r-3); background: var(--surface-2); }
 .service[data-ton="repas"] { background: color-mix(in srgb, var(--chaud-soft) 55%, var(--surface-2)); }
 .service[data-ton="loisir"] { background: color-mix(in srgb, var(--loisir-soft) 45%, var(--surface-2)); }
 .service-tete { display: flex; align-items: center; gap: 9px; }
 .service-tete > div { flex: 1 1 auto; }
-.service-nom { font-weight: 650; font-size: 14px; letter-spacing: -0.01em; }
+.service-nom { font-weight: 650; font-size: var(--t-14); letter-spacing: var(--serre); }
 .service-icone { width: 32px; height: 32px; border-radius: 10px; display: grid; place-items: center; background: var(--surface); color: var(--texte-2); flex: 0 0 auto; box-shadow: var(--el-1); }
 .service[data-ton="repas"] .service-icone { color: var(--chaud); }
 .service[data-ton="loisir"] .service-icone { color: var(--loisir); }
@@ -35,7 +35,7 @@
 .service-annuels > summary { font-size: var(--t-13); color: var(--texte-2); font-weight: 600; padding: 6px 2px; }
 
 /* Une cellule = un jour pour CE service : l'état est écrit, jamais deviné. */
-.creneau { display: flex; align-items: center; justify-content: center; gap: 3px; min-height: 44px; padding: 6px 2px; border-radius: 10px; border: 1px solid transparent; background: var(--surface); color: var(--texte-2); font: inherit; font-size: 11px; font-weight: 600; line-height: 1.15; cursor: pointer; text-align: center; transition: transform var(--d-1), filter var(--d-2), background var(--d-2); }
+.creneau { display: flex; align-items: center; justify-content: center; gap: 3px; min-height: 46px; padding: 6px 2px; border-radius: 12px; border: 1px solid transparent; background: var(--surface); color: var(--texte-2); font: inherit; font-size: 11px; font-weight: 600; line-height: 1.15; cursor: pointer; text-align: center; transition: transform var(--d-1), filter var(--d-2), background var(--d-2); }
 .creneau:active:not(:disabled) { transform: scale(0.94); }
 .creneau[data-etat="reservee"] { background: var(--accent); color: var(--accent-texte); box-shadow: 0 3px 8px color-mix(in srgb, var(--accent) 30%, transparent); }
 .creneau[data-etat="presence"] { background: var(--ok-soft); color: var(--ok); }
@@ -49,7 +49,7 @@
 
 /* Résumé de la semaine, par service */
 .resume-semaine { display: grid; gap: 6px; }
-.resume-semaine strong { font-size: var(--t-22); font-family: var(--police-titre); }
+.resume-semaine strong { font-size: var(--t-28); font-family: var(--police-titre); letter-spacing: var(--tres-serre); line-height: 1.1; }
 .resume-services { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 2px; }
 .resume-service { font-size: var(--t-12); font-weight: 600; padding: 3px 10px; border-radius: var(--r-pill); background: color-mix(in srgb, var(--accent-texte) 18%, transparent); }
 .resume-service b { font-weight: 800; }
@@ -81,3 +81,14 @@
 .vitrine-service[data-ton="repas"] { border-left-color: var(--appel); }
 .vitrine-service[data-ton="loisir"] { border-left-color: var(--loisir); }
 @media (min-width: 760px) { .vitrine-chiffres { grid-template-columns: repeat(4, minmax(0, 1fr)); } .vitrine-grille { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+
+/* ---- Visite guidée (démonstration) : trois bulles, en bas, au-dessus des onglets ---- */
+.visite { position: fixed; left: 12px; right: 12px; bottom: calc(var(--onglets-h) + 12px + env(safe-area-inset-bottom)); z-index: 30; display: grid; gap: 8px; padding: 14px 16px; border-radius: var(--r-3); background: var(--surface); box-shadow: var(--el-3); max-width: 460px; margin: 0 auto; animation: monte var(--d-3) var(--ease); }
+.visite-tete { display: flex; align-items: center; justify-content: space-between; }
+.visite-pas { font-size: var(--t-12); font-weight: 700; color: var(--accent); letter-spacing: 0.04em; }
+.visite strong { font-family: var(--police-titre); font-size: var(--t-18); letter-spacing: var(--serre); }
+.visite-points { display: flex; gap: 5px; align-items: center; }
+.visite-points span { width: 7px; height: 7px; border-radius: 999px; background: var(--surface-3); }
+.visite-points span[data-actif] { background: var(--accent); width: 18px; }
+@keyframes monte { from { opacity: 0; transform: translateY(10px) } to { opacity: 1; transform: none } }
+@media (min-width: 760px) { .visite { bottom: 16px; } }
