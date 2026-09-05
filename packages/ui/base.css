@@ -16,7 +16,7 @@ code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-si
 /* Coquille */
 .coquille { min-height: 100dvh; display: flex; flex-direction: column; }
 .entete { position: sticky; top: 0; z-index: 20; padding-top: env(safe-area-inset-top); background: color-mix(in srgb, var(--fond) 82%, transparent); backdrop-filter: saturate(160%) blur(12px); -webkit-backdrop-filter: saturate(160%) blur(12px); }
-.entete-inner { max-width: var(--largeur); margin: 0 auto; min-height: var(--entete-h); padding: var(--e-2) var(--e-4); display: flex; align-items: center; gap: var(--e-3); }
+.entete-inner { max-width: var(--largeur); margin: 0 auto; min-height: var(--entete-h); padding: var(--e-2) var(--e-4); display: flex; align-items: center; gap: var(--e-3); flex-wrap: nowrap; container: entete / inline-size; }
 .contenu { flex: 1; width: 100%; max-width: var(--largeur); margin: 0 auto; padding: var(--e-2) var(--e-4) calc(var(--onglets-h) + var(--e-6) + env(safe-area-inset-bottom)); display: grid; gap: var(--e-4); align-content: start; }
 .contenu > * { min-width: 0; }
 @media (min-width: 760px) { .contenu { padding-bottom: var(--e-12); } }
@@ -31,7 +31,12 @@ button.onglet { border: 0; background: transparent; font: inherit; font-size: 11
 @media (min-width: 760px) { .onglets { display: none; } }
 
 /* Navigation desktop (client) et barre latérale (admin) */
-.nav-desktop { display: none; gap: var(--e-1); }
+.nav-desktop { display: none; gap: var(--e-1); flex: 0 0 auto; }
+@container entete (max-width: 940px) {
+  .entete-inner .profil-ident, .entete-inner .profil-bouton > svg { display: none; }
+  .entete-inner .profil-bouton { padding: 4px; gap: 0; }
+}
+@container entete (max-width: 720px) { .marque small { display: none; } }
 .nav-lien { display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px; border-radius: var(--r-pill); font-size: var(--t-13); font-weight: 600; color: var(--texte-2); transition: background var(--d-2), color var(--d-2); }
 .nav-lien:hover { background: var(--surface-2); color: var(--texte); }
 .nav-lien[data-actif] { background: var(--surface); color: var(--accent); box-shadow: var(--el-1); }
@@ -45,7 +50,7 @@ button.onglet { border: 0; background: transparent; font: inherit; font-size: 11
 @media (min-width: 900px) { [data-registre="admin"] .laterale { display: flex; } [data-registre="admin"] .entete-mobile { display: none; } }
 
 /* Marque */
-.marque { display: flex; align-items: center; gap: 10px; font-family: var(--police-titre); font-weight: 700; font-size: var(--t-16); color: var(--texte); min-width: 0; }
+.marque { display: flex; align-items: center; gap: 10px; flex: 0 0 auto; white-space: nowrap; font-family: var(--police-titre); font-weight: 700; font-size: var(--t-16); color: var(--texte); min-width: 0; }
 .marque-logo { width: 32px; height: 32px; border-radius: 10px; background: linear-gradient(135deg, var(--accent), var(--accent-fort)); color: var(--accent-texte); display: grid; place-items: center; font-size: 15px; font-weight: 800; flex: 0 0 auto; box-shadow: var(--el-1); }
 .marque small { font-weight: 500; color: var(--texte-3); font-size: var(--t-12); }
 .marque-logo-officiel { height: 30px; width: auto; flex: 0 0 auto; }
@@ -213,3 +218,22 @@ hr, .filet { border: 0; height: 1px; background: color-mix(in srgb, var(--bord) 
 .bandeau-demo svg { flex: 0 0 auto; }
 .bandeau-demo-fermer { margin-left: auto; border: 0; background: transparent; color: inherit; cursor: pointer; padding: 2px; border-radius: 999px; opacity: .7; }
 .bandeau-demo-fermer:hover { opacity: 1; }
+
+/* ---- Chargement et clics : tout geste répond en moins de 100 ms ---- */
+.rouet { display: inline-block; flex: 0 0 auto; border: 2px solid color-mix(in srgb, currentColor 25%, transparent); border-top-color: currentColor; border-radius: 999px; animation: rouet .7s linear infinite; }
+@keyframes rouet { to { transform: rotate(360deg) } }
+
+/* Barre de progression de navigation : fine, en haut, jamais bloquante. */
+.barre-route { position: fixed; inset: 0 auto auto 0; height: 2px; width: 0; z-index: 60; background: var(--accent); border-radius: 0 999px 999px 0; opacity: 0; transition: width .4s ease, opacity .2s ease; pointer-events: none; }
+.barre-route[data-actif] { width: 82%; opacity: 1; transition: width 6s cubic-bezier(.06,.84,.3,1), opacity .12s ease; }
+
+/* Un contrôle qui travaille : il le montre, et il ne se re-tape pas. */
+[aria-busy="true"] > .rouet, .bouton[data-charge] { cursor: progress; }
+.bouton[data-charge] { opacity: .82; }
+.creneau[data-charge] { opacity: .6; cursor: progress; }
+.creneau[data-charge]::after { content: ""; position: absolute; inset: auto 5px 5px auto; width: 9px; height: 9px; border: 2px solid color-mix(in srgb, currentColor 25%, transparent); border-top-color: currentColor; border-radius: 999px; animation: rouet .7s linear infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .rouet, .creneau[data-charge]::after { animation-duration: 2.4s; }
+  .squelette { animation: none; }
+  .barre-route[data-actif] { transition: opacity .12s ease; width: 82%; }
+}

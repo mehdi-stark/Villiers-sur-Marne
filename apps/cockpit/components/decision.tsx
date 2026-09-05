@@ -2,6 +2,7 @@
 
 import { Check, Clock } from "lucide-react";
 import { useState, useTransition } from "react";
+import { Rouet } from "@ville/ui";
 import { prevenirAgent, trancher } from "@/app/pilotage/actions";
 
 export type PriseClient = { choix: string; note: string | null; acteur: string; trancheLe: string; reporteLe: string | null };
@@ -26,10 +27,12 @@ export function Decision(p: {
   const [erreur, setErreur] = useState<string | null>(null);
   const [ouvrirNote, setOuvrirNote] = useState(false);
   const [prevenu, setPrevenu] = useState<string | null>(null);
+  const [enCours, setEnCours] = useState<string | null>(null); // le choix qu'on est en train d'enregistrer
   const prevenir = () => demarrer(async () => { const r = await prevenirAgent(); setPrevenu(r.message); });
 
   const choisir = (choix: string) => {
     setErreur(null);
+    setEnCours(choix);
     demarrer(async () => {
       try {
         await trancher({ sujet: p.sujet, cle: p.cle, libelle: p.titre, choix, note: note || undefined });
@@ -37,6 +40,8 @@ export function Decision(p: {
         setOuvrirNote(false);
       } catch {
         setErreur("La décision n'a pas été enregistrée — réessaie.");
+      } finally {
+        setEnCours(null);
       }
     });
   };
@@ -56,7 +61,7 @@ export function Decision(p: {
       </div>
       <div className="decision-options" role="group" aria-label={`Options pour « ${p.titre} »`}>
         {p.options.map((o) => (
-          <button key={o} className="bouton" data-choisi={p.prise?.choix === o || undefined} data-variant={!p.prise && p.recommandation === o ? "primaire" : undefined} disabled={enAttente} onClick={() => choisir(o)}>
+          <button key={o} className="bouton" data-choisi={p.prise?.choix === o || undefined} data-variant={!p.prise && p.recommandation === o ? "primaire" : undefined} data-charge={enCours === o || undefined} disabled={enAttente} onClick={() => choisir(o)}>
             {o}
           </button>
         ))}

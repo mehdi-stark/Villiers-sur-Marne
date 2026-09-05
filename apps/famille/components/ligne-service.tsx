@@ -22,23 +22,29 @@ export function LigneService(p: {
   const [iFormule, setIFormule] = useState(0);
   const [enAttente, demarrer] = useTransition();
   const [message, setMessage] = useState<string | null>(null);
+  // La cellule TAPÉE porte l'attente, pas la ligne entière : on doit voir OÙ on a tapé.
+  const [enCours, setEnCours] = useState<string | null>(null);
   const multi = p.formules.length > 1;
   // Quand une formule est déjà réservée dans la semaine, c'est celle-là qu'on montre d'abord.
   const iAffiche = multi ? (p.formules.findIndex((f) => f.reserves > 0) >= 0 && p.formules[iFormule]!.reserves === 0 ? p.formules.findIndex((f) => f.reserves > 0) : iFormule) : 0;
   const f = p.formules[iAffiche]!;
-  const taper = (c: CelluleClient) => demarrer(async () => {
-    const actuel: EtatReservation | null = c.etat === "libre" || c.etat === "non_servi" ? null : c.etat;
-    const r = await basculerCreneau({ enfantId: p.enfantId, activiteId: f.activiteId, date: c.date, actuel });
-    setMessage(r.message);
-    setTimeout(() => setMessage(null), 4000);
-  });
+  const taper = (c: CelluleClient) => {
+    setEnCours(c.date);
+    demarrer(async () => {
+      const actuel: EtatReservation | null = c.etat === "libre" || c.etat === "non_servi" ? null : c.etat;
+      const r = await basculerCreneau({ enfantId: p.enfantId, activiteId: f.activiteId, date: c.date, actuel });
+      setEnCours(null);
+      setMessage(r.message);
+      setTimeout(() => setMessage(null), 4000);
+    });
+  };
   return (
-    <div className="service" data-ton={p.ton} aria-busy={enAttente}>
+    <div className="service" data-ton={p.ton} data-compact={!p.reservable || undefined} aria-busy={enAttente}>
       <div className="service-tete">
         <span className="service-icone" aria-hidden><Icone size={17} /></span>
         <div style={{ minWidth: 0 }}>
           <div className="service-nom">{p.nom}</div>
-          <div className="mini t-3">{f.horaires} · {f.tarif} la séance</div>
+          <div className="mini t-3">{f.horaires} · {f.tarif} la séance{!p.reservable && " · sans réservation, facturé à la fréquentation réelle"}</div>
         </div>
         {p.reservable ? (
           <span className="badge" data-tone={p.reserves ? "accent" : undefined}>{p.reserves ? `${p.reserves} réservé${p.reserves > 1 ? "s" : ""}` : "aucun"}</span>
@@ -63,7 +69,7 @@ export function LigneService(p: {
             {f.cellules.map((c) => {
               const tapable = c.etat !== "non_servi" && c.possible && (c.etat === "libre" || c.etat === "reservee");
               return (
-                <button key={c.date} type="button" className="creneau" data-etat={c.etat} disabled={!tapable || enAttente} onClick={() => taper(c)}
+                <button key={c.date} type="button" className="creneau" data-etat={c.etat} data-charge={enCours === c.date || undefined} aria-busy={enCours === c.date || undefined} disabled={!tapable || enAttente} onClick={() => taper(c)}
                   title={c.etat === "non_servi" ? `${p.nom} : pas d'accueil ce jour` : `${p.nom}${f.libelle ? ` — ${f.libelle}` : ""} — ${c.verdict}`}
                   aria-label={`${p.nom}${f.libelle ? `, ${f.libelle}` : ""}, ${JOURS[c.jour]} : ${c.etat === "non_servi" ? "pas d'accueil" : LIBELLE[c.etat]}. ${c.verdict}`}>
                   {c.etat === "non_servi" ? <span className="creneau-vide" aria-hidden>·</span> : (
@@ -80,9 +86,10 @@ export function LigneService(p: {
           {multi && <p className="mini t-3 service-note">Formule affichée : <b>{f.libelle}</b> — {f.tarif}. Changez de formule avant de taper un jour.</p>}
         </>
       ) : (
-        <p className="mini t-2 service-note">Sans réservation : votre enfant peut venir chaque jour d'école{f.horaires ? ` (${f.horaires})` : ""}, vous êtes facturé à la fréquentation réelle.</p>
+        null
       )}
-      {message && <p className="petit service-message" role="status">{message}</p>}
+      {enCours && <p className="petit service-message" role="status">Enregistrement…</p>}
+      {message && !enCours && <p className="petit service-message" role="status">{message}</p>}
     </div>
   );
 }

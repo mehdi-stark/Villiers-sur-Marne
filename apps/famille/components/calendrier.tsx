@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Rouet } from "@ville/ui";
 import { basculerCreneau } from "@/app/actions";
 import type { EtatReservation } from "@ville/core/donnees/types";
 import type { JourMois } from "@/lib/mois";
@@ -14,14 +15,14 @@ const fmtJour = new Intl.DateTimeFormat("fr-FR", { weekday: "long", day: "numeri
 export function Calendrier({ enfantId, prenom, jours, euros }: { enfantId: string; prenom: string; jours: JourMois[]; euros: Record<string, string> }) {
   const [ouvert, setOuvert] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
-  const [enCours, setEnCours] = useState(false);
+  const [enCours, setEnCours] = useState<string | null>(null); // l'activité qu'on enregistre
   const jour = jours.find((j) => j.date === ouvert) ?? null;
   const taper = async (activiteId: string, date: string, etat: string) => {
-    setEnCours(true);
+    setEnCours(activiteId);
     const actuel: EtatReservation | null = etat === "libre" ? null : (etat as EtatReservation);
     const r = await basculerCreneau({ enfantId, activiteId, date, actuel });
     setMessage(r.message);
-    setEnCours(false);
+    setEnCours(null);
     setTimeout(() => setMessage(null), 4000);
   };
   return (
@@ -53,9 +54,11 @@ export function Calendrier({ enfantId, prenom, jours, euros }: { enfantId: strin
                     <div className="mini t-3">{euros[s.activiteId]} · {s.verdict}</div>
                   </div>
                   <button type="button" className="bouton bouton-sm" data-variant={s.etat === "libre" ? "primaire" : undefined} data-choisi={s.etat !== "libre" || undefined}
-                    disabled={enCours || !s.possible || s.etat === "presence" || s.etat === "absence"}
+                    data-charge={enCours === s.activiteId || undefined}
+                    disabled={enCours !== null || !s.possible || s.etat === "presence" || s.etat === "absence"}
                     onClick={() => taper(s.activiteId, jour.date, s.etat)}>
                     {s.etat === "libre" ? "Réserver" : s.etat === "reservee" ? "Annuler" : LIBELLE[s.etat]}
+                    {enCours === s.activiteId && <Rouet />}
                   </button>
                 </div>
               ))}

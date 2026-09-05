@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "typecheck": "tsc --noEmit",
-    "capturer": "node ../cockpit/scripts/capturer.mjs --base http://localhost:3001",
+    "capturer": "node ../cockpit/scripts/capturer.mjs --app famille --base http://localhost:3001",
     "icones": "node --import tsx scripts/icones.mjs"
   },
   "dependencies": {

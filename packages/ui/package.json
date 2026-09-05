@@ -10,7 +10,8 @@
     "./illustrations": "./src/illustrations.tsx",
     "./theme": "./src/theme.tsx",
     "./profil": "./src/profil.tsx",
-    "./demo": "./src/demo.tsx"
+    "./demo": "./src/demo.tsx",
+    "./chargement": "./src/chargement.tsx"
   },
   "scripts": {
     "typecheck": "tsc --noEmit"

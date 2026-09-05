@@ -1,9 +1,9 @@
-import { Clock, Info } from "lucide-react";
+import { Clock, Info, Palette, Sunrise, Sunset, Utensils } from "lucide-react";
 import { redirect } from "next/navigation";
 import { familleCourante } from "@/lib/session";
 import { joursDe, lundiDe, servicesDe } from "@/lib/semaine";
 import { euros, tarif, trancheDe } from "@ville/core/donnees/regles";
-import { reservable } from "@ville/core/donnees/services";
+import { grouperParMoment, plageHoraire } from "@ville/core/donnees/services";
 import { ActiverFaceId } from "@ville/core/ui/passkeys";
 import { ActiverNotifications } from "@ville/core/ui/push";
 import { Cascade, EtatVide, IlluCalendrier } from "@ville/ui";
@@ -14,6 +14,7 @@ import Link from "next/link";
 export const dynamic = "force-dynamic";
 const fmtJour = new Intl.DateTimeFormat("fr-FR", { weekday: "short", timeZone: "Europe/Paris" });
 const fmtSemaine = new Intl.DateTimeFormat("fr-FR", { day: "numeric", month: "long", timeZone: "Europe/Paris" });
+const ICONE_MOMENT = { sunrise: Sunrise, utensils: Utensils, sunset: Sunset, palette: Palette, book: Sunset } as const;
 
 export default async function MaSemaine({ searchParams }: { searchParams: Promise<{ s?: string }> }) {
   const f = await familleCourante();
@@ -106,21 +107,23 @@ export default async function MaSemaine({ searchParams }: { searchParams: Promis
                 })}
               </div>
               <div className="services">
-                {lignes.filter((l) => l.reservable).map((l) => (
-                  <LigneService key={l.groupe} enfantId={enfant.id} nom={l.service.nomGroupe} icone={l.service.icone} ton={l.service.ton} reservable reserves={l.reserves}
-                    formules={l.formules.map((x) => ({ activiteId: x.activite.id, libelle: x.libelle, horaires: x.activite.horaires, tarif: euros(tarif(x.activite, tranche)), cellules: x.cellules, reserves: x.reserves }))} />
-                ))}
-                {lignes.some((l) => !l.reservable) && (
-                  <details className="service-annuels">
-                    <summary>{lignes.filter((l) => !l.reservable).length} services sans réservation (inscription à l'année)</summary>
-                    <div className="pile" style={{ marginTop: 10 }}>
-                      {lignes.filter((l) => !l.reservable).map((l) => (
-                        <LigneService key={l.groupe} enfantId={enfant.id} nom={l.service.nomGroupe} icone={l.service.icone} ton={l.service.ton} reservable={false} reserves={l.reserves}
+                {grouperParMoment(lignes, (l) => l.service.moment).map(({ moment, lignes: ls }) => {
+                  const IconeMoment = ICONE_MOMENT[moment.icone];
+                  const plage = plageHoraire(ls.flatMap((l) => l.formules.map((x) => x.activite.horaires)));
+                  return (
+                    <div key={moment.cle} className="moment" data-ton={moment.ton}>
+                      <div className="moment-tete">
+                        <span className="moment-icone" aria-hidden><IconeMoment size={15} /></span>
+                        <div className="moment-titre"><b>{moment.titre}</b> <span className="mini t-3">{moment.quand}</span></div>
+                        {plage && <span className="moment-plage mini t-3">{plage}</span>}
+                      </div>
+                      {ls.map((l) => (
+                        <LigneService key={l.groupe} enfantId={enfant.id} nom={l.service.nomGroupe} icone={l.service.icone} ton={l.service.ton} reservable={l.reservable} reserves={l.reserves}
                           formules={l.formules.map((x) => ({ activiteId: x.activite.id, libelle: x.libelle, horaires: x.activite.horaires, tarif: euros(tarif(x.activite, tranche)), cellules: x.cellules, reserves: x.reserves }))} />
                       ))}
                     </div>
-                  </details>
-                )}
+                  );
+                })}
               </div>
             </section>
           ))}

@@ -98,3 +98,18 @@ demande une refonte « une décision à la fois » (assistant) — inscrit au ba
 Correctif de navigation du même jour : toute page profonde porte un lien **Retour** ; « Ma semaine »
 renvoie explicitement vers le calendrier, les activités et les factures. Un onglet ne suffit pas :
 une page atteinte depuis un menu profil n'a pas d'onglet actif, donc pas de chemin de retour visible.
+
+### Rubrique du 06/09/2026 — semaine par moments et retours de chargement
+| Axe | Ma semaine (bandes de moment) | Retours de clic et de chargement |
+|---|---|---|
+| Hiérarchie | 5 — la journée se lit du matin au soir, un bandeau par moment | 5 — l'attente est sur le contrôle tapé, pas sur le bloc |
+| Contraste | 5 — liseré de moment testé clair et sombre | 4 — rouet en `currentColor`, lisible sur tous les fonds |
+| Densité | 4 — 4 écrans à 390 px pour deux enfants, plus rien de replié | 5 |
+| Cohérence | 5 — mêmes bandes en semaine et dans le détail du calendrier | 5 — une seule primitive (`Rouet`, `BarreRoute`, squelettes) pour les 3 apps |
+| Identité | 4 — tons de service (vert, orange restauration, violet loisirs) | 4 |
+| Mouvement | 4 — aucune animation décorative ; le seul mouvement est l'attente | 5 — barre 2 px, squelette qui miroite, coupés sous `prefers-reduced-motion` |
+| États | 5 — service non réservable dit « Inscrit à l'année » sur une ligne | 5 — en cours, désactivé, hors délai : tous distincts |
+
+Mesuré, pas estimé : `scripts/tests/alignement-semaine.mjs` échoue si les colonnes de jours
+se décalent des créneaux (± 1 px, à 390 et à 1440) ; `scripts/tests/chargement.mjs` échoue
+s'il n'y a pas exactement UN contrôle en attente, ou pas de squelette pendant la navigation.

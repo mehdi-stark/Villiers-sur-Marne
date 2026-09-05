@@ -6,6 +6,7 @@ import { motion, useReducedMotion } from "motion/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
+import { BarreRoute } from "./chargement";
 
 export type Destination = { href: string; label: string; Icone: LucideIcon; compteur?: number; tone?: "warn" | "accent" };
 export type Section = { titre: string; destinations: Destination[] };
@@ -31,11 +32,12 @@ export function CoquilleClient({ children, marque, destinations, profil, connexi
   useEffect(() => { if ("serviceWorker" in navigator) navigator.serviceWorker.register("/sw.js").catch(() => {}); }, []);
   return (
     <div className="coquille">
+      <BarreRoute />
       <header className="entete">
         <div className="entete-inner">
           <Marque marque={marque} />
           {!connexion && <nav className="nav-desktop" aria-label="Navigation principale" style={{ marginLeft: 8 }}>{destinations.map(({ href, label, Icone }) => <Link key={href} href={href} className="nav-lien" data-actif={actif(p, href) || undefined}><Icone size={16} aria-hidden />{label}</Link>)}</nav>}
-          {!connexion && profil && <div style={{ marginLeft: "auto", maxWidth: 210 }}>{profil}</div>}
+          {!connexion && profil && <div style={{ marginLeft: "auto", flex: "0 0 auto", maxWidth: 210 }}>{profil}</div>}
           {connexion && action && <div style={{ marginLeft: "auto" }}>{action}</div>}
         </div>
       </header>
@@ -76,6 +78,7 @@ export function CoquilleAdmin({ children, marque, sections, profil, deconnecter,
   if (connexion) return <div className="coquille"><div className="principal"><main className="contenu">{children}</main></div></div>;
   return (
     <div className="coquille">
+      <BarreRoute />
       <aside className="laterale">
         <Marque marque={marque} style={{ padding: "4px 8px 12px" }} />
         {menu()}
@@ -157,3 +160,4 @@ export { IlluAppareil, IlluCalendrier, IlluFacture, IlluFile } from "./illustrat
 export { MenuProfil, LIENS_COMPTE, type Identite, type LienProfil } from "./profil";
 export { BasculeTheme, scriptTheme, type Theme } from "./theme";
 export { BandeauDemo } from "./demo";
+export { BarreRoute, Lien, Rouet, SqueletteCarte, SqueletteLigne, SquelettePage } from "./chargement";

@@ -38,3 +38,26 @@
 - Vercel Hobby : 100 déploiements/jour (annulés compris), 300 s/fonction → pousser en lot.
 - Auteur de commit : `cartcallai-lab` (config locale du repo) — à confirmer avant d'ajouter un remote.
 - Le script `creer-base-neon.sh` créait une base puis plantait à l'affichage (f-string avec `\"`, Python 3.14) : corrigé et rendu idempotent le 04/09/2026.
+
+## Ordonnanceur du rappel hebdomadaire (posé le 06/09/2026)
+
+Le rappel « créneaux encore réservables » n'a plus besoin d'un Mac allumé : l'ordonnanceur
+de Vercel le déclenche, déclaré dans `apps/famille/vercel.json` (lu depuis le Root Directory
+du projet `villiers-famille`) :
+
+```json
+"crons": [{ "path": "/api/cron/rappels", "schedule": "0 16 * * 5" },
+          { "path": "/api/cron/rappels", "schedule": "0 17 * * 5" }]
+```
+
+Deux entrées parce que **l'ordonnanceur ne connaît qu'UTC** et que Paris change d'heure deux
+fois par an : l'une tombe à 18 h Paris l'été, l'autre l'hiver. Celle qui tombe à côté répond
+`{"statut":"hors_fenetre"}` et n'envoie rien — le garde est dans la route (fenêtre tolérante
+17 h – 19 h Europe/Paris, l'ordonnanceur ne promettant pas la minute). Le verrou et la cadence
+de `executerRun` (7 jours) empêchent de toute façon un double envoi.
+
+Authentification : Vercel appelle en **GET** avec `Authorization: Bearer $CRON_SECRET` ;
+notre `pnpm rappels` appelle en **POST** avec `x-cron-secret`. Même secret, déjà posé sur le
+projet. Sans secret : 401. Surveillance du silence : `?action=verifier`.
+
+Test réel : `cd apps/famille && node scripts/tests/cron-ordonnanceur.mjs`.
