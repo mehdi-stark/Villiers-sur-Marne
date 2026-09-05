@@ -44,6 +44,14 @@ button.onglet { border: 0; background: transparent; font: inherit; font-size: 11
 .marque { display: flex; align-items: center; gap: 10px; font-family: var(--police-titre); font-weight: 700; font-size: var(--t-16); color: var(--texte); min-width: 0; }
 .marque-logo { width: 32px; height: 32px; border-radius: 10px; background: linear-gradient(135deg, var(--accent), var(--accent-fort)); color: var(--accent-texte); display: grid; place-items: center; font-size: 15px; font-weight: 800; flex: 0 0 auto; box-shadow: var(--el-1); }
 .marque small { font-weight: 500; color: var(--texte-3); font-size: var(--t-12); }
+.marque-logo-officiel { height: 30px; width: auto; flex: 0 0 auto; }
+[data-theme="dark"] .marque-logo-officiel { filter: brightness(0) invert(1) opacity(0.92); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .marque-logo-officiel { filter: brightness(0) invert(1) opacity(0.92); } }
+
+/* Bandeau institutionnel : le ton officiel de la ville, pour ce qui parle AU NOM de la commune. */
+.institutionnel { background: var(--institutionnel); color: #fff; border-radius: var(--r-3); padding: var(--e-4); }
+.institutionnel .t-2, .institutionnel .t-3 { color: rgb(255 255 255 / 0.78); }
+.mention { font-size: 11px; color: var(--texte-3); }
 .bouton-icone { width: 40px; height: 40px; border-radius: var(--r-2); border: 1px solid var(--bord); background: var(--surface); color: var(--texte); display: grid; place-items: center; cursor: pointer; transition: background var(--d-2); }
 .bouton-icone:hover { background: var(--surface-2); }
 
@@ -55,8 +63,9 @@ button.onglet { border: 0; background: transparent; font: inherit; font-size: 11
 /* Cartes, tuiles, rangées */
 .carte { background: var(--surface); border: 1px solid var(--bord); border-radius: var(--r-3); padding: var(--e-4); box-shadow: var(--el-1); }
 .carte > * { min-width: 0; }
-.carte-accent { background: linear-gradient(135deg, var(--accent), var(--accent-fort)); color: var(--accent-texte); border: 0; box-shadow: var(--el-2); }
-.carte-accent .t-2, .carte-accent .t-3 { color: color-mix(in srgb, var(--accent-texte) 78%, transparent); }
+.carte-accent { background: linear-gradient(135deg, var(--institutionnel), color-mix(in srgb, var(--institutionnel) 78%, black)); color: #fff; border: 0; box-shadow: var(--el-2); }
+.carte-accent .t-2, .carte-accent .t-3 { color: rgb(255 255 255 / 0.78); }
+.carte-accent .resume-service { background: rgb(255 255 255 / 0.18); }
 .pile { display: grid; gap: var(--e-3); }
 .rangee { display: flex; align-items: center; gap: var(--e-2); flex-wrap: wrap; }
 .tuiles { display: grid; gap: var(--e-3); grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -164,3 +173,9 @@ details[open] > summary::before { transform: rotate(90deg); }
 
 .onglet-pastille { position: absolute; top: 1px; right: 9px; width: 7px; height: 7px; border-radius: 999px; background: var(--accent); box-shadow: 0 0 0 2px var(--surface); }
 .onglet-pastille[data-tone="warn"] { background: var(--warn); }
+
+@media (max-width: 560px) {
+  .entete-inner .profil-bouton { padding: 4px; gap: 0; }
+  .entete-inner .profil-bouton .profil-ident, .entete-inner .profil-bouton svg { display: none; }
+  .marque small { display: none; }
+}

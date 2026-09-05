@@ -9,11 +9,21 @@ import { useEffect, useState, type ReactNode } from "react";
 
 export type Destination = { href: string; label: string; Icone: LucideIcon; compteur?: number; tone?: "warn" | "accent" };
 export type Section = { titre: string; destinations: Destination[] };
-export type Marque = { nom: string; courte: string; initiale: string; sousTitre?: string };
+export type Marque = { nom: string; courte: string; initiale: string; sousTitre?: string; logoUrl?: string | null };
 
 const actif = (p: string, href: string) => (href === "/" ? p === "/" : p.startsWith(href));
 
 /** Coquille PRODUIT CLIENT : en-tête léger + onglets en bas sur mobile, liens en haut sur desktop. */
+/** La marque : le logo officiel de la commune s'il existe, sinon l'initiale sur l'accent. */
+function Marque({ marque, style }: { marque: Marque; style?: React.CSSProperties }) {
+  return (
+    <Link href="/" className="marque" style={style} aria-label={`${marque.nom} — accueil`}>
+      {marque.logoUrl ? <img src={marque.logoUrl} alt="" className="marque-logo-officiel" /> : <span className="marque-logo" aria-hidden>{marque.initiale}</span>}
+      <span>{marque.courte} {marque.sousTitre && <small>{marque.sousTitre}</small>}</span>
+    </Link>
+  );
+}
+
 export function CoquilleClient({ children, marque, destinations, profil, connexionPath = "/connexion" }: { children: ReactNode; marque: Marque; destinations: Destination[]; profil?: ReactNode; connexionPath?: string }) {
   const p = usePathname();
   const connexion = p === connexionPath;
@@ -22,7 +32,7 @@ export function CoquilleClient({ children, marque, destinations, profil, connexi
     <div className="coquille">
       <header className="entete">
         <div className="entete-inner">
-          <Link href="/" className="marque" aria-label={`${marque.nom} — accueil`}><span className="marque-logo" aria-hidden>{marque.initiale}</span><span>{marque.courte} {marque.sousTitre && <small>{marque.sousTitre}</small>}</span></Link>
+          <Marque marque={marque} />
           {!connexion && <nav className="nav-desktop" aria-label="Navigation principale" style={{ marginLeft: 8 }}>{destinations.map(({ href, label, Icone }) => <Link key={href} href={href} className="nav-lien" data-actif={actif(p, href) || undefined}><Icone size={16} aria-hidden />{label}</Link>)}</nav>}
           {!connexion && profil && <div style={{ marginLeft: "auto", maxWidth: 210 }}>{profil}</div>}
         </div>
@@ -65,7 +75,7 @@ export function CoquilleAdmin({ children, marque, sections, profil, deconnecter,
   return (
     <div className="coquille">
       <aside className="laterale">
-        <Link href="/" className="marque" style={{ padding: "4px 8px 12px" }}><span className="marque-logo" aria-hidden>{marque.initiale}</span><span>{marque.courte} {marque.sousTitre && <small>{marque.sousTitre}</small>}</span></Link>
+        <Marque marque={marque} style={{ padding: "4px 8px 12px" }} />
         {menu()}
         <div className="laterale-pied">{profil}</div>
       </aside>
@@ -86,7 +96,7 @@ export function CoquilleAdmin({ children, marque, sections, profil, deconnecter,
                 </Dialog.Content>
               </Dialog.Portal>
             </Dialog.Root>
-            <Link href="/" className="marque"><span className="marque-logo" aria-hidden>{marque.initiale}</span><span>{marque.courte} {marque.sousTitre && <small>{marque.sousTitre}</small>}</span></Link>
+            <Marque marque={marque} />
             <div style={{ marginLeft: "auto" }}>{profil}</div>
           </div>
         </header>

@@ -17,10 +17,17 @@
 - **Mehdi (cockpit)** : « je sais ce qui m'attend et ce que ça bloque » — chiffres, badges, décisions en cartes.
 
 ## Tokens (source unique : `packages/ui/tokens.css`)
-Rôles de couleur clair/sombre (fond, surfaces 1-3, bords, texte 1-3, accent/soft/fort = **bleu Villiers `#015f89`** extrait du site officiel, secondaire vert `#71b21a`, appel orange `#ff6600`, ok/warn/danger/info + soft, **chaud** pour la restauration, **loisir** pour l'ALSH) ; titres en **Exo** (police du site) ; échelle typographique 12 → 36 ; espacement 4 pt ; rayons 8/12/16/24/pill ; élévations 1-3 ; durées 120/200/320 ms. L'accent de la commune (`packages/core/src/communes.ts`) est injecté par le layout et prime.
+Rôles de couleur clair/sombre (fond **crème `#f4f0eb`** du site, surfaces 1-3, bords, texte 1-3, **action = vert `#4a7411`** (cran foncé du vert de la ville, 5,5:1), **aplats = vert `#71b21a`**, **institutionnel = bleu `#015f89`** pour les blocs qui parlent au nom de la commune, appel orange `#ef984b`, ok/warn/danger/info + soft, **chaud** pour la restauration, **loisir** pour l'ALSH) ; titres en **Exo** (police du site) ; échelle typographique 12 → 36 ; espacement 4 pt ; rayons 8/12/16/24/pill ; élévations 1-3 ; durées 120/200/320 ms. L'accent de la commune (`packages/core/src/communes.ts`) est injecté par le layout et prime.
 
 ## Primitives (`packages/ui`)
 `CoquilleClient` (onglets bas + liens desktop), `CoquilleAdmin` (barre latérale + tiroir mobile), `EtatVide` illustré (`IlluCalendrier`, `IlluFacture`, `IlluFile`, `IlluAppareil`), `TuileChiffre` (compteur animé), `Cascade` (apparition en cascade), `BoutonTap` (spring) ; classes : `.bouton` (primaire/discret/danger, sm/lg/pleine), `.carte`, `.carte-accent`, `.badge[data-tone]`, `.bandeau`, `.ligne`, `.icone-ronde`, `.tableau-defile`.
+
+## Charte de la ville (relevée dans son CSS le 05/09/2026 — détail dans DIRECTION_ARTISTIQUE §3)
+Vert `#71b21a` (105 occurrences) = la couleur de Villiers → **aplats** ; sa version foncée `#4a7411`
+= **action** (contraste 5,5:1, testé) ; bleu `#015f89` (73) = **institutionnel**, réservé aux blocs
+pleins qui parlent au nom de la commune ; crème `#f4f0eb` (43) = **fond** de l'app en clair ; orange
+`#ef984b` (24) = **appel** (restauration) ; police **Exo** pour les titres. Logo officiel dans l'en-tête
+des trois apps et sur la vitrine, avec sa mention de propriété.
 
 ## Coquille standard (recette `COQUILLE_APPLICATION`, 05/09/2026)
 - **Sections de navigation** : cockpit « Pilotage / Le projet / Le produit » · agents « Aujourd'hui / Dossiers / Référentiel » · famille = onglets bas. Chaque entrée porte son compteur (décisions à trancher, démarches à traiter) — la couleur `warn` signale ce qui bloque.
@@ -49,7 +56,9 @@ Safe areas, inputs ≥ 16 px, `min-width: 0`, onglets fixes avec `env(safe-area-
 | Famille · Ma semaine PAR SERVICE (390, clair + sombre) | 5 | 5 | 4 | 5 | 4 | 4 | 5 | oui — chaque service nommé, horaire, tarif, formules groupées |
 | Famille · Démarche guidée (390) | 5 | 5 | 5 | 5 | 4 | 3 | 5 | oui — une pièce par carte, le bouton dit ce qui manque |
 | Agents · Démarches à traiter (1440 + 390) | 5 | 5 | 5 | 5 | 4 | 3 | 5 | oui — refus impossible sans motif |
-| Toutes · Coquille (sections + menu profil, 1280) | 5 | 5 | 5 | 5 | 4 | 4 | 5 | oui — 05/09/2026, testée (profil + thème persistant) |
+| Toutes · Coquille (sections + menu profil, 1280) | 5 | 5 | 5 | 5 | 5 | 4 | 5 | oui — charte de la ville + logo officiel |
+| Famille · Vitrine publique `/decouvrir` (1440 + 390) | 5 | 5 | 4 | 5 | 5 | 3 | 5 | oui — support de vente, mention « non officiel » |
+| Famille · Ma semaine, charte ville (390 clair + sombre) | 5 | 5 | 4 | 5 | 5 | 4 | 5 | oui |
 | Famille · Réglages (390) | 5 | 5 | 5 | 5 | 4 | 3 | 5 | oui |
 
 ### Correctif du 04/09/2026 (retour : « on ne comprend pas les services réservés »)

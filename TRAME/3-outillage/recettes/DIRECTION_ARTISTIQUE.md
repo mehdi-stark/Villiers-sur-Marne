@@ -9,6 +9,10 @@ pas la finition, c'était la DIRECTION : personne n'avait décidé à quoi ça d
 ressembler, ni mesuré l'écart avec les meilleurs du segment.
 
 ## Les six manques, et ce qu'on pose désormais
+0. **La charte du client d'abord** (quand il en a une) : compter les couleurs dans la
+   feuille de style de son site, relever police, rayons et fond, mesurer les contrastes,
+   distinguer action / aplat / institutionnel / fond / appel. Une identité empruntée bien
+   relevée vaut mieux qu'une identité inventée bien exécutée — et c'est ce qui VEND.
 1. **Une référence visuelle réelle, par registre** — trois produits du segment que
    l'opérateur reconnaît (produit client : ex. Doctolib, Lydia, Apple Santé ;
    admin : Linear, Stripe Dashboard, Notion). On EXTRAIT leurs patterns

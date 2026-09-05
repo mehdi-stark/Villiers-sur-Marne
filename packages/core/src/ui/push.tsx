@@ -9,7 +9,7 @@ function b64ToU8(b64: string) {
 
 /** Activation des notifications, partagée par les trois apps : le service worker est
  *  enregistré par la coquille ; ici on demande l'autorisation et on enregistre l'appareil. */
-export function ActiverNotifications({ texte = "Être prévenu des créneaux encore réservables" }: { texte?: string }) {
+export function ActiverNotifications({ texte = "Être prévenu des créneaux encore réservables", muetSiRefus = false }: { texte?: string; muetSiRefus?: boolean }) {
   const [etat, setEtat] = useState<"indispo" | "off" | "on" | "refus">("indispo");
   useEffect(() => {
     if (!("serviceWorker" in navigator) || !("PushManager" in window) || !("Notification" in window)) return;
@@ -26,6 +26,6 @@ export function ActiverNotifications({ texte = "Être prévenu des créneaux enc
       setEtat(r.ok ? "on" : "off");
     } catch { setEtat("off"); }
   };
-  if (etat === "refus") return <p className="mini t-3">Notifications refusées — réautorise-les dans les réglages du navigateur.</p>;
+  if (etat === "refus") return muetSiRefus ? null : <p className="mini t-3">Notifications refusées — réautorisez-les dans les réglages du navigateur.</p>;
   return <button type="button" className="bouton bouton-sm" data-variant="discret" onClick={activer} style={{ justifySelf: "start" }}>{texte}</button>;
 }

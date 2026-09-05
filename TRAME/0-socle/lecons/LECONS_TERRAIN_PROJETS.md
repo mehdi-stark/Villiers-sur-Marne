@@ -499,3 +499,26 @@ tests, les linters, les alertes et les sondes de supervision.
     jamais écrasement) et n'avait pas été appliquée au suivant. Tout endpoint
     d'inventaire refuse d'écraser un contenu non vide par du vide ; vider est
     une opération explicite, pas un effet de bord.
+86. **Avant d'ajouter une option, mesurer si le problème existe** : « je ne veux
+    pas que le Mac se mette en veille » — or `pmset -g custom` disait `sleep 0`
+    sur secteur : branché, capot ouvert, ce Mac ne dort JAMAIS. Le risque réel
+    était ailleurs (batterie : `sleep 1`, une minute ; capot fermé : rien n'y
+    peut). Trois minutes de mesure ont transformé une option approximative en
+    trois réponses justes — dont une qui dit franchement « là, je ne peux rien ».
+87. **Un processus lancé par un job launchd meurt avec lui** : le `caffeinate`
+    démarré par l'écouteur disparaissait à la fin du passage, pendant que le
+    journal affichait fièrement « éveillé jusqu'à 11:55 ». Ce qui doit survivre
+    à son lanceur se confie à launchd (son propre agent), pas à un `nohup` — et
+    on le vérifie par le PPID, pas par le message de succès du script.
+88. **Un horodatage sans fuseau ment** : les scripts du Mac émettaient
+    `2026-09-05T10:58:41`, lu comme de l'UTC par le serveur puis affiché à
+    Dubaï — deux heures d'écart, en silence, sur toutes les dates du parc depuis
+    le premier jour. `%z` clôt la question. Et pour une échéance courte, une
+    durée RELATIVE (« encore 58 min ») ne dépend d'aucun fuseau : c'est la seule
+    forme qu'on ne peut pas lire de travers.
+89. **Sous launchd, `/usr/sbin` n'est pas dans le PATH** : `ipconfig` et
+    `networksetup` échouaient en silence, et l'app annonçait « SANS RÉSEAU » à
+    un Mac parfaitement connecté — une alarme fausse sur le point le plus
+    sensible du système. Même piège que celui payé le 31/08 pour `claude`. Tout
+    binaire appelé depuis un job launchd s'écrit en chemin ABSOLU, et le script
+    se teste avec `env -i PATH=<celui du plist>`.

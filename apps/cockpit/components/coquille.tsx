@@ -30,5 +30,5 @@ export function Coquille({ children, email, aTrancher, aReporter }: { children: 
       deconnecter={deconnecter}
       extra={aReporter > 0 ? <div className="profil-item" style={{ cursor: "default" }}><CheckSquare size={16} aria-hidden /> {aReporter} décision(s) à reporter par l'agent</div> : undefined} />
   ) : undefined;
-  return <CoquilleAdmin marque={{ nom: "Ville — cockpit", courte: "Ville", initiale: "V", sousTitre: "cockpit" }} sections={sections} profil={profil}><VerrouBiometrique cle="ville-passkey" /><Pwa />{children}</CoquilleAdmin>;
+  return <CoquilleAdmin marque={{ nom: "Ville — cockpit", courte: "Ville", initiale: "V", sousTitre: "cockpit", logoUrl: "/logo-villiers.svg" }} sections={sections} profil={profil}><VerrouBiometrique cle="ville-passkey" /><Pwa />{children}</CoquilleAdmin>;
 }

@@ -32,6 +32,9 @@ trois cookies/secrets** (`ville_session`/`AUTH_SECRET`, `famille_session`/`FAMIL
 
 **Déployé (3 projets Vercel mehdi-starks-projects, sans SSO)** : cockpit `https://villiers-sur-marne.vercel.app` · famille `https://villiers-famille.vercel.app` · agents `https://villiers-agents.vercel.app` — `pnpm deployer cockpit|famille|agents` (depuis la racine). GitHub `mehdi-stark/Villiers-sur-Marne`.
 **Données** : adaptateur `packages/core/src/donnees/` (`SOURCE_DONNEES=fictif`), règles réelles de Villiers sourcées, écritures persistées (`reservations.ts` : réserver/annuler avec verdict, pointer), page `/pilotage/donnees`.
+**Identité** : charte RELEVÉE dans le CSS du site officiel (vert action `#4a7411`, aplats `#71b21a`,
+institutionnel `#015f89`, fond crème `#f4f0eb`, appel `#ef984b`, police Exo, logo `public/logo-villiers.svg`
+avec mention de propriété) — `packages/core/src/communes.ts`, contrastes testés. Vitrine publique : `/decouvrir`.
 **Coquille** : `packages/ui` — `CoquilleAdmin` à SECTIONS (+ compteurs), `CoquilleClient` (onglets bas),
 `MenuProfil` (identité, thème clair/sombre/système, réglages, appareils, déconnexion), `scriptTheme` (anti-flash).
 Démo peuplée : `apps/agents/scripts/seed-demo.mjs` (idempotent, `--purger`). Recette `COQUILLE_APPLICATION`.

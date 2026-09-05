@@ -76,7 +76,7 @@ export function Pwa() {
         </button>
       )}
       {notif === "on" && <span className="tiny" style={{ display: "inline-flex", alignItems: "center", gap: 5 }}><BellRing size={12} aria-hidden /> Notifications actives sur cet appareil</span>}
-      {notif === "refus" && <span className="tiny">Notifications refusées — réautorise-les dans les réglages du navigateur.</span>}
+      
     </>
   );
 }

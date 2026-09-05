@@ -48,6 +48,7 @@ function Formulaire() {
               {occupe ? "Envoi…" : "Recevoir un code"}
             </button>
             <p className="mini t-3">Un code à 6 chiffres, valable 10 minutes. L'adresse doit être celle de votre dossier famille.</p>
+            <a className="mini" href="/decouvrir">Découvrir le portail</a>
           </>
         ) : (
           <>

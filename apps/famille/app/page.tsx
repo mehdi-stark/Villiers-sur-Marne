@@ -72,7 +72,7 @@ export default async function MaSemaine({ searchParams }: { searchParams: Promis
       </div>
 
       <ActiverFaceId cle="famille-passkey" />
-      <ActiverNotifications texte="Me rappeler les créneaux encore réservables" />
+      <ActiverNotifications texte="Me rappeler les créneaux encore réservables" muetSiRefus />
       <SemaineType />
 
       {verdictCantine && (

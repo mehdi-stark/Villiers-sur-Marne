@@ -28,7 +28,7 @@ export default async function Layout({ children }: { children: React.ReactNode }
         <style dangerouslySetInnerHTML={{ __html: jetonsCommune(c) }} />
         <script dangerouslySetInnerHTML={{ __html: scriptTheme }} />
       </head>
-      <body><Coquille commune={{ nom: c.nom, courte: c.courte, initiale: c.logoInitiale, telephone: c.telephoneAccueil }} famille={f?.famille.nom ?? null} email={f?.email ?? null} demarchesActives={actives}>{children}</Coquille></body>
+      <body><Coquille commune={{ nom: c.nom, courte: c.courte, initiale: c.logoInitiale, telephone: c.telephoneAccueil, logoUrl: c.logoUrl, mentionLogo: c.mentionLogo }} famille={f?.famille.nom ?? null} email={f?.email ?? null} demarchesActives={actives}>{children}</Coquille></body>
     </html>
   );
 }
