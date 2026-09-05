@@ -29,7 +29,8 @@
     "./demarches-definitions": "./src/demarches-definitions.ts",
     "./documents/proposition": "./src/documents/proposition.ts",
     "./marche": "./src/marche.ts",
-    "./demonstration": "./src/demonstration.ts"
+    "./demonstration": "./src/demonstration.ts",
+    "./demo-seed": "./src/demo-seed.ts"
   },
   "scripts": {
     "db:generate": "drizzle-kit generate",

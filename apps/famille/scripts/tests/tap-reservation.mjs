@@ -25,11 +25,17 @@ try {
   const repas = p.locator("button.creneau[data-etat=\"libre\"]:not(:disabled)").first();
   await repas.waitFor({ timeout: 15000 });
   const label = await repas.getAttribute("aria-label");
+  // On re-cible EXACTEMENT le même créneau après le tour serveur (la page contient d'autres
+  // créneaux déjà réservés : cliquer « le premier réservé » annulerait celui d'un autre jour).
+  const jour = label.match(/, (Lun\.|Mar\.|Mer\.|Jeu\.|Ven\.) :/)[1];
+  const service = label.split(",")[0];
+  const meme = () => p.locator("button.creneau").filter({ has: p.locator("xpath=.") }).filter({ hasText: /./ }).and(p.locator(`[aria-label^="${service}"][aria-label*=", ${jour} :"]`)).first();
   await repas.click();
-  await p.locator("button.creneau[data-etat=\"reservee\"]").first().waitFor({ timeout: 15000 });
+  await meme().locator("xpath=.").waitFor({ timeout: 15000 });
+  await p.waitForTimeout(1200);
   const l1 = await sql`SELECT etat, acteur FROM reservations_demo WHERE acteur = ${EMAIL}`;
   if (l1.length !== 1 || l1[0].etat !== "reservee") throw new Error(`base après réservation : ${JSON.stringify(l1)}`);
-  await p.locator("button.creneau[data-etat=\"reservee\"]").first().click();
+  await meme().click();
   await p.waitForTimeout(1500);
   const l2 = await sql`SELECT etat FROM reservations_demo WHERE acteur = ${EMAIL}`;
   if (l2[0]?.etat !== "annulee") throw new Error(`base après annulation : ${JSON.stringify(l2)}`);

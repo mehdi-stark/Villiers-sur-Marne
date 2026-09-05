@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { TYPES, type TypeDemarche } from "@ville/core/demarches-definitions";
 import { familleCourante } from "@/lib/session";
 import { FormulaireDemarche } from "@/components/formulaire-demarche";
+import { Retour } from "@/components/retour";
 
 export const metadata: Metadata = { title: "Nouvelle démarche" };
 export const dynamic = "force-dynamic";
@@ -15,6 +16,7 @@ export default async function Nouvelle({ searchParams }: { searchParams: Promise
   const valide = type && type in TYPES ? (type as TypeDemarche) : null;
   return (
     <>
+      <Retour vers="/demarches" libelle="Mes démarches" />
       <div className="page-tete"><div><span className="salut">{f.famille.nom}</span><h1>{valide ? TYPES[valide].nom : "Nouvelle démarche"}</h1><p className="petit t-2">{valide ? "Les pièces sont demandées une par une ; vous pouvez les photographier." : "Choisissez la démarche à effectuer."}</p></div></div>
       {valide ? <FormulaireDemarche type={valide} /> : (
         <div className="pile">

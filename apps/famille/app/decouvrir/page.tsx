@@ -93,6 +93,25 @@ export default async function Decouvrir() {
       </section>
 
       <section className="carte pile">
+        <h2>Une commune, une identité</h2>
+        <p className="petit t-2">La charte se lit dans un fichier : couleurs, police, logo, coordonnées. Les treize communes d'Infocom'94 partagent le même moteur, chacune garde son image.</p>
+        <div className="identites">
+          <div className="identite" style={{ "--i-accent": "#4a7411", "--i-inst": "#015f89", "--i-fond": "#f4f0eb" } as React.CSSProperties}>
+            <span className="identite-bandeau" />
+            <strong>Villiers-sur-Marne</strong>
+            <div className="identite-jetons"><span style={{ background: "#4a7411" }} /><span style={{ background: "#71b21a" }} /><span style={{ background: "#015f89" }} /><span style={{ background: "#ef984b" }} /></div>
+            <span className="mini t-3">Relevé dans la charte du site officiel · police Exo</span>
+          </div>
+          <div className="identite" style={{ "--i-accent": "#2f5bea", "--i-inst": "#1f3a93", "--i-fond": "#f4f5f9" } as React.CSSProperties}>
+            <span className="identite-bandeau" />
+            <strong>Une autre commune</strong>
+            <div className="identite-jetons"><span style={{ background: "#2f5bea" }} /><span style={{ background: "#6d8cff" }} /><span style={{ background: "#1f3a93" }} /><span style={{ background: "#d9772a" }} /></div>
+            <span className="mini t-3">Même produit, autre charte — une entrée dans le fichier des communes</span>
+          </div>
+        </div>
+      </section>
+
+      <section className="carte pile">
         <h2>Les services couverts</h2>
         <div className="vitrine-services">
           {ACTIVITES.map((a) => (

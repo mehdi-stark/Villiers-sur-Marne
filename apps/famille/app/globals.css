@@ -102,3 +102,42 @@
 .porte-num { width: 26px; height: 26px; border-radius: 999px; display: grid; place-items: center; background: var(--accent-soft); color: var(--accent); font-size: var(--t-12); font-weight: 800; }
 .porte-action { font-size: var(--t-13); font-weight: 650; color: var(--accent); margin-top: 2px; }
 @media (min-width: 760px) { .portes-grille { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+
+/* Légende : une pastille de couleur devant chaque état */
+.legende { display: flex; gap: 12px; flex-wrap: wrap; font-size: var(--t-12); color: var(--texte-2); }
+.legende span { display: inline-flex; align-items: center; }
+.legende span::before { content: ""; display: inline-block; width: 9px; height: 9px; border-radius: 3px; margin-right: 6px; background: var(--x); }
+
+/* ---- Calendrier du mois ---- */
+.calendrier { display: grid; gap: 8px; }
+.calendrier-entete { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; font-size: 11px; font-weight: 700; color: var(--texte-3); text-align: center; }
+.calendrier-grille { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
+.jour-mois { display: grid; gap: 3px; justify-items: center; align-content: start; min-height: 46px; padding: 5px 2px; border: 0; border-radius: 10px; background: var(--surface-2); color: var(--texte); font: inherit; cursor: pointer; transition: background var(--d-2), transform var(--d-1); }
+.jour-mois:active { transform: scale(0.95); }
+.jour-mois[data-hors] { opacity: 0.35; }
+.jour-mois[data-weekend] { background: transparent; }
+.jour-mois[data-aujourdhui] { box-shadow: inset 0 0 0 1.5px var(--accent); }
+.jour-mois[data-ouvert] { background: var(--accent-soft); }
+.jour-mois-num { font-size: var(--t-13); font-weight: 650; font-variant-numeric: tabular-nums; }
+.jour-mois-pastilles { display: flex; gap: 2px; min-height: 6px; }
+.pastille { width: 6px; height: 6px; border-radius: 999px; background: var(--bord-fort); }
+.pastille[data-etat="reservee"] { background: var(--accent); }
+.pastille[data-etat="presence"] { background: var(--ok); }
+.pastille[data-etat="absence"] { background: var(--warn); }
+.calendrier-detail { display: grid; gap: 8px; padding: 12px; border-radius: var(--r-2); background: var(--surface-2); }
+.detail-ligne { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; }
+.tarifs-lignes { display: grid; gap: 6px; }
+.tarif-ligne { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; font-size: var(--t-13); }
+.tarif-ligne strong { font-size: var(--t-16); font-family: var(--police-titre); }
+.retour { display: inline-flex; align-items: center; gap: 4px; font-size: var(--t-13); font-weight: 600; color: var(--texte-2); padding: 4px 0; }
+.retour:hover { color: var(--accent); text-decoration: none; }
+
+/* ---- Deux identités côte à côte : le même produit, deux communes ---- */
+.identites { display: grid; gap: var(--e-3); grid-template-columns: 1fr; }
+.identite { display: grid; gap: 6px; padding: var(--e-3); border-radius: var(--r-2); background: var(--i-fond); box-shadow: var(--el-1); }
+.identite-bandeau { height: 8px; border-radius: 999px; background: linear-gradient(90deg, var(--i-inst), var(--i-accent)); }
+.identite strong { font-family: var(--police-titre); letter-spacing: var(--serre); color: #12131a; }
+.identite .mini { color: #555a6b; }
+.identite-jetons { display: flex; gap: 5px; }
+.identite-jetons span { width: 22px; height: 22px; border-radius: 7px; }
+@media (min-width: 640px) { .identites { grid-template-columns: 1fr 1fr; } }

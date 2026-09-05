@@ -1,58 +1,41 @@
-# ville — état courant (04/09/2026) — LIRE EN PREMIER
+# ville — état courant (05/09/2026) — LIRE EN PREMIER
 
-**Projet** : portail famille de nouvelle génération pour Villiers-sur-Marne (B2G :
-client = mairie / Infocom'94, paiement famille = PayFIP). Cadrage rédigé
-(`docs/planning/CADRAGE.md`), **en attente des décisions de l'opérateur**.
-Étapes 1-2/7 : cadrage (7 décisions) et **verdict marché calculé : 68/100, GO
-conditionnel dégradé à NO-GO** tant que la faille « pas d'API Agora+ » n'est pas parée
-(`lib/marche.ts`, `/pilotage/marche`) — **aucun code MÉTIER avant** que l'opérateur tranche.
+**Projet** : portail famille de nouvelle génération proposé à Villiers-sur-Marne
+(B2G : client = mairie / Infocom'94, paiement famille = PayFIP). Cadrage, analyse de
+marché, audit et direction artistique rédigés dans `docs/planning/`.
+**⏸ 21 décisions attendent Mehdi dans le cockpit** (7 cadrage, 7 design, 1 marché,
+6 backlog) — le verdict marché reste **NO-GO tant que l'interop Agora+ n'est pas parée**.
 
-**Au début de CHAQUE session** : `pnpm decisions` — les décisions prises depuis le
-cockpit (table `decisions`) ; les reporter dans le document canonique avec la
-date, puis `pnpm decisions --reporter <id,…>`. Puis relire `.claude-consignes.md`.
+**Au début de CHAQUE session** : `pnpm decisions` (décisions tranchées depuis le cockpit),
+les reporter dans le document canonique avec la date, puis `pnpm decisions --reporter <id,…>`.
+Puis relire `.claude-consignes.md` et `.claude-resume.txt`.
 
-**Structure (monorepo pnpm, 04/09/2026)** : `apps/cockpit` (pilotage, port 3000) · `apps/famille` (portail famille PWA, 3001) ·
-`apps/agents` (back-office agents PWA, 3002) · **`packages/ui`** (jetons `tokens.css` + `base.css` + primitives React — SEULE source de style, aucune app ne redéfinit de jetons) · `packages/core` (`db/schema.ts` + migrations, `src/auth.ts` `creerAuth` PAR app,
-`src/donnees/` adaptateur + règles réelles, `src/communes.ts` thème par commune, e-mail, alertes, push). Les documents
-canoniques restent à la racine (`docs/planning`), lus par le cockpit via `../../docs/planning`. **Trois déploiements séparés,
-trois cookies/secrets** (`ville_session`/`AUTH_SECRET`, `famille_session`/`FAMILLE_AUTH_SECRET`, `agents_session`/`AGENTS_AUTH_SECRET`).
+**Trois applications déployées SÉPARÉMENT** (monorepo pnpm, Next.js 15 App Router, TS strict) :
+- **Cockpit** `apps/cockpit` → https://villiers-sur-marne.vercel.app — pilotage, décisions,
+  cadrage, direction artistique, marché, backlog, données et tarifs, journal des présentations.
+- **Portail famille** `apps/famille` → https://villiers-famille.vercel.app — PWA : Ma semaine,
+  Calendrier (mois), Factures, Démarches, Activités et tarifs, Enfants, Appareils, Réglages ;
+  vitrine publique `/decouvrir` + dossier PDF ; lien de présentation borné `/presentation`.
+- **Back-office agents** `apps/agents` → https://villiers-agents.vercel.app — PWA : file du
+  jour et pointage, démarches à valider, activités, familles, réglages (réinitialiser la démo).
 
-**Ce qui existe et est PROUVÉ** (maillon 0, recette `TRAME/3-outillage/recettes/COCKPIT_SQUELETTE.md`) :
-- Cockpit Next.js 15 (App Router, TS strict) dans `apps/cockpit` : `/` pilotage, `/pilotage/cadrage`
-  (décisions en un tap), `/pilotage/decisions` (tout ce qui attend, badge PWA), `/pilotage/marche` (verdict par code), `/pilotage/backlog`, `/connexion`
-  (OTP e-mail, whitelist `ADMIN_EMAILS`). PWA (manifest, `public/sw.js` push-only, icônes `pnpm icones`),
-  push web (`lib/push.ts`, `pnpm notifier "Titre" "Corps" /url` → l'opérateur).
-- Base Neon « ville » (une base par projet) ; schéma `db/schema.ts` (Drizzle, migrations
-  GÉNÉRÉES dans `db/migrations`) : `decisions`, `otp_codes`, `journal_connexions`, `alertes`, `parametres`, `push_abonnements`.
-- Charte en jetons `app/globals.css` (clair/sombre, registre admin sobre), coquille
-  `components/coquille.tsx` (header collant, drawer Radix), `components/decision.tsx`.
-- Preuves : `captures/*-1440.png` et `*-390.png` sans débordement (`pnpm capturer --forger <email>`),
-  test réel du tap `scripts/tests/tap-decision.mjs` (auto-purgé), CI `.github/workflows/ci.yml`.
-- Convention du §7 du cadrage : dernière ligne `Options : A · B — Recommandation : A` (parsée par `lib/docs.ts`).
+**Partagé** : `packages/core` (schéma Drizzle unique + migrations GÉNÉRÉES, auth PAR app
+`creerAuth`, passkeys, push, données réelles de Villiers, facturation, PayFIP, documents PDF,
+démonstration bornée, runs/cron) et `packages/ui` (jetons, primitives, coquilles, thème).
+**Jamais** de session, cookie ou secret partagé entre apps.
 
-**Déployé (3 projets Vercel mehdi-starks-projects, sans SSO)** : cockpit `https://villiers-sur-marne.vercel.app` · famille `https://villiers-famille.vercel.app` · agents `https://villiers-agents.vercel.app` — `pnpm deployer cockpit|famille|agents` (depuis la racine). GitHub `mehdi-stark/Villiers-sur-Marne`.
-**Données** : adaptateur `packages/core/src/donnees/` (`SOURCE_DONNEES=fictif`), règles réelles de Villiers sourcées, écritures persistées (`reservations.ts` : réserver/annuler avec verdict, pointer), page `/pilotage/donnees`.
-**Identité** : charte RELEVÉE dans le CSS du site officiel (vert action `#4a7411`, aplats `#71b21a`,
-institutionnel `#015f89`, fond crème `#f4f0eb`, appel `#ef984b`, police Exo, logo `public/logo-villiers.svg`
-avec mention de propriété) — `packages/core/src/communes.ts`, contrastes testés. **Démonstration** : données relatives à aujourd'hui (`fictif.ts`), mode présentation borné (`packages/core/src/demonstration.ts`, `/presentation?demo=…`, `pnpm --filter famille exec node scripts/lien-presentation.mjs`), bandeau démo dans les 3 apps. Vitrine publique : `/decouvrir` (+ visite guidée, dossier PDF `/decouvrir/dossier.pdf` via `packages/core/src/documents/proposition.ts`).
-**Coquille** : `packages/ui` — `CoquilleAdmin` à SECTIONS (+ compteurs), `CoquilleClient` (onglets bas),
-`MenuProfil` (identité, thème clair/sombre/système, réglages, appareils, déconnexion), `scriptTheme` (anti-flash).
-Démo peuplée : `apps/agents/scripts/seed-demo.mjs` (idempotent, `--purger`). Recette `COQUILLE_APPLICATION`.
-**Design** : skill `directeur-artistique` + recette `DIRECTION_ARTISTIQUE.md` — `docs/planning/DIRECTION_ARTISTIQUE.md` (identité Villiers extraite du site : bleu #015f89, Exo), maquettes canvas (`MAQUETTES_URL`, page `/pilotage/design`), 5 décisions `design:*` à trancher AVANT tout nouvel écran, rubrique /5 par capture (`REFERENTIEL_DESIGN.md`).
-**Auth (3 apps)** : OTP + passkeys (`packages/core/src/passkeys.ts`, `/api/passkey`, `/appareils`) ; identité `mehdi.stark@gmail.com` (JAMAIS `admin@delivup.io`, réservé à Delivup).
-**Métier livré** : semaine par service (`apps/famille/lib/semaine.ts` + `packages/core/src/donnees/services.ts`),
-réservation/annulation, pointage agents, facture calculée + PayFIP, attestation PDF, démarches à pièces
-(`packages/core/src/demarches.ts` + `demarches-definitions.ts` — un composant client n'importe QUE les définitions),
-rappel hebdomadaire (`/api/cron/rappels`, `packages/core/src/runs.ts` : verrou, journal, surveillance).
-**Tests réels** : `apps/cockpit/scripts/tests/*` (tap décision, consigne Lanceur), `apps/famille/scripts/tests/*` (réservation, passkey), `apps/agents/scripts/tests/tap-pointage.mjs`, `apps/famille/scripts/tests/demarche.mjs` (bout en bout famille → agent → famille) — tous auto-purgés, acteur `test@ville.local` (à mettre dans la liste blanche du serveur de dev).
+**Prouvé** (tests réels bout en bout, captures 1440 + 390 sans débordement) : OTP + passkeys,
+réservation/annulation avec verdict de délai, semaine type, pointage, démarche à pièces
+famille → agent → famille, attestation PDF servie à la seule famille, cron de rappel + push,
+lien de présentation (altéré/expiré/absent → 403), anti-pourrissement de la démo.
 
-**Ce qui n'existe PAS encore** : connexion GitHub → Vercel (app GitHub à installer),
-`RESEND_API_KEY` en prod (sans elle aucun code ne part — alerte affichée), passkeys/appareils,
-cron, file de jobs, thème par commune, tout le métier (réservations, factures…).
+**Ce qui n'existe PAS** : le numéro client PayFIP (différé par Mehdi, mode MVP), l'accord
+écrit de la ville sur son logo, l'auto-déploiement GitHub→Vercel, l'ordonnanceur externe du
+cron, toute source de données réelle (Agora+ / API ville).
 
-**Commandes (racine)** : `pnpm dev` (cockpit) · `pnpm -r typecheck` · `pnpm -r build` · `pnpm -r test` · `pnpm db:generate` /
-`db:migrate` / `db:check` (core) · `pnpm decisions` · `pnpm notifier` · captures : `cd apps/<app> && node ../cockpit/scripts/capturer.mjs --base http://localhost:<port> --app famille|agents --forger <email> --viewport 390x844 [--dark]`.
-Secrets locaux : `apps/*/.env.local` et `packages/core/.env.local` (jamais commités).
+**Commandes** : `pnpm dev` · `pnpm typecheck` · `pnpm build` · `pnpm db:generate` / `db:migrate`
+· `pnpm decisions` · `pnpm deployer <app>` · `pnpm --filter @ville/core test` ·
+captures : `node scripts/capturer.mjs --forger mehdi.stark@gmail.com [--dark]` dans chaque app.
 
 ---
 

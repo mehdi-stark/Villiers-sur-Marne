@@ -1,6 +1,6 @@
 "use client";
 
-import { Bell, CalendarDays, FileText, Receipt, Smartphone, Users } from "lucide-react";
+import { Bell, CalendarDays, CalendarRange, FileText, ListChecks, Receipt, Smartphone, Users } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { BandeauDemo, CoquilleClient, MenuProfil } from "@ville/ui";
 import { VerrouBiometrique } from "@ville/core/ui/passkeys";
@@ -9,14 +9,14 @@ export function Coquille({ children, commune, famille, email, demarchesActives, 
   const router = useRouter();
   const deconnecter = async () => { await fetch("/api/auth", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "deconnecter" }) }); router.push("/connexion"); router.refresh(); };
   const destinations = [
-    { href: "/", label: "Ma semaine", Icone: CalendarDays },
+    { href: "/", label: "Semaine", Icone: CalendarDays },
+    { href: "/calendrier", label: "Calendrier", Icone: CalendarRange },
     { href: "/factures", label: "Factures", Icone: Receipt },
     { href: "/demarches", label: "Démarches", Icone: FileText, compteur: demarchesActives, tone: "accent" as const },
-    { href: "/enfants", label: "Enfants", Icone: Users },
   ];
   const profil = famille && email ? (
     <MenuProfil cote="bottom" align="end" identite={{ nom: famille, sousTitre: email, initiale: famille.slice(0, 1).toUpperCase() }}
-      liens={[{ href: "/enfants", label: "Mon dossier", Icone: Users }, { href: "/appareils", label: "Appareils et sécurité", Icone: Smartphone }, { href: "/reglages", label: "Notifications", Icone: Bell }]}
+      liens={[{ href: "/enfants", label: "Mes enfants", Icone: Users }, { href: "/activites", label: "Activités et tarifs", Icone: ListChecks }, { href: "/appareils", label: "Appareils et sécurité", Icone: Smartphone }, { href: "/reglages", label: "Réglages et notifications", Icone: Bell }]}
       deconnecter={deconnecter}
       extra={<div className="profil-item" style={{ cursor: "default", display: "grid", gap: 2 }}><span>Accueil et Facturation — {commune.telephone}</span>{commune.mentionLogo && <span className="mention">{commune.mentionLogo}</span>}</div>} />
   ) : undefined;

@@ -83,3 +83,18 @@ demande une refonte « une décision à la fois » (assistant) — inscrit au ba
 ## Icônes et logos
 - Marques/services : logos officiels SVG (`simple-icons`) ; icônes d'interface : `lucide` ; jamais d'emoji fonctionnel.
 - Identité commune : initiale sur dégradé de l'accent tant que la charte officielle de Villiers n'est pas fournie (PROVISOIRE).
+
+### Rubrique du 05/09/2026 — vue Mois et Activités (captures `apps/famille/captures/`)
+| Axe | Calendrier (mois) | Activités et tarifs |
+|---|---|---|
+| Hiérarchie | 5 — un titre de mois, une grille, un détail qui s'ouvre sous le doigt | 5 — un service par bloc, le prix à droite |
+| Contraste | 5 — pastilles de service testées sur crème et sur sombre | 5 |
+| Densité | 4 — 390 px tient le mois entier sans zoom (1 291 px de haut, 2 écrans) | 4 — 1 609 px, se parcourt au pouce |
+| Cohérence | 5 — mêmes jetons, même bascule segmentée que le reste | 5 |
+| Identité | 4 — vert d'action, orange restauration, bleu institutionnel | 4 |
+| Mouvement | 4 — ouverture du détail en 200 ms, aucun effet décoratif | 3 — statique par nature |
+| États | 5 — jour sans service, jour hors délai, jour fermé : tous traités | 5 — « Inscrit à l'année » au lieu d'un bouton mort |
+
+Correctif de navigation du même jour : toute page profonde porte un lien **Retour** ; « Ma semaine »
+renvoie explicitement vers le calendrier, les activités et les factures. Un onglet ne suffit pas :
+une page atteinte depuis un menu profil n'a pas d'onglet actif, donc pas de chemin de retour visible.

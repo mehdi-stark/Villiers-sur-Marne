@@ -5,6 +5,7 @@ import { familleCourante } from "@/lib/session";
 import { trancheDe } from "@ville/core/donnees/regles";
 import { ActiverNotifications } from "@ville/core/ui/push";
 import { BasculeTheme } from "@ville/ui/theme";
+import { Retour } from "@/components/retour";
 
 export const metadata: Metadata = { title: "Réglages" };
 export const dynamic = "force-dynamic";
@@ -15,6 +16,7 @@ export default async function Reglages() {
   const tranche = trancheDe(f.famille.quotientFamilial, f.famille.exterieur);
   return (
     <>
+      <Retour vers="/" libelle="Ma semaine" />
       <div className="page-tete"><div><span className="salut">{f.famille.nom}</span><h1>Réglages</h1><p className="petit t-2">Votre dossier, vos notifications, l'apparence de l'application.</p></div></div>
 
       <section className="carte pile">

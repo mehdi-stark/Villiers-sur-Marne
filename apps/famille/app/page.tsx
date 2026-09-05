@@ -9,6 +9,7 @@ import { ActiverNotifications } from "@ville/core/ui/push";
 import { Cascade, EtatVide, IlluCalendrier } from "@ville/ui";
 import { LigneService } from "@/components/ligne-service";
 import { SemaineType } from "@/components/semaine-type";
+import Link from "next/link";
 
 export const dynamic = "force-dynamic";
 const fmtJour = new Intl.DateTimeFormat("fr-FR", { weekday: "short", timeZone: "Europe/Paris" });
@@ -72,6 +73,10 @@ export default async function MaSemaine({ searchParams }: { searchParams: Promis
         <span className="petit t-2">Facturé à terme échu, payable par PayFIP. Les services « inscrit à l'année » sont facturés à la fréquentation réelle.</span>
       </div>
 
+      <div className="segmente" style={{ justifySelf: "start" }}>
+        <span data-actif>Semaine</span>
+        <Link href="/calendrier">Mois</Link>
+      </div>
       <div className="pile" style={{ gap: 8 }}>
         <ActiverFaceId cle="famille-passkey" />
         <SemaineType />
@@ -122,6 +127,7 @@ export default async function MaSemaine({ searchParams }: { searchParams: Promis
         </Cascade>
       )}
       <p className="mini t-3">Un tap sur un jour réserve ou annule, tant que le délai de prévenance court. Hors délai, la case est grisée et dit jusqu'à quand c'était possible.</p>
+      <div className="rangee"><Link className="bouton" href="/activites">Voir tous les tarifs</Link><Link className="bouton" data-variant="discret" href="/factures">Mes factures</Link><Link className="bouton" data-variant="discret" href="/demarches">Mes démarches</Link></div>
     </>
   );
 }

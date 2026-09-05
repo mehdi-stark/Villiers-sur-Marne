@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { journalAcces, passkeysDe } from "@ville/core/passkeys";
 import { ListeAppareils } from "@ville/core/ui/passkeys";
 import { auth } from "@/lib/auth";
+import { Retour } from "@/components/retour";
 
 export const metadata: Metadata = { title: "Appareils" };
 export const dynamic = "force-dynamic";
@@ -16,6 +17,7 @@ export default async function Appareils() {
   const [appareils, journal] = await Promise.all([passkeysDe(auth.app, s.email), journalAcces(auth.app, s.email)]);
   return (
     <>
+      <Retour vers="/" libelle="Ma semaine" />
       <div className="page-tete"><div><h1>Appareils de confiance</h1><p className="petit t-2">{s.email} · Face ID / Touch ID par appareil, révocable ici. Le code par e-mail reste toujours possible.</p></div></div>
       <ListeAppareils appareils={appareils.map((a) => ({ id: a.id, appareil: a.appareil, creeLe: a.creeLe.toISOString(), dernierUsageLe: a.dernierUsageLe?.toISOString() ?? null }))} />
       <section className="carte pile">

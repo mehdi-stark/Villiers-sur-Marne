@@ -8,7 +8,8 @@
     "start": "next start",
     "typecheck": "tsc --noEmit",
     "capturer": "node ../cockpit/scripts/capturer.mjs --base http://localhost:3002",
-    "icones": "node --import tsx scripts/icones.mjs"
+    "icones": "node --import tsx scripts/icones.mjs",
+    "seed-demo": "node --import tsx scripts/seed-demo.mjs"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.23",

@@ -14,3 +14,15 @@ export async function pointerEnfant(p: { enfantId: string; activiteId: string; d
   revalidatePath("/");
   return r.ok ? { ok: true, message: p.voulu === "presence" ? "Présent" : "Absent" } : { ok: false, message: r.motif };
 }
+
+/** Remet le jeu de démonstration à zéro — refusé si la source n'est pas fictive. */
+export async function reinitialiserDemo(): Promise<{ ok: boolean; message: string }> {
+  const a = await agentCourant();
+  if (!a) return { ok: false, message: "Session expirée." };
+  const { surDonneesFictives } = await import("@ville/core/demonstration");
+  if (!surDonneesFictives()) return { ok: false, message: "Refusé : la source n'est pas fictive." };
+  const { poserDemo } = await import("@ville/core/demo-seed");
+  const r = await poserDemo();
+  revalidatePath("/"); revalidatePath("/demarches");
+  return { ok: true, message: `Démonstration remise à zéro : ${r.demarches} démarches, ${r.pointages} pointages du ${r.jour}.` };
+}

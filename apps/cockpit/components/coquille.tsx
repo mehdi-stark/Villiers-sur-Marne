@@ -1,6 +1,6 @@
 "use client";
 
-import { BarChart3, CheckSquare, ClipboardList, Compass, Database, LayoutDashboard, Palette, Settings, Smartphone } from "lucide-react";
+import { BarChart3, CheckSquare, ClipboardList, Compass, Database, LayoutDashboard, Eye, Palette, Settings, Smartphone } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { BandeauDemo, CoquilleAdmin, MenuProfil, type Section } from "@ville/ui";
 import { VerrouBiometrique } from "@ville/core/ui/passkeys";
@@ -22,6 +22,7 @@ export function Coquille({ children, email, aTrancher, aReporter, demo }: { chil
     ] },
     { titre: "Le produit", destinations: [
       { href: "/pilotage/donnees", label: "Données et tarifs", Icone: Database },
+      { href: "/pilotage/presentations", label: "Présentations", Icone: Eye },
     ] },
   ];
   const profil = email ? (

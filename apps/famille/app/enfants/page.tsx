@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { familleCourante } from "@/lib/session";
 import { trancheDe } from "@ville/core/donnees/regles";
+import { Retour } from "@/components/retour";
 
 export const metadata: Metadata = { title: "Mes enfants" };
 export const dynamic = "force-dynamic";
@@ -13,6 +14,7 @@ export default async function Enfants() {
   const tranche = trancheDe(f.famille.quotientFamilial, f.famille.exterieur);
   return (
     <>
+      <Retour vers="/" libelle="Ma semaine" />
       <div className="page-tete"><div><h1>Mes enfants</h1><p className="petit t-2">{f.famille.nom} · quotient familial {f.famille.quotientFamilial ?? "non calculé"} · tranche {tranche}</p></div></div>
       {f.famille.quotientFamilial === null && (
         <div className="bandeau" data-tone="warn"><div><strong>Quotient familial non calculé : la tranche 9 s'applique</strong><div className="mini t-3">Faites-le calculer à l'Espace Accueil et Facturation ({f.commune.telephoneAccueil}) — aucune rétroactivité, prise en compte le mois suivant.</div></div></div>
