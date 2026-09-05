@@ -1,6 +1,5 @@
 import { redirect } from "next/navigation";
 import { agentCourant } from "@/lib/session";
-import { sourceFictive } from "@ville/core/donnees/fictif";
 import type { EtatReservation } from "@ville/core/donnees/types";
 import { Pointage } from "@/components/pointage";
 import { Cascade, EtatVide, IlluFile, TuileChiffre } from "@ville/ui";
@@ -23,8 +22,9 @@ export default async function FileDuJour({ searchParams }: { searchParams: Promi
   const jour = d ?? new Intl.DateTimeFormat("sv-SE", { timeZone: "Europe/Paris" }).format(new Date());
   const [activites, aValider] = await Promise.all([a.source.activites(), compterAValider()]);
   const lignes: Ligne[] = [];
-  for (const fid of ["fam-demo-1", "fam-demo-2"]) {
-    for (const e of await sourceFictive.enfants(fid)) {
+  const familles = await a.source.familles();
+  for (const fam of familles) {
+    for (const e of await a.source.enfants(fam.id)) {
       for (const r of await a.source.reservations(e.id, jour, jour)) {
         if (r.etat === "annulee") continue;
         lignes.push({ enfantId: e.id, prenom: e.prenom, ecole: e.ecole, activiteId: r.activiteId, activite: activites.find((x) => x.id === r.activiteId)?.libelle ?? r.activiteId, etat: r.etat });

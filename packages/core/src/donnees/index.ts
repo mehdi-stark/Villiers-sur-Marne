@@ -6,7 +6,7 @@ import type { SourceDonnees } from "./types";
 // (interop signée) sont déclarés mais NON BRANCHÉS — et le disent.
 function nonBranchee(nom: "export-agora" | "api-agora", cause: string): SourceDonnees {
   const refus = async () => { throw new Error(`Source ${nom} non branchée : ${cause}`); };
-  return { nom, disponible: async () => ({ ok: false, cause }), famille: refus, enfants: refus, activites: refus, reservations: refus, factures: refus };
+  return { nom, disponible: async () => ({ ok: false, cause }), famille: refus, familles: refus, enfants: refus, activites: refus, reservations: refus, factures: refus };
 }
 
 export const SOURCES: Record<string, SourceDonnees> = {

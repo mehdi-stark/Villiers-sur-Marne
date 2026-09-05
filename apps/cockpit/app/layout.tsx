@@ -2,6 +2,10 @@ import type { Metadata, Viewport } from "next";
 import { Inter, Instrument_Sans } from "next/font/google";
 import "./globals.css";
 import { Coquille } from "@/components/coquille";
+import { scriptTheme } from "@ville/ui/theme";
+import { sessionCourante } from "@/lib/session";
+import { compteurs } from "@/lib/decisions";
+import { nombreOuvertes } from "@/lib/ouvertes";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
 const display = Instrument_Sans({ subsets: ["latin"], variable: "--font-display", weight: ["500", "600", "700"], display: "swap" });
@@ -24,11 +28,14 @@ export const viewport: Viewport = {
   ],
 };
 
-export default function Layout({ children }: { children: React.ReactNode }) {
+export default async function Layout({ children }: { children: React.ReactNode }) {
+  const s = await sessionCourante();
+  const [ouvertes, cpt] = s ? await Promise.all([nombreOuvertes().catch(() => 0), compteurs().catch(() => ({ tranchees: 0, aReporter: 0 }))]) : [0, { tranchees: 0, aReporter: 0 }];
   return (
     <html lang="fr" data-registre="admin" className={`${inter.variable} ${display.variable}`}>
+      <head><script dangerouslySetInnerHTML={{ __html: scriptTheme }} /></head>
       <body>
-        <Coquille>{children}</Coquille>
+        <Coquille email={s?.email ?? null} aTrancher={ouvertes} aReporter={cpt.aReporter}>{children}</Coquille>
       </body>
     </html>
   );

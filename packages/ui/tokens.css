@@ -29,8 +29,19 @@
   --entete-h: 56px; --onglets-h: 64px; --largeur: 760px;
 }
 [data-registre="admin"] { --fond: #f7f7f9; --r-3: 12px; --largeur: 1180px; }
+/* --- Thème SOMBRE : choisi explicitement, ou hérité du système si rien n'est choisi --- */
+[data-theme="dark"] {
+    --fond: #0d0e14; --surface: #15161e; --surface-2: #1c1d27; --surface-3: #242633;
+    --bord: #272935; --bord-fort: #383b4b;
+    --texte: #f3f4f8; --texte-2: #a7abbd; --texte-3: #6e7386;
+    --accent: #6f8cff; --accent-fort: #8ea3ff; --accent-soft: #1d2650; --accent-texte: #0d0e14;
+    --ok: #4bd58a; --ok-soft: #12321f; --warn: #f0b24a; --warn-soft: #3a2a0c; --danger: #ff7b7b; --danger-soft: #3f1616;
+    --info: #6cb4f0; --info-soft: #12283a; --chaud: #f0a05a; --chaud-soft: #3a2413; --loisir: #b58cf0; --loisir-soft: #2a1d3f;
+    --el-1: 0 1px 2px rgb(0 0 0 / 0.5); --el-2: 0 6px 16px rgb(0 0 0 / 0.5); --el-3: 0 20px 48px rgb(0 0 0 / 0.6);
+  }
+
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]):not([data-theme="dark"]) {
     --fond: #0d0e14; --surface: #15161e; --surface-2: #1c1d27; --surface-3: #242633;
     --bord: #272935; --bord-fort: #383b4b;
     --texte: #f3f4f8; --texte-2: #a7abbd; --texte-3: #6e7386;

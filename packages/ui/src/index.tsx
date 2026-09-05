@@ -1,19 +1,20 @@
 "use client";
 
 import * as Dialog from "@radix-ui/react-dialog";
-import { LogOut, Menu, X, type LucideIcon } from "lucide-react";
+import { Menu, X, type LucideIcon } from "lucide-react";
 import { motion, useReducedMotion } from "motion/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
 
-export type Destination = { href: string; label: string; Icone: LucideIcon };
+export type Destination = { href: string; label: string; Icone: LucideIcon; compteur?: number; tone?: "warn" | "accent" };
+export type Section = { titre: string; destinations: Destination[] };
 export type Marque = { nom: string; courte: string; initiale: string; sousTitre?: string };
 
 const actif = (p: string, href: string) => (href === "/" ? p === "/" : p.startsWith(href));
 
 /** Coquille PRODUIT CLIENT : en-tête léger + onglets en bas sur mobile, liens en haut sur desktop. */
-export function CoquilleClient({ children, marque, destinations, pied, deconnecter, connexionPath = "/connexion" }: { children: ReactNode; marque: Marque; destinations: Destination[]; pied?: ReactNode; deconnecter?: () => void; connexionPath?: string }) {
+export function CoquilleClient({ children, marque, destinations, profil, connexionPath = "/connexion" }: { children: ReactNode; marque: Marque; destinations: Destination[]; profil?: ReactNode; connexionPath?: string }) {
   const p = usePathname();
   const connexion = p === connexionPath;
   useEffect(() => { if ("serviceWorker" in navigator) navigator.serviceWorker.register("/sw.js").catch(() => {}); }, []);
@@ -23,37 +24,50 @@ export function CoquilleClient({ children, marque, destinations, pied, deconnect
         <div className="entete-inner">
           <Link href="/" className="marque" aria-label={`${marque.nom} — accueil`}><span className="marque-logo" aria-hidden>{marque.initiale}</span><span>{marque.courte} {marque.sousTitre && <small>{marque.sousTitre}</small>}</span></Link>
           {!connexion && <nav className="nav-desktop" aria-label="Navigation principale" style={{ marginLeft: 8 }}>{destinations.map(({ href, label, Icone }) => <Link key={href} href={href} className="nav-lien" data-actif={actif(p, href) || undefined}><Icone size={16} aria-hidden />{label}</Link>)}</nav>}
-          {!connexion && deconnecter && <button className="bouton bouton-sm nav-desktop" data-variant="discret" style={{ marginLeft: "auto" }} onClick={deconnecter}><LogOut size={14} aria-hidden /> Quitter</button>}
-          {!connexion && pied && <div style={{ marginLeft: "auto" }} className="nav-desktop">{pied}</div>}
+          {!connexion && profil && <div style={{ marginLeft: "auto", maxWidth: 210 }}>{profil}</div>}
         </div>
       </header>
       <main className="contenu">{children}</main>
       {!connexion && (
         <nav className="onglets" aria-label="Navigation">
-          {destinations.map(({ href, label, Icone }) => (
-            <Link key={href} href={href} className="onglet" data-actif={actif(p, href) || undefined}><span className="onglet-icone"><Icone size={20} aria-hidden /></span>{label}</Link>
+          {destinations.map(({ href, label, Icone, compteur, tone }) => (
+            <Link key={href} href={href} className="onglet" data-actif={actif(p, href) || undefined}>
+              <span className="onglet-icone">{compteur !== undefined && compteur > 0 && <span className="onglet-pastille" data-tone={tone} aria-hidden />}<Icone size={20} aria-hidden /></span>
+              {label}
+            </Link>
           ))}
-          {deconnecter && <button className="onglet" onClick={deconnecter} type="button"><span className="onglet-icone"><LogOut size={20} aria-hidden /></span>Quitter</button>}
         </nav>
       )}
     </div>
   );
 }
 
-/** Coquille ADMIN : barre latérale desktop, en-tête + tiroir sur mobile. */
-export function CoquilleAdmin({ children, marque, destinations, pied, deconnecter, connexionPath = "/connexion" }: { children: ReactNode; marque: Marque; destinations: Destination[]; pied?: ReactNode; deconnecter?: () => void; connexionPath?: string }) {
+/** Coquille ADMIN : barre latérale ORGANISÉE PAR SECTIONS (un menu qui s'empile ne dit
+ *  plus quoi fait quoi), menu profil en bas, tiroir sur mobile. */
+export function CoquilleAdmin({ children, marque, sections, profil, deconnecter, connexionPath = "/connexion" }: { children: ReactNode; marque: Marque; sections: Section[]; profil?: ReactNode; deconnecter?: () => void; connexionPath?: string }) {
   const p = usePathname();
   const [ouvert, setOuvert] = useState(false);
   const connexion = p === connexionPath;
   useEffect(() => { if ("serviceWorker" in navigator) navigator.serviceWorker.register("/sw.js").catch(() => {}); }, []);
-  const liens = (onClick?: () => void) => destinations.map(({ href, label, Icone }) => <Link key={href} href={href} className="nav-lien" data-actif={actif(p, href) || undefined} onClick={onClick}><Icone size={16} aria-hidden />{label}</Link>);
+  const menu = (onClick?: () => void) => sections.map((s) => (
+    <div key={s.titre} className="nav-section">
+      <div className="nav-titre">{s.titre}</div>
+      {s.destinations.map(({ href, label, Icone, compteur, tone }) => (
+        <Link key={href} href={href} className="nav-lien" data-actif={actif(p, href) || undefined} onClick={onClick}>
+          <Icone size={16} aria-hidden />
+          {label}
+          {compteur !== undefined && compteur > 0 && <span className="nav-compteur" data-tone={tone}>{compteur}</span>}
+        </Link>
+      ))}
+    </div>
+  ));
   if (connexion) return <div className="coquille"><div className="principal"><main className="contenu">{children}</main></div></div>;
   return (
     <div className="coquille">
       <aside className="laterale">
         <Link href="/" className="marque" style={{ padding: "4px 8px 12px" }}><span className="marque-logo" aria-hidden>{marque.initiale}</span><span>{marque.courte} {marque.sousTitre && <small>{marque.sousTitre}</small>}</span></Link>
-        {liens()}
-        <div className="tiroir-pied">{pied}{deconnecter && <button className="bouton" data-variant="discret" onClick={deconnecter}><LogOut size={15} aria-hidden /> Se déconnecter</button>}</div>
+        {menu()}
+        <div className="laterale-pied">{profil}</div>
       </aside>
       <div className="principal">
         <header className="entete entete-mobile">
@@ -67,12 +81,13 @@ export function CoquilleAdmin({ children, marque, destinations, pied, deconnecte
                     <Dialog.Title asChild><span className="marque"><span className="marque-logo">{marque.initiale}</span>{marque.nom}</span></Dialog.Title>
                     <Dialog.Close asChild><button className="bouton-icone" aria-label="Fermer le menu"><X size={18} /></button></Dialog.Close>
                   </div>
-                  {liens(() => setOuvert(false))}
-                  <div className="tiroir-pied">{pied}{deconnecter && <button className="bouton" data-variant="discret" onClick={deconnecter}><LogOut size={15} aria-hidden /> Se déconnecter</button>}</div>
+                  {menu(() => setOuvert(false))}
+                  <div className="tiroir-pied">{profil}</div>
                 </Dialog.Content>
               </Dialog.Portal>
             </Dialog.Root>
             <Link href="/" className="marque"><span className="marque-logo" aria-hidden>{marque.initiale}</span><span>{marque.courte} {marque.sousTitre && <small>{marque.sousTitre}</small>}</span></Link>
+            <div style={{ marginLeft: "auto" }}>{profil}</div>
           </div>
         </header>
         <main className="contenu">{children}</main>
@@ -127,3 +142,5 @@ export function BoutonTap({ children, ...props }: React.ComponentProps<typeof mo
 }
 
 export { IlluAppareil, IlluCalendrier, IlluFacture, IlluFile } from "./illustrations";
+export { MenuProfil, LIENS_COMPTE, type Identite, type LienProfil } from "./profil";
+export { BasculeTheme, scriptTheme, type Theme } from "./theme";

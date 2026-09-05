@@ -34,6 +34,7 @@ export type SourceDonnees = {
   nom: "fictif" | "export-agora" | "api-agora";
   disponible: () => Promise<{ ok: true } | { ok: false; cause: string }>;
   famille: (id: string) => Promise<Famille | null>;
+  familles: () => Promise<Famille[]>;
   enfants: (familleId: string) => Promise<Enfant[]>;
   activites: () => Promise<Activite[]>;
   reservations: (enfantId: string, du: string, au: string) => Promise<Reservation[]>;

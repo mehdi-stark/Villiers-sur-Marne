@@ -22,6 +22,12 @@ Rôles de couleur clair/sombre (fond, surfaces 1-3, bords, texte 1-3, accent/sof
 ## Primitives (`packages/ui`)
 `CoquilleClient` (onglets bas + liens desktop), `CoquilleAdmin` (barre latérale + tiroir mobile), `EtatVide` illustré (`IlluCalendrier`, `IlluFacture`, `IlluFile`, `IlluAppareil`), `TuileChiffre` (compteur animé), `Cascade` (apparition en cascade), `BoutonTap` (spring) ; classes : `.bouton` (primaire/discret/danger, sm/lg/pleine), `.carte`, `.carte-accent`, `.badge[data-tone]`, `.bandeau`, `.ligne`, `.icone-ronde`, `.tableau-defile`.
 
+## Coquille standard (recette `COQUILLE_APPLICATION`, 05/09/2026)
+- **Sections de navigation** : cockpit « Pilotage / Le projet / Le produit » · agents « Aujourd'hui / Dossiers / Référentiel » · famille = onglets bas. Chaque entrée porte son compteur (décisions à trancher, démarches à traiter) — la couleur `warn` signale ce qui bloque.
+- **Menu profil** (bas de barre latérale, en-tête à droite côté client) : identité, apparence **clair / sombre / système**, réglages, appareils et sécurité, déconnexion en dernier. Plus aucun « Quitter » isolé.
+- **Thème persistant** : jetons sous `[data-theme]` + `prefers-color-scheme`, script inline dans `<head>` (aucun flash) ; prouvé par test (le choix survit au rechargement).
+- **Démo peuplée** : 6 familles, 11 enfants, réservations variées, 3 démarches, pointages du jour (`apps/agents/scripts/seed-demo.mjs`, idempotent et purgeable) — un écran vide ne se juge pas.
+
 ## Navigation par registre
 - Famille : **onglets en bas** (Ma semaine · Factures · Enfants · Appareils) — plus de hamburger ; desktop : liens en en-tête.
 - Agents et cockpit : **barre latérale** dès 900 px, tiroir en dessous.
@@ -43,6 +49,8 @@ Safe areas, inputs ≥ 16 px, `min-width: 0`, onglets fixes avec `env(safe-area-
 | Famille · Ma semaine PAR SERVICE (390, clair + sombre) | 5 | 5 | 4 | 5 | 4 | 4 | 5 | oui — chaque service nommé, horaire, tarif, formules groupées |
 | Famille · Démarche guidée (390) | 5 | 5 | 5 | 5 | 4 | 3 | 5 | oui — une pièce par carte, le bouton dit ce qui manque |
 | Agents · Démarches à traiter (1440 + 390) | 5 | 5 | 5 | 5 | 4 | 3 | 5 | oui — refus impossible sans motif |
+| Toutes · Coquille (sections + menu profil, 1280) | 5 | 5 | 5 | 5 | 4 | 4 | 5 | oui — 05/09/2026, testée (profil + thème persistant) |
+| Famille · Réglages (390) | 5 | 5 | 5 | 5 | 4 | 3 | 5 | oui |
 
 ### Correctif du 04/09/2026 (retour : « on ne comprend pas les services réservés »)
 Trois défauts corrigés : (1) la semaine empilait des pastilles par JOUR sans jamais nommer le

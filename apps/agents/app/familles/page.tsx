@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { agentCourant } from "@/lib/session";
-import { sourceFictive } from "@ville/core/donnees/fictif";
 import { trancheDe } from "@ville/core/donnees/regles";
 
 export const metadata: Metadata = { title: "Familles" };
@@ -10,9 +9,8 @@ export const dynamic = "force-dynamic";
 export default async function Familles() {
   const a = await agentCourant();
   if (!a) redirect("/connexion");
-  const ids = ["fam-demo-1", "fam-demo-2"];
-  const familles = (await Promise.all(ids.map((id) => sourceFictive.famille(id)))).filter((f) => f !== null);
-  const enfants = await Promise.all(familles.map((f) => sourceFictive.enfants(f.id)));
+  const familles = await a.source.familles();
+  const enfants = await Promise.all(familles.map((f) => a.source.enfants(f.id)));
   return (
     <>
       <div className="page-tete"><div><h1>Familles</h1><p className="petit t-2">{familles.length} dossiers (fictifs — source « {a.source.nom} »)</p></div></div>

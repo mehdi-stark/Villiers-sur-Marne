@@ -3,6 +3,9 @@ import { Inter, Instrument_Sans } from "next/font/google";
 import "./globals.css";
 import { commune, jetonsCommune } from "@ville/core/communes";
 import { Coquille } from "@/components/coquille";
+import { scriptTheme } from "@ville/ui/theme";
+import { agentCourant } from "@/lib/session";
+import { compterAValider } from "@ville/core/demarches";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
 const display = Instrument_Sans({ subsets: ["latin"], variable: "--font-display", weight: ["500", "600", "700"], display: "swap" });
@@ -16,11 +19,16 @@ export const metadata: Metadata = {
 };
 export const viewport: Viewport = { width: "device-width", initialScale: 1, viewportFit: "cover", themeColor: [{ media: "(prefers-color-scheme: light)", color: "#f7f7f8" }, { media: "(prefers-color-scheme: dark)", color: "#0f0f13" }] };
 
-export default function Layout({ children }: { children: React.ReactNode }) {
+export default async function Layout({ children }: { children: React.ReactNode }) {
+  const a = await agentCourant();
+  const aTraiter = a ? await compterAValider().catch(() => 0) : 0;
   return (
     <html lang="fr" data-registre="admin" className={`${inter.variable} ${display.variable}`}>
-      <head><style dangerouslySetInnerHTML={{ __html: jetonsCommune(c) }} /></head>
-      <body><Coquille commune={{ nom: c.nom, courte: c.courte, initiale: c.logoInitiale, telephone: c.telephoneAccueil }}>{children}</Coquille></body>
+      <head>
+        <style dangerouslySetInnerHTML={{ __html: jetonsCommune(c) }} />
+        <script dangerouslySetInnerHTML={{ __html: scriptTheme }} />
+      </head>
+      <body><Coquille commune={{ nom: c.nom, courte: c.courte, initiale: c.logoInitiale, telephone: c.telephoneAccueil }} email={a?.email ?? null} aTraiter={aTraiter} aPointer={0}>{children}</Coquille></body>
     </html>
   );
 }

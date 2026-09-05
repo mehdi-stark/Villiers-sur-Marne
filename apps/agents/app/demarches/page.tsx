@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { fileDesDemarches, piecesDe } from "@ville/core/demarches";
-import { PIECES, TYPES, type CodePiece } from "@ville/core/demarches-definitions";
+import { PIECES, taille, TYPES, type CodePiece } from "@ville/core/demarches-definitions";
 import { agentCourant } from "@/lib/session";
 import { EtatVide, IlluFile } from "@ville/ui";
 import { TraiterDemarche } from "@/components/traiter-demarche";
@@ -35,7 +35,7 @@ export default async function DemarchesAgents() {
               <div className="file">
                 {pieces[i]!.map((p) => (
                   <a key={p.id} className="file-ligne" href={`/api/pieces/${p.id}`} target="_blank" rel="noopener">
-                    <div><strong>{PIECES[p.code as CodePiece]?.nom ?? p.code}</strong><div className="mini t-3">{p.nom} · {Math.round(p.taille / 1024)} Ko</div></div>
+                    <div><strong>{PIECES[p.code as CodePiece]?.nom ?? p.code}</strong><div className="mini t-3">{p.nom} · {taille(p.taille)}</div></div>
                     <span className="badge">ouvrir</span>
                   </a>
                 ))}

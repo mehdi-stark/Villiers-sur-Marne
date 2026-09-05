@@ -25,7 +25,7 @@ button.onglet { border: 0; background: transparent; font: inherit; font-size: 11
 .onglet { display: grid; justify-items: center; gap: 2px; padding: var(--e-2) var(--e-1); border-radius: var(--r-2); color: var(--texte-3); font-size: 11px; font-weight: 600; min-height: 52px; transition: color var(--d-2), background var(--d-2); }
 .onglet[data-actif] { color: var(--accent); }
 .onglet[data-actif] .onglet-icone { background: var(--accent-soft); }
-.onglet-icone { width: 44px; height: 28px; border-radius: var(--r-pill); display: grid; place-items: center; transition: background var(--d-2); }
+.onglet-icone { position: relative; width: 44px; height: 28px; border-radius: var(--r-pill); display: grid; place-items: center; transition: background var(--d-2); }
 @media (min-width: 760px) { .onglets { display: none; } }
 
 /* Navigation desktop (client) et barre latérale (admin) */
@@ -129,3 +129,38 @@ details[open] > summary::before { transform: rotate(90deg); }
 .backlog-meta span b { color: var(--texte-3); font-weight: 600; margin-right: 4px; }
 .backlog-ligne { display: grid; gap: var(--e-2); padding: var(--e-3) 0; border-top: 1px solid var(--bord); }
 .backlog-ligne:first-child { border-top: 0; padding-top: 0; }
+
+/* ---- Navigation par SECTIONS : un menu qui s'empile ne dit plus quoi fait quoi ---- */
+.nav-section { display: grid; gap: 2px; }
+.nav-section + .nav-section { margin-top: var(--e-3); }
+.nav-titre { font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--texte-3); padding: 4px 12px 2px; }
+.nav-lien { justify-content: flex-start; }
+.nav-lien .nav-compteur { margin-left: auto; font-size: 11px; font-weight: 700; padding: 1px 7px; border-radius: var(--r-pill); background: var(--surface-3); color: var(--texte-2); }
+.nav-lien[data-actif] .nav-compteur { background: color-mix(in srgb, var(--accent) 18%, transparent); color: var(--accent); }
+.nav-lien .nav-compteur[data-tone="warn"] { background: var(--warn-soft); color: var(--warn); }
+
+/* ---- Menu profil : l'identité, les réglages, le thème, la sortie — au même endroit ---- */
+.profil-bouton { display: flex; align-items: center; gap: 10px; width: 100%; padding: 8px; border-radius: var(--r-2); border: 1px solid transparent; background: transparent; color: inherit; font: inherit; cursor: pointer; text-align: left; transition: background var(--d-2); }
+.profil-bouton:hover { background: var(--surface-2); }
+.profil-bouton[data-etat="ouvert"] { background: var(--surface-2); border-color: var(--bord); }
+.profil-avatar { width: 34px; height: 34px; border-radius: var(--r-pill); flex: 0 0 auto; display: grid; place-items: center; font-weight: 700; font-family: var(--police-titre); font-size: 14px; background: linear-gradient(135deg, var(--accent), var(--accent-fort)); color: var(--accent-texte); }
+.profil-ident { display: grid; min-width: 0; }
+.profil-nom { font-size: var(--t-13); font-weight: 650; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.profil-role { font-size: 11.5px; color: var(--texte-3); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.profil-panneau { width: min(300px, calc(100vw - 24px)); background: var(--surface); border: 1px solid var(--bord); border-radius: var(--r-3); box-shadow: var(--el-3); padding: var(--e-2); display: grid; gap: 2px; z-index: 40; animation: apparait var(--d-2) var(--ease); }
+.profil-entete { display: flex; align-items: center; gap: 10px; padding: 8px; }
+.profil-sep { height: 1px; background: var(--bord); margin: 6px 2px; }
+.profil-item { display: flex; align-items: center; gap: 9px; padding: 9px 10px; border-radius: var(--r-1); border: 0; background: transparent; color: var(--texte); font: inherit; font-size: var(--t-13); font-weight: 550; cursor: pointer; text-align: left; width: 100%; }
+.profil-item:hover { background: var(--surface-2); text-decoration: none; }
+.profil-item[data-danger] { color: var(--danger); }
+.profil-libelle { font-size: 11px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--texte-3); padding: 6px 10px 2px; }
+.themes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; padding: 2px; }
+.theme-choix { display: grid; justify-items: center; gap: 4px; padding: 8px 4px; border-radius: var(--r-1); border: 1px solid var(--bord); background: var(--surface); color: var(--texte-2); font: inherit; font-size: 11px; font-weight: 600; cursor: pointer; }
+.theme-choix[data-choisi] { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
+@keyframes apparait { from { opacity: 0; transform: translateY(4px) } to { opacity: 1; transform: none } }
+
+/* Le profil vit en BAS de la barre latérale (admin) et dans l'en-tête (client). */
+.laterale-pied { margin-top: auto; padding-top: var(--e-3); border-top: 1px solid var(--bord); display: grid; gap: var(--e-2); }
+
+.onglet-pastille { position: absolute; top: 1px; right: 9px; width: 7px; height: 7px; border-radius: 999px; background: var(--accent); box-shadow: 0 0 0 2px var(--surface); }
+.onglet-pastille[data-tone="warn"] { background: var(--warn); }

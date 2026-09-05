@@ -28,3 +28,10 @@ export const ETATS: Record<Etat, { libelle: string; tone: "accent" | "warn" | "o
   validee: { libelle: "Validée", tone: "ok", quoi: "C'est bon : la démarche est prise en compte." },
   refusee: { libelle: "À corriger", tone: "danger", quoi: "Une pièce ne convient pas — le motif est ci-dessous." },
 };
+
+/** Taille lisible : « 640 o », « 82 Ko », « 1,4 Mo » — jamais « 0 Ko ». */
+export function taille(octets: number): string {
+  if (octets < 1024) return `${octets} o`;
+  if (octets < 1024 * 1024) return `${Math.round(octets / 1024)} Ko`;
+  return `${(octets / (1024 * 1024)).toFixed(1).replace(".", ",")} Mo`;
+}

@@ -34,6 +34,10 @@
 ## 3. Produit — back-office / cockpit au niveau Linear / Stripe
 - Charte en **tokens CSS**, zéro couleur en dur ; typographie soignée ;
   micro-interactions discrètes ; primitives accessibles (jamais de confirm()).
+- **Coquille standard** (recette `3-outillage/recettes/COQUILLE_APPLICATION.md`) : navigation
+  PAR SECTIONS avec compteurs, **menu profil** unique (identité, apparence clair/sombre/système,
+  réglages, appareils, déconnexion), thème persistant sans flash, page `/reglages`, jeu de
+  démonstration peuplé — un écran vide ne se juge pas.
 - **Responsive et mobile réels** : drawer, header collant, `min-width: 0` sur
   les items de grille, tables qui défilent dans leur conteneur, safe areas.
 - **Responsive PARTOUT, sans exception.** **PWA pour toute application à compte**

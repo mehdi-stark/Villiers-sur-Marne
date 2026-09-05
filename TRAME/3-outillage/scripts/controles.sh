@@ -71,6 +71,13 @@ if [ -f "$HOME/.config/trames/lanceur.env" ]; then
   esac
 else saute "écouteur non configuré sur cette machine"; fi
 
+echo "⑤ Composants client PURS — protège : le pilote Postgres embarqué dans le paquet du navigateur"
+if [ -d "$ICI/lanceur/app" ]; then
+  chaines="$(python3 "$ICI/3-outillage/scripts/verifier-client-pur.py" "$ICI/lanceur" 2>/dev/null)"
+  [ -z "$chaines" ] && vert "aucun composant client n'atteint la base" \
+    || rouge "chaîne d'import interdite — $(printf '%s' "$chaines" | tr '\n' ' ')"
+else saute "pas d'app Next dans ce dépôt"; fi
+
 echo
 printf '%s réussis · %s échoués · %s sautés (un contrôle sauté n’est PAS un contrôle réussi)\n' "$OK" "$KO" "$SAUTES"
 [ "$KO" -eq 0 ]

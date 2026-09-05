@@ -43,35 +43,61 @@ export const ACTIVITES: Activite[] = [
   { id: "alsh-mercredi-am", type: "alsh_mercredi_apres_midi", libelle: "Accueil de loisirs — mercredi après-midi (sans repas)", horaires: "13h30 – 18h30", tarifsParTranche: c(1.33, 1.65, 1.96, 2.43, 3.09, 3.88, 4.31, 4.74, 5.18, 6.72), prevenance: { joursAvant: 2, type: "francs", heureLimite: "23:59", source: SRC_GUIDE }, joursServis: [3], public: "tous" },
 ];
 
-// ---- FICTIF : deux familles-témoins pour la démo (aucune donnée réelle) ----
+// ---- FICTIF : un jeu de démonstration RÉALISTE (6 familles, 11 enfants répartis sur les
+// écoles réelles) — un écran vide ne se juge pas, et une démo sur deux enfants ne montre rien.
+// Aucune donnée réelle : prénoms courants, e-mails en .invalid, quotients variés.
 const FAMILLES: Famille[] = [
-  { id: "fam-demo-1", nom: "Famille Témoin A", email: "temoin-a@exemple.invalid", quotientFamilial: 812, exterieur: false, communeId: "villiers-sur-marne" },
-  { id: "fam-demo-2", nom: "Famille Témoin B", email: "temoin-b@exemple.invalid", quotientFamilial: null, exterieur: false, communeId: "villiers-sur-marne" },
+  { id: "fam-demo-1", nom: "Famille Bernard", email: "temoin-a@exemple.invalid", quotientFamilial: 812, exterieur: false, communeId: "villiers-sur-marne" },
+  { id: "fam-demo-2", nom: "Famille Diallo", email: "temoin-b@exemple.invalid", quotientFamilial: null, exterieur: false, communeId: "villiers-sur-marne" },
+  { id: "fam-demo-3", nom: "Famille Moreau", email: "temoin-c@exemple.invalid", quotientFamilial: 356, exterieur: false, communeId: "villiers-sur-marne" },
+  { id: "fam-demo-4", nom: "Famille Nguyen", email: "temoin-d@exemple.invalid", quotientFamilial: 1420, exterieur: false, communeId: "villiers-sur-marne" },
+  { id: "fam-demo-5", nom: "Famille Rossi", email: "temoin-e@exemple.invalid", quotientFamilial: 605, exterieur: true, communeId: "villiers-sur-marne" },
+  { id: "fam-demo-6", nom: "Famille Chevallier", email: "temoin-f@exemple.invalid", quotientFamilial: 228, exterieur: false, communeId: "villiers-sur-marne" },
 ];
 const ENFANTS: Enfant[] = [
-  { id: "enf-1", familleId: "fam-demo-1", prenom: "Enfant 1", naissance: "2019-03-12", ecole: "Simone Veil", classe: "GS" },
-  { id: "enf-2", familleId: "fam-demo-1", prenom: "Enfant 2", naissance: "2016-09-30", ecole: "Albert Camus", classe: "CM1" },
-  { id: "enf-3", familleId: "fam-demo-2", prenom: "Enfant 3", naissance: "2018-01-05", ecole: "Jules Ferry", classe: "CP" },
+  { id: "enf-1", familleId: "fam-demo-1", prenom: "Lina", naissance: "2019-03-12", ecole: "Simone Veil", classe: "GS" },
+  { id: "enf-2", familleId: "fam-demo-1", prenom: "Noah", naissance: "2016-09-30", ecole: "Albert Camus", classe: "CM1" },
+  { id: "enf-3", familleId: "fam-demo-2", prenom: "Aya", naissance: "2018-01-05", ecole: "Jules Ferry", classe: "CP" },
+  { id: "enf-4", familleId: "fam-demo-2", prenom: "Ibrahim", naissance: "2020-06-22", ecole: "Charles Perrault", classe: "MS" },
+  { id: "enf-5", familleId: "fam-demo-3", prenom: "Jade", naissance: "2017-11-02", ecole: "Léon Dauer", classe: "CE2" },
+  { id: "enf-6", familleId: "fam-demo-3", prenom: "Tom", naissance: "2019-08-17", ecole: "Édouard Herriot Maternelle", classe: "MS" },
+  { id: "enf-7", familleId: "fam-demo-4", prenom: "Mia", naissance: "2015-04-09", ecole: "Jean Jaurès Élémentaire", classe: "CM2" },
+  { id: "enf-8", familleId: "fam-demo-5", prenom: "Léo", naissance: "2018-10-28", ecole: "J. et M. Dudragne Élémentaire", classe: "CE1" },
+  { id: "enf-9", familleId: "fam-demo-5", prenom: "Zoé", naissance: "2021-02-14", ecole: "J. et M. Dudragne Maternelle", classe: "PS" },
+  { id: "enf-10", familleId: "fam-demo-6", prenom: "Sacha", naissance: "2016-12-01", ecole: "Charles Péguy", classe: "CM1" },
+  { id: "enf-11", familleId: "fam-demo-6", prenom: "Inès", naissance: "2019-05-19", ecole: "M. & J. Renon Maternelle", classe: "GS" },
 ];
 
-/** Réservations fictives : cantine les lundi/mardi/jeudi/vendredi de septembre 2026, ALSH un mercredi sur deux. */
+/** Réservations déterministes et VARIÉES : présences passées, absences, mercredis. */
 function reservationsFictives(enfantId: string): Reservation[] {
+  const graine = [...enfantId].reduce((s, c) => s + c.charCodeAt(0), 0);
   const out: Reservation[] = [];
   for (let j = 1; j <= 30; j++) {
     const d = new Date(Date.UTC(2026, 8, j));
     const jour = d.getUTCDay();
     const iso = d.toISOString().slice(0, 10);
-    if ([1, 2, 4, 5].includes(jour)) out.push({ enfantId, activiteId: "cantine", date: iso, etat: j < 4 ? "presence" : "reservee" });
-    if (jour === 3 && Math.floor(j / 7) % 2 === 0) out.push({ enfantId, activiteId: "alsh-mercredi", date: iso, etat: "reservee" });
+    if ([1, 2, 4, 5].includes(jour)) {
+      // Chaque famille a son rythme : certaines mangent 4 jours, d'autres 2.
+      const mange = (graine + j) % 5 !== 0;
+      if (!mange) continue;
+      const passe = j < 5;
+      out.push({ enfantId, activiteId: "cantine", date: iso, etat: passe ? ((graine + j) % 7 === 0 ? "absence" : "presence") : "reservee" });
+    }
+    if (jour === 3 && (graine + Math.floor(j / 7)) % 2 === 0) out.push({ enfantId, activiteId: "alsh-mercredi", date: iso, etat: j < 5 ? "presence" : "reservee" });
   }
   return out;
 }
 
+/** Facture du mois écoulé : ce qui a été RÉELLEMENT consommé (présences + absences facturées). */
 function facturesFictives(familleId: string): Facture[] {
   const fam = FAMILLES.find((f) => f.id === familleId)!;
   const tranche = trancheDe(fam.quotientFamilial, fam.exterieur);
   const enfants = ENFANTS.filter((e) => e.familleId === familleId);
-  const lignes = enfants.flatMap((e) => reservationsFictives(e.id).filter((r) => r.etat === "presence").map((r) => ({ enfantId: e.id, activiteId: r.activiteId, date: r.date, montant: tarif(ACTIVITES.find((a) => a.id === r.activiteId)!, tranche) })));
+  const lignes = enfants.flatMap((e) =>
+    reservationsFictives(e.id)
+      .filter((r) => r.etat === "presence" || r.etat === "absence")
+      .map((r) => ({ enfantId: e.id, activiteId: r.activiteId, date: r.date, montant: tarif(ACTIVITES.find((a) => a.id === r.activiteId)!, tranche) })),
+  );
   const montant = lignes.reduce((s, l) => s + l.montant, 0);
   return montant ? [{ id: `fac-${familleId}-2026-09`, familleId, periode: "2026-09", montant, etat: "a_payer", echeance: "2026-10-31", lignes }] : [];
 }
@@ -80,6 +106,7 @@ export const sourceFictive: SourceDonnees = {
   nom: "fictif",
   disponible: async () => ({ ok: true }),
   famille: async (id) => FAMILLES.find((f) => f.id === id) ?? null,
+  familles: async () => FAMILLES,
   enfants: async (familleId) => ENFANTS.filter((e) => e.familleId === familleId),
   activites: async () => ACTIVITES,
   // Fixture + écritures persistées (réservations du parent, pointages de l'agent).
@@ -88,3 +115,4 @@ export const sourceFictive: SourceDonnees = {
 };
 
 export const FICTIF_STATS = { familles: FAMILLES.length, enfants: ENFANTS.length, activites: ACTIVITES.length, ecoles: ECOLES.length };
+export const IDS_FAMILLES = FAMILLES.map((f) => f.id);

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { demarchesDe, piecesDe } from "@ville/core/demarches";
-import { ETATS, TYPES, type Etat } from "@ville/core/demarches-definitions";
+import { ETATS, taille, TYPES, type Etat } from "@ville/core/demarches-definitions";
 import { familleCourante } from "@/lib/session";
 import { EtatVide, IlluFacture } from "@ville/ui";
 
@@ -42,7 +42,7 @@ export default async function Demarches() {
                 </div>
                 <details><summary>Pièces jointes</summary>
                   <div className="pile" style={{ marginTop: 8 }}>
-                    {pieces[i]!.map((p) => <a key={p.id} className="ligne" style={{ gridTemplateColumns: "1fr auto" }} href={`/api/pieces/${p.id}`} target="_blank" rel="noopener"><span>{p.nom}</span><span className="mini t-3">{Math.round(p.taille / 1024)} Ko</span></a>)}
+                    {pieces[i]!.map((p) => <a key={p.id} className="ligne" style={{ gridTemplateColumns: "1fr auto" }} href={`/api/pieces/${p.id}`} target="_blank" rel="noopener"><span>{p.nom}</span><span className="mini t-3">{taille(p.taille)}</span></a>)}
                   </div>
                 </details>
               </section>

@@ -12,6 +12,9 @@ Vercel + un VPS pour les jobs longs, n8n/QStash pour l'orchestration.
 - **Pilotage dès le maillon 0** : `/pilotage/cadrage` et `/pilotage/backlog` rendent
   les documents canoniques et écrivent les décisions en base (recette
   `3-outillage/recettes/COCKPIT_SQUELETTE.md`) — le cadrage se fait depuis le cockpit.
+- **Coquille standard** (`3-outillage/recettes/COQUILLE_APPLICATION.md`) : sections de navigation
+  avec compteurs, menu profil (identité, thème, réglages, appareils, déconnexion), thème persistant
+  sans flash, `/reglages`, jeu de démonstration peuplé.
 - Cockpit : verdicts sur chaque décision, textes générés structurés, listes
   groupées, vides expliqués, palette ⌘K, notifications push (PWA) pour les
   décisions et les pannes critiques, bandeau « travail en cours » + état.

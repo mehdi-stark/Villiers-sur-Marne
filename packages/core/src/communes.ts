@@ -42,9 +42,11 @@ export function commune(id: string | undefined): Commune {
 }
 
 /** Jetons CSS injectés sur <html> : `--accent` clair/sombre — le reste de la charte ne bouge pas. */
+/** Jetons CSS injectés sur <html> : l'accent de la commune, en clair, en sombre CHOISI,
+ *  et en sombre hérité du système — le thème se choisit dans le menu profil. */
 export function jetonsCommune(c: Commune): string {
   const clair = `--accent:${c.accent};--accent-fort:color-mix(in srgb, ${c.accent} 82%, black);--accent-soft:color-mix(in srgb, ${c.accent} 11%, white);--secondaire:${c.secondaire};--secondaire-soft:color-mix(in srgb, ${c.secondaire} 14%, white);--appel:${c.appel};--appel-soft:color-mix(in srgb, ${c.appel} 14%, white)`;
   const sombre = `--accent:${c.accentSombre};--accent-fort:color-mix(in srgb, ${c.accentSombre} 80%, white);--accent-soft:color-mix(in srgb, ${c.accentSombre} 22%, black);--secondaire:${c.secondaire};--secondaire-soft:color-mix(in srgb, ${c.secondaire} 24%, black);--appel:${c.appel};--appel-soft:color-mix(in srgb, ${c.appel} 24%, black)`;
   const police = c.policeTitre ? `--police-titre:"${c.policeTitre}", var(--font-display), var(--police-corps);` : "";
-  return `:root{${clair};${police}}@media (prefers-color-scheme: dark){:root{${sombre}}}`;
+  return `:root{${clair};${police}}[data-theme="dark"]{${sombre}}@media (prefers-color-scheme: dark){:root:not([data-theme="light"]):not([data-theme="dark"]){${sombre}}}`;
 }

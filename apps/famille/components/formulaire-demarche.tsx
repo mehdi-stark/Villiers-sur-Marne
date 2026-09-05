@@ -4,7 +4,7 @@ import { Check, Paperclip, Upload } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { envoyerDemarche } from "@/app/demarches/actions";
-import { MIMES, PIECES, TAILLE_MAX, TYPES, type CodePiece, type TypeDemarche } from "@ville/core/demarches-definitions";
+import { MIMES, PIECES, taille as tailleLisible, TAILLE_MAX, TYPES, type CodePiece, type TypeDemarche } from "@ville/core/demarches-definitions";
 
 type Fichier = { code: CodePiece; nom: string; mime: string; contenuBase64: string; taille: number };
 
@@ -22,7 +22,7 @@ export function FormulaireDemarche({ type }: { type: TypeDemarche }) {
     setErreur(null);
     if (!file) return;
     if (!MIMES.includes(file.type)) { setErreur(`Format refusé : photo (JPEG, PNG, HEIC) ou PDF. Reçu « ${file.type || "inconnu"} ».`); return; }
-    if (file.size > TAILLE_MAX) { setErreur(`« ${file.name} » fait ${Math.round(file.size / 1024)} Ko, la limite est de 2 Mo. Reprenez la photo en qualité normale.`); return; }
+    if (file.size > TAILLE_MAX) { setErreur(`« ${file.name} » fait ${tailleLisible(file.size)}, la limite est de 2 Mo. Reprenez la photo en qualité normale.`); return; }
     const contenuBase64 = await new Promise<string>((res, rej) => { const fr = new FileReader(); fr.onerror = () => rej(new Error("lecture")); fr.onload = () => res(String(fr.result).split(",")[1] ?? ""); fr.readAsDataURL(file); });
     setFichiers((f) => ({ ...f, [code]: { code, nom: file.name, mime: file.type, contenuBase64, taille: file.size } }));
   };
@@ -50,7 +50,7 @@ export function FormulaireDemarche({ type }: { type: TypeDemarche }) {
             </div>
             <p className="mini t-2">{PIECES[code].aide}</p>
             <label className="bouton bouton-pleine" style={{ cursor: "pointer" }}>
-              {f ? <><Paperclip size={15} aria-hidden /> {f.nom.slice(0, 28)} ({Math.round(f.taille / 1024)} Ko) — remplacer</> : <><Upload size={15} aria-hidden /> Photographier ou choisir un fichier</>}
+              {f ? <><Paperclip size={15} aria-hidden /> {f.nom.slice(0, 28)} ({tailleLisible(f.taille)}) — remplacer</> : <><Upload size={15} aria-hidden /> Photographier ou choisir un fichier</>}
               <input type="file" accept="image/*,application/pdf" capture="environment" style={{ display: "none" }} onChange={(e) => choisir(code, e.target.files?.[0] ?? null)} aria-label={PIECES[code].nom} />
             </label>
           </div>

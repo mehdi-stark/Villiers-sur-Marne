@@ -186,6 +186,13 @@ Gravité : 🔴 bloquant (prod, argent, sécurité) · 🟠 important (qualité,
     registre (onglets bas en grand public), identité et mouvement, et une note /5 par
     écran. Recette `DIRECTION_ARTISTIQUE.md` ; étape 4bis du prompt de démarrage.
 
+66. **Un menu qui s'empile ne dit plus quoi fait quoi** : six entrées à plat dans une barre
+    latérale, un « Quitter » perdu dans l'en-tête, aucun réglage d'apparence. Standard
+    désormais : sections nommées + compteurs, menu profil unique (identité, thème
+    clair/sombre/système, réglages, appareils, déconnexion), thème persistant appliqué par
+    un script inline AVANT le rendu. Et une démo se juge PEUPLÉE : un écran vide n'apprend
+    rien (recette `COQUILLE_APPLICATION.md`, `ville`, 05/09/2026).
+
 ## E. Chaînes, contrôles et instruments (usine mobile, 09/2026)
 42. **Une chaîne qui exige un clic humain à un maillon s'ARRÊTE à ce maillon** :
     99 entrées en attente en amont, zéro en aval, un cron qui tournait chaque
@@ -448,3 +455,47 @@ tests, les linters, les alertes et les sondes de supervision.
     prompt de démarrage dit qu'elles existent, où elles sont, qu'il faut les
     REGARDER d'abord — et laquelle fait foi en cas de contradiction avec le
     texte. Poser un artefact sans dire qu'il existe, c'est ne pas l'avoir posé.
+79. **Ce qui part sans laisser de trace est un envoi aveugle** : les pièces
+    jointes étaient effacées de la base après remise (bonne règle : un colis
+    n'est pas un archivage), mais plus rien ne permettait de répondre à
+    « qu'est-ce que je lui avais envoyé, déjà ? ». La vignette de 200 px (2 Ko)
+    survit, le contenu part. Quand on efface pour de bonnes raisons, garder ce
+    qui coûte mille fois moins cher et répond à la question qu'on se posera.
+80. **Un plafond assumé vaut mieux qu'une liste infinie** : l'adoption en masse
+    s'arrête à dix projets. Dix adoptions, c'est déjà une nuit de sessions ;
+    au-delà on empilerait une file qu'on ne relirait pas, et un compteur qui
+    grossit sans que rien n'avance apprend à ne plus regarder l'écran. Le
+    plafond se DIT dans l'interface (« 3 cochés sur 10 maximum »), il ne se
+    subit pas.
+81. **Le répertoire courant d'une commande n'est pas une évidence** : deux
+    pannes en deux jours, toutes deux silencieuses — un `vercel --prod` lancé à
+    la racine du dépôt au lieu du dossier de l'app (déploiement sans le code du
+    jour), et un `cat >> docs/…` qui a échoué parce que le shell était resté
+    dans un sous-dossier (leçon non écrite, commit incomplet). Toute écriture de
+    fichier et tout déploiement passent par un chemin ABSOLU, ou vérifient leur
+    répertoire avant d'agir.
+82. **Lancer dix choses d'un tap oblige à dire où elles en sont** : l'adoption
+    en masse livrée sans progression aurait produit dix cartes à faire défiler,
+    et aucune réponse à « ça avance ? ». Une action de masse se conçoit avec son
+    compte-rendu de masse — trois faites, une en cours, une en échec — et le
+    détail ne s'ouvre que si on le demande. Sans quoi on remplace un geste
+    répété par une attente aveugle, ce qui n'est pas un progrès.
+83. **Un tri déplace le travail, un GESTE le supprime** : « il faudrait mieux
+    trier les comptes par projet » décrivait le symptôme. Ce qu'on veut n'est
+    pas un classement mais « donne à ce projet les mêmes accès qu'à ecom ».
+    D'où les JEUX de comptes, dérivés tout seuls des projets existants (zéro
+    saisie, toujours justes puisqu'ils sont relus) et enregistrables sous un
+    nom. Devant une demande de tri ou de filtre, chercher d'abord le geste
+    qu'elle cache : c'est souvent une action en un tap, pas un rangement.
+84. **Ce qui MANQUE compte plus que ce qui est mal rangé** : un e-commerce lancé
+    sans compte de paiement se bloque au premier maillon qui encaisse ; des
+    comptes mal triés ne coûtent qu'un regard. Le sélecteur annonce donc
+    « rien de coché pour : Resend — ce type de projet en a besoin », et le
+    message disparaît dès que le jeu couvre le nécessaire.
+85. **Une publication vide n'efface pas ce qui était établi** : une sonde
+    envoyée avec `{"comptes":[]}` pour vérifier l'existence d'une route a vidé
+    l'index du trousseau — le sélecteur de comptes a disparu de l'application.
+    La règle avait déjà été payée le 02/09 sur un autre inventaire (fusion,
+    jamais écrasement) et n'avait pas été appliquée au suivant. Tout endpoint
+    d'inventaire refuse d'écraser un contenu non vide par du vide ; vider est
+    une opération explicite, pas un effet de bord.
