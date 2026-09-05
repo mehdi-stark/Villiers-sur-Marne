@@ -27,11 +27,14 @@ démonstration bornée, runs/cron) et `packages/ui` (jetons, primitives, coquill
 **Prouvé** (tests réels bout en bout, captures 1440 + 390 sans débordement) : OTP + passkeys,
 réservation/annulation avec verdict de délai, semaine type, pointage, démarche à pièces
 famille → agent → famille, attestation PDF servie à la seule famille, cron de rappel + push,
-lien de présentation (altéré/expiré/absent → 403), anti-pourrissement de la démo.
+lien de présentation (altéré/expiré/absent → 403), anti-pourrissement de la démo, retours de
+clic et de chargement (un seul contrôle en attente, barre + squelette), alignement de la
+semaine à 390 et 1440, ordonnanceur Vercel du rappel hebdomadaire (deux entrées UTC + garde
+d'heure Paris — enregistré et actif côté Vercel).
 
 **Ce qui n'existe PAS** : le numéro client PayFIP (différé par Mehdi, mode MVP), l'accord
-écrit de la ville sur son logo, l'auto-déploiement GitHub→Vercel, l'ordonnanceur externe du
-cron, toute source de données réelle (Agora+ / API ville).
+écrit de la ville sur son logo, l'auto-déploiement GitHub→Vercel, toute source de données
+réelle (Agora+ / API ville).
 
 **Commandes** : `pnpm dev` · `pnpm typecheck` · `pnpm build` · `pnpm db:generate` / `db:migrate`
 · `pnpm decisions` · `pnpm deployer <app>` · `pnpm --filter @ville/core test` ·
