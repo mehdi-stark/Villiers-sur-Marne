@@ -206,3 +206,10 @@ details[open] > summary::before { transform: rotate(90deg); }
 hr, .filet { border: 0; height: 1px; background: color-mix(in srgb, var(--bord) 75%, transparent); margin: var(--e-3) 0; }
 .badge { line-height: 1.35; }
 ::selection { background: color-mix(in srgb, var(--accent) 25%, transparent); }
+
+/* ---- Bandeau de démonstration : discret mais toujours là (jamais une capture trompeuse) ---- */
+.bandeau-demo { display: flex; align-items: center; gap: 8px; padding: 7px 12px; border-radius: var(--r-pill); background: color-mix(in srgb, var(--warn) 14%, var(--surface)); color: color-mix(in srgb, var(--warn) 80%, var(--texte)); font-size: var(--t-12); line-height: 1.35; }
+.bandeau-demo strong { font-weight: 700; }
+.bandeau-demo svg { flex: 0 0 auto; }
+.bandeau-demo-fermer { margin-left: auto; border: 0; background: transparent; color: inherit; cursor: pointer; padding: 2px; border-radius: 999px; opacity: .7; }
+.bandeau-demo-fermer:hover { opacity: 1; }

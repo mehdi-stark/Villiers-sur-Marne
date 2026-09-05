@@ -6,11 +6,12 @@ import { ACTIVITES, ECOLES } from "@ville/core/donnees/fictif";
 import { euros, tarif } from "@ville/core/donnees/regles";
 import { service } from "@ville/core/donnees/services";
 import { VisiteGuidee } from "@/components/visite";
+import { demonstrationActive, jetonDemo } from "@ville/core/demonstration";
 
 // PAGE PUBLIQUE de démonstration — le support de vente : ce que la commune verrait.
 // Aucune donnée réelle de famille, et une mention sans ambiguïté sur son caractère non officiel.
 export const metadata: Metadata = { title: "Découvrir le portail", robots: { index: false, follow: false } };
-export const dynamic = "force-static";
+export const dynamic = "force-dynamic";
 
 const c = commune(process.env.COMMUNE_ID);
 const ARGUMENTS = [
@@ -22,23 +23,21 @@ const ARGUMENTS = [
   { Icone: ShieldCheck, titre: "Sécurité et accessibilité", texte: "Code à usage unique, Face ID en option, appareils révocables, journal des accès. Contrastes vérifiés, mobile d'abord." },
 ];
 
-export default function Decouvrir() {
+export default async function Decouvrir() {
+  const ouvert = demonstrationActive();
+  const jeton = ouvert.ok ? await jetonDemo("demo@exemple.invalid") : null;
+  const agents = process.env.AGENTS_URL ?? "https://villiers-agents.vercel.app";
   const cantine = ACTIVITES.find((a) => a.type === "cantine")!;
   return (
     <div className="vitrine">
       <VisiteGuidee />
-      <div className="bandeau" data-tone="warn" role="note">
-        <div><strong>Démonstration</strong><div className="mini t-2">Proposition indépendante présentée à la Ville de Villiers-sur-Marne. Ce site n'est pas un service officiel de la commune ; les familles et les réservations affichées sont fictives.</div></div>
-      </div>
-
       <section className="vitrine-hero">
         <img src="/logo-villiers.svg" alt="Ville de Villiers-sur-Marne" className="vitrine-logo" />
         <h1>Le portail famille que les parents ouvrent le soir, sur leur téléphone</h1>
         <p className="vitrine-accroche">Réserver la cantine, payer, suivre un dossier : trois gestes, pas trois appels à l'accueil. Conçu sur les tarifs et les délais réels de la commune.</p>
         <div className="rangee">
-          <Link className="bouton bouton-lg" data-variant="primaire" href="/connexion">Ouvrir la démonstration</Link>
+          <a className="bouton bouton-lg" data-variant="primaire" href={jeton ? `/presentation?demo=${jeton}` : "/connexion"}>Ouvrir la démonstration</a>
           <a className="bouton bouton-lg" href="/decouvrir/dossier.pdf" target="_blank" rel="noopener">Le dossier (PDF, 2 pages)</a>
-          <a className="bouton bouton-lg" data-variant="discret" href={c.siteUrl} target="_blank" rel="noopener">Le site de la ville</a>
         </div>
         <div className="vitrine-chiffres">
           <div><b>{ECOLES.length}</b><span>écoles et leurs accueils</span></div>
@@ -46,6 +45,31 @@ export default function Decouvrir() {
           <div><b>{euros(tarif(cantine, 1))} – {euros(tarif(cantine, 9))}</b><span>le repas, selon le quotient</span></div>
           <div><b>7 j</b><span>francs de délai, calculés par le code</span></div>
         </div>
+      </section>
+
+      <section className="portes">
+        <h2>Trois façons de regarder</h2>
+        <div className="portes-grille">
+          <a className="porte" href={jeton ? `/presentation?demo=${jeton}` : "/connexion"}>
+            <span className="porte-num">1</span>
+            <strong>Côté parent</strong>
+            <span className="petit t-2">La semaine, les factures, une démarche — sur un dossier fictif, sans code à saisir.</span>
+            <span className="porte-action">Ouvrir le portail →</span>
+          </a>
+          <a className="porte" href={jeton ? `${agents}/presentation?demo=${jeton}` : agents} target="_blank" rel="noopener">
+            <span className="porte-num">2</span>
+            <strong>Côté agents</strong>
+            <span className="petit t-2">La file du jour, le pointage, les démarches à valider — ce que vos équipes utiliseraient.</span>
+            <span className="porte-action">Ouvrir le back-office →</span>
+          </a>
+          <a className="porte" href="/decouvrir/dossier.pdf" target="_blank" rel="noopener">
+            <span className="porte-num">3</span>
+            <strong>Le dossier</strong>
+            <span className="petit t-2">Deux pages : le constat sur l'existant, ce qu'on apporte, les chiffres et le cadre.</span>
+            <span className="porte-action">Ouvrir le PDF →</span>
+          </a>
+        </div>
+        {!ouvert.ok && <p className="mini t-3">Accès direct fermé ({ouvert.cause}) — la démonstration reste accessible par code.</p>}
       </section>
 
       <section className="vitrine-grille">

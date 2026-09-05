@@ -34,7 +34,7 @@ trois cookies/secrets** (`ville_session`/`AUTH_SECRET`, `famille_session`/`FAMIL
 **Données** : adaptateur `packages/core/src/donnees/` (`SOURCE_DONNEES=fictif`), règles réelles de Villiers sourcées, écritures persistées (`reservations.ts` : réserver/annuler avec verdict, pointer), page `/pilotage/donnees`.
 **Identité** : charte RELEVÉE dans le CSS du site officiel (vert action `#4a7411`, aplats `#71b21a`,
 institutionnel `#015f89`, fond crème `#f4f0eb`, appel `#ef984b`, police Exo, logo `public/logo-villiers.svg`
-avec mention de propriété) — `packages/core/src/communes.ts`, contrastes testés. Vitrine publique : `/decouvrir` (+ visite guidée, dossier PDF `/decouvrir/dossier.pdf` via `packages/core/src/documents/proposition.ts`).
+avec mention de propriété) — `packages/core/src/communes.ts`, contrastes testés. **Démonstration** : données relatives à aujourd'hui (`fictif.ts`), mode présentation borné (`packages/core/src/demonstration.ts`, `/presentation?demo=…`, `pnpm --filter famille exec node scripts/lien-presentation.mjs`), bandeau démo dans les 3 apps. Vitrine publique : `/decouvrir` (+ visite guidée, dossier PDF `/decouvrir/dossier.pdf` via `packages/core/src/documents/proposition.ts`).
 **Coquille** : `packages/ui` — `CoquilleAdmin` à SECTIONS (+ compteurs), `CoquilleClient` (onglets bas),
 `MenuProfil` (identité, thème clair/sombre/système, réglages, appareils, déconnexion), `scriptTheme` (anti-flash).
 Démo peuplée : `apps/agents/scripts/seed-demo.mjs` (idempotent, `--purger`). Recette `COQUILLE_APPLICATION`.

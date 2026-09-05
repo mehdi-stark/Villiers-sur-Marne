@@ -24,6 +24,21 @@ thème et la sortie finissent éparpillés (un bouton « Quitter » dans l'en-t�
 5. **Produit client** : onglets en bas (pouce), pastille de compteur sur l'onglet concerné,
    l'avatar en haut à droite ouvre le même menu profil.
 
+## Une démo POURRIT si on la cloue dans le temps (payé le 05/09/2026)
+Le jeu de démonstration était figé sur un mois : deux semaines plus tard, l'écran principal
+serait vide en plein rendez-vous. **Toute donnée de démonstration se génère RELATIVEMENT à la
+date du jour** (fenêtre glissante : quelques semaines en arrière avec des états consommés,
+quelques semaines en avant avec des états à venir ; période facturée = mois écoulé). Un test
+doit échouer si on re-cloue les données à une date fixe.
+
+## Le mode PRÉSENTATION (montrer sans donner de code) se BORNE
+Un lien qui ouvre l'app « déjà connectée » contourne l'authentification. Il n'est acceptable
+qu'avec les cinq garde-fous, tous codés : (1) refusé si la source n'est pas fictive — jamais
+sur des données réelles ; (2) refusé sans secret dédié (`DEMO_SECRET`) ; (3) jeton SIGNÉ à
+durée courte (2 h) ; (4) chaque ouverture journalisée ; (5) bandeau de démonstration
+**non refermable** pendant la session de présentation — une capture ne doit jamais pouvoir
+passer pour du réel. Et une page PUBLIQUE n'affiche ni la navigation privée ni le menu profil.
+
 ## Ce qu'un écran vide n'apprend à personne
 Une démo se juge PEUPLÉE : prévoir un **jeu de démonstration réaliste** (plusieurs dossiers,
 des états variés — en cours, en retard, refusé) et un script `seed-demo.mjs` idempotent et

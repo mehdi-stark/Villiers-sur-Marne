@@ -2,11 +2,11 @@
 
 import { BarChart3, CheckSquare, ClipboardList, Compass, Database, LayoutDashboard, Palette, Settings, Smartphone } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { CoquilleAdmin, MenuProfil, type Section } from "@ville/ui";
+import { BandeauDemo, CoquilleAdmin, MenuProfil, type Section } from "@ville/ui";
 import { VerrouBiometrique } from "@ville/core/ui/passkeys";
 import { Pwa } from "./pwa";
 
-export function Coquille({ children, email, aTrancher, aReporter }: { children: React.ReactNode; email: string | null; aTrancher: number; aReporter: number }) {
+export function Coquille({ children, email, aTrancher, aReporter, demo }: { children: React.ReactNode; email: string | null; aTrancher: number; aReporter: number; demo: boolean }) {
   const router = useRouter();
   const deconnecter = async () => { await fetch("/api/auth", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "deconnecter" }) }); router.push("/connexion"); router.refresh(); };
   const sections: Section[] = [
@@ -30,5 +30,5 @@ export function Coquille({ children, email, aTrancher, aReporter }: { children: 
       deconnecter={deconnecter}
       extra={aReporter > 0 ? <div className="profil-item" style={{ cursor: "default" }}><CheckSquare size={16} aria-hidden /> {aReporter} décision(s) à reporter par l'agent</div> : undefined} />
   ) : undefined;
-  return <CoquilleAdmin marque={{ nom: "Ville — cockpit", courte: "Ville", initiale: "V", sousTitre: "cockpit", logoUrl: "/logo-villiers.svg" }} sections={sections} profil={profil}><VerrouBiometrique cle="ville-passkey" /><Pwa />{children}</CoquilleAdmin>;
+  return <CoquilleAdmin marque={{ nom: "Ville — cockpit", courte: "Ville", initiale: "V", sousTitre: "cockpit", logoUrl: "/logo-villiers.svg" }} sections={sections} profil={profil}><VerrouBiometrique cle="ville-passkey" /><Pwa />{demo && <BandeauDemo detail="Le produit tourne sur la source fictive." />}{children}</CoquilleAdmin>;
 }

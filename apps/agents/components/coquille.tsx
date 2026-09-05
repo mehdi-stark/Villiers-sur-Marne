@@ -2,10 +2,10 @@
 
 import { CalendarDays, FileText, Receipt, Settings, Smartphone, Users } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { CoquilleAdmin, MenuProfil, type Section } from "@ville/ui";
+import { BandeauDemo, CoquilleAdmin, MenuProfil, type Section } from "@ville/ui";
 import { VerrouBiometrique } from "@ville/core/ui/passkeys";
 
-export function Coquille({ children, commune, email, aTraiter, aPointer }: { children: React.ReactNode; commune: { nom: string; courte: string; initiale: string; telephone: string; logoUrl: string | null; mentionLogo: string | null }; email: string | null; aTraiter: number; aPointer: number }) {
+export function Coquille({ children, commune, email, aTraiter, aPointer, demo, presentation }: { children: React.ReactNode; commune: { nom: string; courte: string; initiale: string; telephone: string; logoUrl: string | null; mentionLogo: string | null }; email: string | null; aTraiter: number; aPointer: number; demo: boolean; presentation: boolean }) {
   const router = useRouter();
   const deconnecter = async () => { await fetch("/api/auth", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "deconnecter" }) }); router.push("/connexion"); router.refresh(); };
   const sections: Section[] = [
@@ -22,5 +22,5 @@ export function Coquille({ children, commune, email, aTraiter, aPointer }: { chi
       deconnecter={deconnecter}
       extra={<div className="profil-item" style={{ cursor: "default", display: "grid", gap: 2 }}><span>Accueil et Facturation — {commune.telephone}</span>{commune.mentionLogo && <span className="mention">{commune.mentionLogo}</span>}</div>} />
   ) : undefined;
-  return <CoquilleAdmin marque={{ nom: `Agents — ${commune.nom}`, courte: "Agents", initiale: commune.initiale, sousTitre: commune.courte, logoUrl: commune.logoUrl }} sections={sections} profil={profil}><VerrouBiometrique cle="agents-passkey" />{children}</CoquilleAdmin>;
+  return <CoquilleAdmin marque={{ nom: `Agents — ${commune.nom}`, courte: "Agents", initiale: commune.initiale, sousTitre: commune.courte, logoUrl: commune.logoUrl }} sections={sections} profil={profil}><VerrouBiometrique cle="agents-passkey" />{demo && <BandeauDemo presentation={presentation} detail="File du jour, familles et démarches fictives." />}{children}</CoquilleAdmin>;
 }

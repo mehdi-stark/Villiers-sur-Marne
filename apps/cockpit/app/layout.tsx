@@ -6,6 +6,7 @@ import { scriptTheme } from "@ville/ui/theme";
 import { sessionCourante } from "@/lib/session";
 import { compteurs } from "@/lib/decisions";
 import { nombreOuvertes } from "@/lib/ouvertes";
+import { surDonneesFictives } from "@ville/core/demonstration";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
 const display = Instrument_Sans({ subsets: ["latin"], variable: "--font-display", weight: ["500", "600", "700"], display: "swap" });
@@ -35,7 +36,7 @@ export default async function Layout({ children }: { children: React.ReactNode }
     <html lang="fr" data-registre="admin" className={`${inter.variable} ${display.variable}`}>
       <head><script dangerouslySetInnerHTML={{ __html: scriptTheme }} /></head>
       <body>
-        <Coquille email={s?.email ?? null} aTrancher={ouvertes} aReporter={cpt.aReporter}>{children}</Coquille>
+        <Coquille email={s?.email ?? null} aTrancher={ouvertes} aReporter={cpt.aReporter} demo={surDonneesFictives()}>{children}</Coquille>
       </body>
     </html>
   );

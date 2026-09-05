@@ -24,9 +24,10 @@ function Marque({ marque, style }: { marque: Marque; style?: React.CSSProperties
   );
 }
 
-export function CoquilleClient({ children, marque, destinations, profil, connexionPath = "/connexion" }: { children: ReactNode; marque: Marque; destinations: Destination[]; profil?: ReactNode; connexionPath?: string }) {
+export function CoquilleClient({ children, marque, destinations, profil, connexionPath = "/connexion", action }: { children: ReactNode; marque: Marque; destinations: Destination[]; profil?: ReactNode; connexionPath?: string; action?: ReactNode }) {
   const p = usePathname();
-  const connexion = p === connexionPath;
+  // Pas de profil = pas de session : la navigation privée disparaît (page publique).
+  const connexion = p === connexionPath || !profil;
   useEffect(() => { if ("serviceWorker" in navigator) navigator.serviceWorker.register("/sw.js").catch(() => {}); }, []);
   return (
     <div className="coquille">
@@ -35,6 +36,7 @@ export function CoquilleClient({ children, marque, destinations, profil, connexi
           <Marque marque={marque} />
           {!connexion && <nav className="nav-desktop" aria-label="Navigation principale" style={{ marginLeft: 8 }}>{destinations.map(({ href, label, Icone }) => <Link key={href} href={href} className="nav-lien" data-actif={actif(p, href) || undefined}><Icone size={16} aria-hidden />{label}</Link>)}</nav>}
           {!connexion && profil && <div style={{ marginLeft: "auto", maxWidth: 210 }}>{profil}</div>}
+          {connexion && action && <div style={{ marginLeft: "auto" }}>{action}</div>}
         </div>
       </header>
       <main className="contenu">{children}</main>
@@ -154,3 +156,4 @@ export function BoutonTap({ children, ...props }: React.ComponentProps<typeof mo
 export { IlluAppareil, IlluCalendrier, IlluFacture, IlluFile } from "./illustrations";
 export { MenuProfil, LIENS_COMPTE, type Identite, type LienProfil } from "./profil";
 export { BasculeTheme, scriptTheme, type Theme } from "./theme";
+export { BandeauDemo } from "./demo";

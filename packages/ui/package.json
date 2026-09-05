@@ -9,7 +9,8 @@
     ".": "./src/index.tsx",
     "./illustrations": "./src/illustrations.tsx",
     "./theme": "./src/theme.tsx",
-    "./profil": "./src/profil.tsx"
+    "./profil": "./src/profil.tsx",
+    "./demo": "./src/demo.tsx"
   },
   "scripts": {
     "typecheck": "tsc --noEmit"

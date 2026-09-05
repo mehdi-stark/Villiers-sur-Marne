@@ -91,4 +91,14 @@
 .visite-points span { width: 7px; height: 7px; border-radius: 999px; background: var(--surface-3); }
 .visite-points span[data-actif] { background: var(--accent); width: 18px; }
 @keyframes monte { from { opacity: 0; transform: translateY(10px) } to { opacity: 1; transform: none } }
-@media (min-width: 760px) { .visite { bottom: 16px; } }
+@media (min-width: 760px) { .visite { bottom: 20px; right: 20px; left: auto; margin: 0; width: 380px; } }
+
+/* ---- Trois portes d'entrée pour l'élu : parent, agents, dossier ---- */
+.portes { display: grid; gap: var(--e-3); }
+.portes-grille { display: grid; gap: var(--e-3); grid-template-columns: 1fr; }
+.porte { display: grid; gap: 6px; padding: var(--e-4); border-radius: var(--r-3); background: var(--surface); box-shadow: var(--el-1); color: inherit; transition: transform var(--d-2) var(--ease), box-shadow var(--d-2); }
+.porte:hover { transform: translateY(-2px); box-shadow: var(--el-2); text-decoration: none; }
+.porte strong { font-family: var(--police-titre); font-size: var(--t-18); letter-spacing: var(--serre); }
+.porte-num { width: 26px; height: 26px; border-radius: 999px; display: grid; place-items: center; background: var(--accent-soft); color: var(--accent); font-size: var(--t-12); font-weight: 800; }
+.porte-action { font-size: var(--t-13); font-weight: 650; color: var(--accent); margin-top: 2px; }
+@media (min-width: 760px) { .portes-grille { grid-template-columns: repeat(3, minmax(0, 1fr)); } }

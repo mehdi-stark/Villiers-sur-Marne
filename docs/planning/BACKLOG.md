@@ -51,3 +51,7 @@
 | Passe PREMIUM du système visuel : typographie serrée, profondeur en couches, focus annelé, contrôles segmentés, squelettes, bandeaux d'une ligne (demande Mehdi 05/09/2026) | Le niveau perçu passe de « propre » à « produit » | ~½ j | **Fait le 05/09/2026** (packages/ui, 3 apps) |
 | Dossier de proposition PDF (2 pages, chiffres issus du code) sur la vitrine (proposé 05/09/2026, Feature) | Le document qu'on laisse après le rendez-vous | ~½ j | **Fait le 05/09/2026** (`/decouvrir/dossier.pdf`) |
 | Visite guidée en 3 bulles sur la démonstration (proposé 05/09/2026, UX) | L'élu comprend le produit sans compte | ~½ j | **Fait le 05/09/2026** (refusable, mémorisée) |
+| Données de démonstration relatives à aujourd'hui (challenge de l'agent, 05/09/2026) | La démo ne devient jamais vide avec le temps | ~2 h | **Fait le 05/09/2026** (test anti-pourrissement) |
+| Mode présentation borné : lien signé 2 h, source fictive obligatoire, journalisé (proposé 05/09/2026, Feature) | Montrer la démo sans donner de code, sans risque | ~½ j | **Fait le 05/09/2026** (`/presentation`, test réel : altéré/expiré/absent → 403) |
+| Trois portes sur la vitrine : côté parent, côté agents, le dossier (proposé 05/09/2026, Design) | L'élu entre par où il veut, en un tap | ~2 h | **Fait le 05/09/2026** |
+| Bandeau « données de démonstration » dans les 3 apps, non refermable en présentation (proposé 05/09/2026, UX) | Aucune capture ne peut passer pour du réel | ~1 h | **Fait le 05/09/2026** |

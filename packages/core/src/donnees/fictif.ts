@@ -68,38 +68,49 @@ const ENFANTS: Enfant[] = [
   { id: "enf-11", familleId: "fam-demo-6", prenom: "Inès", naissance: "2019-05-19", ecole: "M. & J. Renon Maternelle", classe: "GS" },
 ];
 
-/** Réservations déterministes et VARIÉES : présences passées, absences, mercredis. */
-function reservationsFictives(enfantId: string): Reservation[] {
+/** Réservations déterministes, VARIÉES et RELATIVES À AUJOURD'HUI — une démo figée sur un
+ *  mois donné devient vide toute seule (défaut trouvé le 05/09/2026 : les données étaient
+ *  clouées à septembre 2026). Fenêtre : 8 semaines en arrière, 6 en avant ; le passé porte
+ *  des présences et des absences, l'avenir des réservations. */
+function reservationsFictives(enfantId: string, maintenant = new Date()): Reservation[] {
   const graine = [...enfantId].reduce((s, c) => s + c.charCodeAt(0), 0);
+  const jour0 = Date.UTC(maintenant.getUTCFullYear(), maintenant.getUTCMonth(), maintenant.getUTCDate());
   const out: Reservation[] = [];
-  for (let j = 1; j <= 30; j++) {
-    const d = new Date(Date.UTC(2026, 8, j));
-    const jour = d.getUTCDay();
-    const iso = d.toISOString().slice(0, 10);
+  for (let d = -56; d <= 42; d++) {
+    const date = new Date(jour0 + d * 86_400_000);
+    const jour = date.getUTCDay();
+    const iso = date.toISOString().slice(0, 10);
+    const n = Math.abs(d);
     if ([1, 2, 4, 5].includes(jour)) {
-      // Chaque famille a son rythme : certaines mangent 4 jours, d'autres 2.
-      const mange = (graine + j) % 5 !== 0;
-      if (!mange) continue;
-      const passe = j < 5;
-      out.push({ enfantId, activiteId: "cantine", date: iso, etat: passe ? ((graine + j) % 7 === 0 ? "absence" : "presence") : "reservee" });
+      if ((graine + n) % 5 === 0) continue; // chaque famille a son rythme : 3 à 4 repas par semaine
+      const passe = d < 0;
+      out.push({ enfantId, activiteId: "cantine", date: iso, etat: passe ? ((graine + n) % 7 === 0 ? "absence" : "presence") : "reservee" });
     }
-    if (jour === 3 && (graine + Math.floor(j / 7)) % 2 === 0) out.push({ enfantId, activiteId: "alsh-mercredi", date: iso, etat: j < 5 ? "presence" : "reservee" });
+    if (jour === 3 && (graine + Math.floor((d + 56) / 7)) % 2 === 0) out.push({ enfantId, activiteId: "alsh-mercredi", date: iso, etat: d < 0 ? "presence" : "reservee" });
   }
   return out;
 }
 
+/** Le mois FACTURÉ est le mois écoulé (facturation à terme échu, règle de la ville). */
+export function periodeFacturee(maintenant = new Date()): string {
+  const d = new Date(Date.UTC(maintenant.getUTCFullYear(), maintenant.getUTCMonth() - 1, 1));
+  return d.toISOString().slice(0, 7);
+}
+
 /** Facture du mois écoulé : ce qui a été RÉELLEMENT consommé (présences + absences facturées). */
-function facturesFictives(familleId: string): Facture[] {
+function facturesFictives(familleId: string, maintenant = new Date()): Facture[] {
   const fam = FAMILLES.find((f) => f.id === familleId)!;
   const tranche = trancheDe(fam.quotientFamilial, fam.exterieur);
   const enfants = ENFANTS.filter((e) => e.familleId === familleId);
+  const periode = periodeFacturee(maintenant);
   const lignes = enfants.flatMap((e) =>
-    reservationsFictives(e.id)
-      .filter((r) => r.etat === "presence" || r.etat === "absence")
+    reservationsFictives(e.id, maintenant)
+      .filter((r) => r.date.startsWith(periode) && (r.etat === "presence" || r.etat === "absence"))
       .map((r) => ({ enfantId: e.id, activiteId: r.activiteId, date: r.date, montant: tarif(ACTIVITES.find((a) => a.id === r.activiteId)!, tranche) })),
   );
   const montant = lignes.reduce((s, l) => s + l.montant, 0);
-  return montant ? [{ id: `fac-${familleId}-2026-09`, familleId, periode: "2026-09", montant, etat: "a_payer", echeance: "2026-10-31", lignes }] : [];
+  const fin = new Date(Date.UTC(Number(periode.slice(0, 4)), Number(periode.slice(5, 7)), 0));
+  return montant ? [{ id: `fac-${familleId}-${periode}`, familleId, periode, montant, etat: "a_payer", echeance: fin.toISOString().slice(0, 10), lignes }] : [];
 }
 
 export const sourceFictive: SourceDonnees = {

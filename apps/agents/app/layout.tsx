@@ -6,6 +6,8 @@ import { Coquille } from "@/components/coquille";
 import { scriptTheme } from "@ville/ui/theme";
 import { agentCourant } from "@/lib/session";
 import { compterAValider } from "@ville/core/demarches";
+import { surDonneesFictives } from "@ville/core/demonstration";
+import { cookies } from "next/headers";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
 const display = Instrument_Sans({ subsets: ["latin"], variable: "--font-display", weight: ["500", "600", "700"], display: "swap" });
@@ -22,13 +24,14 @@ export const viewport: Viewport = { width: "device-width", initialScale: 1, view
 export default async function Layout({ children }: { children: React.ReactNode }) {
   const a = await agentCourant();
   const aTraiter = a ? await compterAValider().catch(() => 0) : 0;
+  const presentation = (await cookies()).get("agents_presentation")?.value === "1";
   return (
     <html lang="fr" data-registre="admin" className={`${inter.variable} ${display.variable}`}>
       <head>
         <style dangerouslySetInnerHTML={{ __html: jetonsCommune(c) }} />
         <script dangerouslySetInnerHTML={{ __html: scriptTheme }} />
       </head>
-      <body><Coquille commune={{ nom: c.nom, courte: c.courte, initiale: c.logoInitiale, telephone: c.telephoneAccueil, logoUrl: c.logoUrl, mentionLogo: c.mentionLogo }} email={a?.email ?? null} aTraiter={aTraiter} aPointer={0}>{children}</Coquille></body>
+      <body><Coquille commune={{ nom: c.nom, courte: c.courte, initiale: c.logoInitiale, telephone: c.telephoneAccueil, logoUrl: c.logoUrl, mentionLogo: c.mentionLogo }} email={a?.email ?? null} aTraiter={aTraiter} aPointer={0} demo={surDonneesFictives()} presentation={presentation}>{children}</Coquille></body>
     </html>
   );
 }

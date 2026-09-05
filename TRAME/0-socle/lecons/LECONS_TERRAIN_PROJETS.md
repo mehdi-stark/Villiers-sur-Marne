@@ -193,6 +193,16 @@ Gravité : 🔴 bloquant (prod, argent, sécurité) · 🟠 important (qualité,
     un script inline AVANT le rendu. Et une démo se juge PEUPLÉE : un écran vide n'apprend
     rien (recette `COQUILLE_APPLICATION.md`, `ville`, 05/09/2026).
 
+67. **Une démonstration figée dans le temps pourrit toute seule** : le jeu de démo était
+    cloué à un mois ; deux semaines plus tard, l'écran principal serait vide devant le
+    client. Toute donnée de démonstration se génère par rapport à AUJOURD'HUI (fenêtre
+    glissante, période facturée = mois écoulé), avec un test qui échoue si on la re-cloue
+    (`ville`, 05/09/2026).
+68. **Un lien qui ouvre l'app « déjà connectée » se borne** : source fictive obligatoire,
+    secret dédié, jeton signé de 2 h, ouverture journalisée, bandeau de démonstration NON
+    refermable. Et une page publique n'affiche jamais la navigation privée ni le menu
+    profil — sinon on offre des onglets qui mènent à un mur (`ville`, 05/09/2026).
+
 ## E. Chaînes, contrôles et instruments (usine mobile, 09/2026)
 42. **Une chaîne qui exige un clic humain à un maillon s'ARRÊTE à ce maillon** :
     99 entrées en attente en amont, zéro en aval, un cron qui tournait chaque
