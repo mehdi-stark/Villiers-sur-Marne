@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { familleCourante } from "@/lib/session";
 import { joursDe, lundiDe, servicesDe } from "@/lib/semaine";
 import { euros, tarif, trancheDe } from "@ville/core/donnees/regles";
-import { grouperParMoment, plageHoraire } from "@ville/core/donnees/services";
+import { dansLaPlage, grouperParMoment, plageHoraire } from "@ville/core/donnees/services";
 import { ActiverFaceId } from "@ville/core/ui/passkeys";
 import { ActiverNotifications } from "@ville/core/ui/push";
 import { Cascade, EtatVide, IlluCalendrier } from "@ville/ui";
@@ -30,6 +30,13 @@ export default async function MaSemaine({ searchParams }: { searchParams: Promis
   const tranche = trancheDe(f.famille.quotientFamilial, f.famille.exterieur);
   const semaines = await Promise.all(enfants.map(async (e) => ({ enfant: e, lignes: servicesDe(e, activites, await f.source.reservations(e.id, iso(lundi), iso(vendredi)), lundi, maintenant) })));
   const prec = iso(new Date(lundi.getTime() - 7 * 86_400_000)), suiv = iso(new Date(lundi.getTime() + 7 * 86_400_000));
+
+  // Semaine passée : tout y est figé. On le DIT au lieu de laisser taper des boutons morts.
+  const semainePassee = iso(vendredi) < aujourdhui;
+  // Le moment en cours ne se marque que si la semaine affichée contient aujourd'hui.
+  const partsHeure = new Intl.DateTimeFormat("fr-FR", { hour: "numeric", minute: "numeric", hour12: false, timeZone: "Europe/Paris" }).formatToParts(maintenant);
+  const minutesParis = Number(partsHeure.find((x) => x.type === "hour")?.value) * 60 + Number(partsHeure.find((x) => x.type === "minute")?.value);
+  const semaineCourante = jours.some((j) => j.date === aujourdhui);
 
   // Récapitulatif PAR SERVICE : ce que le parent veut savoir en 2 secondes.
   const parService = new Map<string, { nom: string; nb: number; montant: number }>();
@@ -83,6 +90,13 @@ export default async function MaSemaine({ searchParams }: { searchParams: Promis
         <SemaineType />
       </div>
 
+      {semainePassee && (
+        <div className="bandeau" role="status">
+          <Info size={16} aria-hidden />
+          <div><strong>Semaine passée — lecture seule</strong><div className="mini t-2">Rien n'y est modifiable. <Link href="/">Revenir à la semaine en cours</Link>.</div></div>
+        </div>
+      )}
+
       {verdictCantine && (
         <div className="bandeau" data-tone={verdictCantine.possible ? "accent" : "warn"} role="status">
           {verdictCantine.possible ? <Clock size={16} aria-hidden /> : <Info size={16} aria-hidden />}
@@ -110,11 +124,13 @@ export default async function MaSemaine({ searchParams }: { searchParams: Promis
                 {grouperParMoment(lignes, (l) => l.service.moment).map(({ moment, lignes: ls }) => {
                   const IconeMoment = ICONE_MOMENT[moment.icone];
                   const plage = plageHoraire(ls.flatMap((l) => l.formules.map((x) => x.activite.horaires)));
+                  const enCoursMaintenant = semaineCourante && dansLaPlage(plage, minutesParis);
                   return (
-                    <div key={moment.cle} className="moment" data-ton={moment.ton}>
+                    <div key={moment.cle} className="moment" data-ton={moment.ton} data-maintenant={enCoursMaintenant || undefined}>
                       <div className="moment-tete">
                         <span className="moment-icone" aria-hidden><IconeMoment size={15} /></span>
                         <div className="moment-titre"><b>{moment.titre}</b> <span className="mini t-3">{moment.quand}</span></div>
+                        {enCoursMaintenant && <span className="moment-maintenant">en ce moment</span>}
                         {plage && <span className="moment-plage mini t-3">{plage}</span>}
                       </div>
                       {ls.map((l) => (

@@ -156,3 +156,6 @@
 .moment-titre { min-width: 0; font-size: var(--t-13); }
 .moment-titre b { font-weight: 700; letter-spacing: var(--serre); }
 .moment-plage { margin-left: auto; flex: 0 0 auto; font-variant-numeric: tabular-nums; padding: 2px 8px; border-radius: var(--r-pill); background: var(--surface-2); }
+.moment[data-maintenant] { border-left-color: var(--ton); }
+.moment[data-maintenant] .moment-icone { background: color-mix(in srgb, var(--ton) 26%, var(--surface)); }
+.moment-maintenant { flex: 0 0 auto; font-size: 10.5px; font-weight: 700; letter-spacing: .03em; text-transform: uppercase; padding: 2px 8px; border-radius: var(--r-pill); background: color-mix(in srgb, var(--ton) 16%, transparent); color: color-mix(in srgb, var(--ton) 82%, var(--texte)); }

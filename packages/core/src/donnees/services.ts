@@ -81,6 +81,15 @@ export function plageHoraire(horaires: string[]): string | null {
   return `${fmt(Math.min(...bornes))} – ${fmt(Math.max(...bornes))}`;
 }
 
+/** Vrai si l'instant donné (minutes depuis minuit, heure de Paris) tombe dans la plage
+ *  « 7h30 – 8h20 ». Sert à marquer le moment EN COURS dans la journée de l'enfant. */
+export function dansLaPlage(plage: string | null, minutes: number): boolean {
+  if (!plage) return false;
+  const bornes = plage.split(/[–—-]/).map((s) => { const m = /(\d{1,2})\s*h\s*(\d{0,2})/.exec(s); return m ? Number(m[1]) * 60 + Number(m[2] || 0) : null; });
+  const [debut, fin] = bornes;
+  return debut !== null && fin !== null && debut !== undefined && fin !== undefined && minutes >= debut && minutes <= fin;
+}
+
 /** Regroupe des lignes déjà constituées par MOMENT de la journée, dans l'ordre des aiguilles.
  *  Les moments sans aucun service sont omis (un enfant d'élémentaire n'a pas d'accueil du soir). */
 export function grouperParMoment<T>(lignes: T[], momentDe: (l: T) => Moment): { moment: (typeof MOMENTS)[number]; lignes: T[] }[] {

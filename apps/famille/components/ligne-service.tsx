@@ -1,7 +1,7 @@
 "use client";
 
 import { BookOpen, Check, Palette, Sunrise, Sunset, Utensils, X } from "lucide-react";
-import { useState, useTransition } from "react";
+import { useOptimistic, useState, useTransition } from "react";
 import { basculerCreneau } from "@/app/actions";
 import type { EtatReservation } from "@ville/core/donnees/types";
 
@@ -22,18 +22,27 @@ export function LigneService(p: {
   const [iFormule, setIFormule] = useState(0);
   const [enAttente, demarrer] = useTransition();
   const [message, setMessage] = useState<string | null>(null);
-  // La cellule TAPÉE porte l'attente, pas la ligne entière : on doit voir OÙ on a tapé.
-  const [enCours, setEnCours] = useState<string | null>(null);
+  // L'attente ne se garde pas dans un state : dans une transition, React peut regrouper
+  // « je commence » et « j'ai fini » en un seul rendu, et l'indicateur ne s'affiche jamais
+  // (payé le 06/09/2026). Une cellule est « en cours » quand son état OPTIMISTE diffère
+  // de l'état que le serveur nous a rendu — c'est exactement la définition.
   const multi = p.formules.length > 1;
   // Quand une formule est déjà réservée dans la semaine, c'est celle-là qu'on montre d'abord.
   const iAffiche = multi ? (p.formules.findIndex((f) => f.reserves > 0) >= 0 && p.formules[iFormule]!.reserves === 0 ? p.formules.findIndex((f) => f.reserves > 0) : iFormule) : 0;
   const f = p.formules[iAffiche]!;
+  // Le créneau change d'état AU TAP : le parent voit le résultat de son geste tout de
+  // suite. Si le serveur refuse (délai dépassé, erreur), React remet l'état réel et le
+  // message dit pourquoi — on ne ment jamais plus de quelques centaines de millisecondes.
+  const [cellules, poserOptimiste] = useOptimistic(f.cellules, (etat: CelluleClient[], maj: { date: string; etat: CelluleClient["etat"] }) =>
+    etat.map((c) => (c.date === maj.date ? { ...c, etat: maj.etat } : c)));
+
   const taper = (c: CelluleClient) => {
-    setEnCours(c.date);
+    // TOUT se passe dans la transition : un setState hors transition re-rend le composant
+    // et JETTE l'état optimiste au passage (payé le 06/09/2026 — la bascule reprenait 1,5 s).
     demarrer(async () => {
+      poserOptimiste({ date: c.date, etat: c.etat === "libre" ? "reservee" : "libre" });
       const actuel: EtatReservation | null = c.etat === "libre" || c.etat === "non_servi" ? null : c.etat;
       const r = await basculerCreneau({ enfantId: p.enfantId, activiteId: f.activiteId, date: c.date, actuel });
-      setEnCours(null);
       setMessage(r.message);
       setTimeout(() => setMessage(null), 4000);
     });
@@ -66,10 +75,11 @@ export function LigneService(p: {
       {p.reservable ? (
         <>
           <div className="service-cellules" role="group" aria-label={`${p.nom}${f.libelle ? ` — ${f.libelle}` : ""}`}>
-            {f.cellules.map((c) => {
+            {cellules.map((c) => {
               const tapable = c.etat !== "non_servi" && c.possible && (c.etat === "libre" || c.etat === "reservee");
+              const enregistre = f.cellules.find((x) => x.date === c.date)?.etat !== c.etat;
               return (
-                <button key={c.date} type="button" className="creneau" data-etat={c.etat} data-charge={enCours === c.date || undefined} aria-busy={enCours === c.date || undefined} disabled={!tapable || enAttente} onClick={() => taper(c)}
+                <button key={c.date} type="button" className="creneau" data-etat={c.etat} data-charge={enregistre || undefined} aria-busy={enregistre || undefined} disabled={!tapable || enAttente} onClick={() => taper(c)}
                   title={c.etat === "non_servi" ? `${p.nom} : pas d'accueil ce jour` : `${p.nom}${f.libelle ? ` — ${f.libelle}` : ""} — ${c.verdict}`}
                   aria-label={`${p.nom}${f.libelle ? `, ${f.libelle}` : ""}, ${JOURS[c.jour]} : ${c.etat === "non_servi" ? "pas d'accueil" : LIBELLE[c.etat]}. ${c.verdict}`}>
                   {c.etat === "non_servi" ? <span className="creneau-vide" aria-hidden>·</span> : (
@@ -88,8 +98,8 @@ export function LigneService(p: {
       ) : (
         null
       )}
-      {enCours && <p className="petit service-message" role="status">Enregistrement…</p>}
-      {message && !enCours && <p className="petit service-message" role="status">{message}</p>}
+      {enAttente && <p className="petit service-message" role="status">Enregistrement…</p>}
+      {message && !enAttente && <p className="petit service-message" role="status">{message}</p>}
     </div>
   );
 }
