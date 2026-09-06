@@ -1,7 +1,16 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "crons": [
-    { "path": "/api/cron/rappels", "schedule": "0 16 * * 5" },
-    { "path": "/api/cron/rappels", "schedule": "0 17 * * 5" }
+    {
+      "path": "/api/cron/rappels",
+      "schedule": "0 16 * * 5"
+    },
+    {
+      "path": "/api/cron/rappels",
+      "schedule": "0 17 * * 5"
+    }
+  ],
+  "regions": [
+    "cdg1"
   ]
 }
