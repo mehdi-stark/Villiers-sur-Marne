@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { AlertTriangle, Check, Database, ExternalLink, GitBranch, Server, Terminal, X } from "lucide-react";
-import { COMMANDES, COMPTES, etatApplications, etatAutomatismes, etatBase } from "@/lib/systeme";
+import { COMMANDES, COMPTES, etatApplications, etatAutomatismes, etatBase, regionLointaine } from "@/lib/systeme";
 
 export const metadata: Metadata = { title: "Système" };
 export const dynamic = "force-dynamic";
@@ -22,6 +22,7 @@ export default async function Systeme() {
   ]);
   const enPanne = apps.filter((a) => !a.enLigne).length;
   const manquantes = apps.flatMap((a) => (a.sante?.manquantes ?? []).map((v) => `${a.nom} : ${v}`));
+  const lointaines = apps.filter((a) => regionLointaine(a.sante?.region ?? null));
 
   return (
     <>
@@ -37,6 +38,13 @@ export default async function Systeme() {
         <div className="bandeau" data-tone="warn" role="status">
           <AlertTriangle size={16} aria-hidden />
           <div><strong>{manquantes.length} variable{manquantes.length > 1 ? "s" : ""} obligatoire{manquantes.length > 1 ? "s" : ""} absente{manquantes.length > 1 ? "s" : ""}</strong><div className="mini t-2">{manquantes.join(" · ")}</div></div>
+        </div>
+      )}
+
+      {lointaines.length > 0 && (
+        <div className="bandeau" data-tone="warn" role="status">
+          <AlertTriangle size={16} aria-hidden />
+          <div><strong>{lointaines.length} application{lointaines.length > 1 ? "s tournent" : " tourne"} loin de la base</strong><div className="mini t-2">{lointaines.map((a) => `${a.nom} (${a.sante?.region})`).join(" · ")} — la base Neon est à Francfort : chaque requête SQL traverse l'Atlantique. Posez <code>&quot;regions&quot;: [&quot;cdg1&quot;]</code> dans le <code>vercel.json</code> de l'app.</div></div>
         </div>
       )}
 
@@ -65,7 +73,7 @@ export default async function Systeme() {
               <div><dt>En local</dt><dd>port {a.port}</dd></div>
               <div><dt>Déploiement</dt><dd>{a.sante?.version.commit ? `${a.sante.version.commit} (${a.sante.version.branche ?? "?"})` : "—"}</dd></div>
               <div><dt>Source de données</dt><dd>{a.sante ? a.sante.source : "—"}</dd></div>
-              <div><dt>Région</dt><dd>{a.sante?.region ?? "—"}</dd></div>
+              <div><dt>Région</dt><dd>{a.sante?.region ?? "—"}{regionLointaine(a.sante?.region ?? null) && " ⚠ loin de la base"}</dd></div>
             </dl>
 
             {a.sante ? (

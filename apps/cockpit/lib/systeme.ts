@@ -76,6 +76,13 @@ export async function etatApplications(): Promise<EtatApp[]> {
   }));
 }
 
+/** La base est à Francfort : une fonction hors d'Europe traverse l'Atlantique à chaque
+ *  requête SQL. Constaté le 06/09/2026 (iad1) — TTFB divisé par ~1,7 après rapatriement. */
+export const REGIONS_EUROPE = ["cdg1", "fra1", "arn1", "dub1", "lhr1"];
+export function regionLointaine(region: string | null): boolean {
+  return region !== null && !REGIONS_EUROPE.includes(region);
+}
+
 export type EtatBase = { tables: number; migrations: number; derniereMigration: string | null; volumes: { table: string; lignes: number }[] };
 
 /** La base dit elle-même où elle en est : nombre de tables, migrations appliquées, volumétrie. */

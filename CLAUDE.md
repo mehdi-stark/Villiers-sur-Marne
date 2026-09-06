@@ -12,7 +12,9 @@ Puis relire `.claude-consignes.md` et `.claude-resume.txt`.
 
 **Trois applications déployées SÉPARÉMENT** (monorepo pnpm, Next.js 15 App Router, TS strict) :
 - **Cockpit** `apps/cockpit` → https://villiers-sur-marne.vercel.app — pilotage, décisions,
-  cadrage, direction artistique, marché, backlog, données et tarifs, journal des présentations.
+  cadrage, direction artistique, marché, backlog, données et tarifs, journal des présentations,
+  et **`/pilotage/systeme`** : l'état RÉEL (apps en ligne, commit déployé, variables posées ou
+  manquantes, base, cron, alertes, comptes, commandes). À ouvrir en premier après une absence.
 - **Portail famille** `apps/famille` → https://villiers-famille.vercel.app — PWA : Ma semaine,
   Calendrier (mois), Factures, Démarches, Activités et tarifs, Enfants, Appareils, Réglages ;
   vitrine publique `/decouvrir` + dossier PDF ; lien de présentation borné `/presentation`.
@@ -35,6 +37,9 @@ d'heure Paris — enregistré et actif côté Vercel).
 **Ce qui n'existe PAS** : le numéro client PayFIP (différé par Mehdi, mode MVP), l'accord
 écrit de la ville sur son logo, l'auto-déploiement GitHub→Vercel, toute source de données
 réelle (Agora+ / API ville).
+
+**Régions** : les trois apps tournent à `cdg1` (Paris), au plus près de la base Neon
+(`eu-central-1`) — `regions` dans chaque `vercel.json`. Ne jamais laisser le défaut `iad1`.
 
 **Commandes** : `pnpm dev` · `pnpm typecheck` · `pnpm build` · `pnpm db:generate` / `db:migrate`
 · `pnpm decisions` · `pnpm deployer <app>` · `pnpm --filter @ville/core test` ·
