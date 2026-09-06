@@ -164,3 +164,5 @@ export { BasculeTheme, scriptTheme, type Theme } from "./theme";
 export { BandeauDemo } from "./demo";
 export { BoutonCopier } from "./copier";
 export { BarreRoute, Lien, Rouet, SqueletteCarte, SqueletteLigne, SquelettePage } from "./chargement";
+
+export { teinteEnfant } from "./teintes";

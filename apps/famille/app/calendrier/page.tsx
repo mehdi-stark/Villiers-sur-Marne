@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { teinteEnfant } from "@ville/ui/teintes";
 import { redirect } from "next/navigation";
 import { familleCourante } from "@/lib/session";
 import { moisDe, moisEnfant } from "@/lib/mois";
@@ -53,9 +54,9 @@ export default async function PageCalendrier({ searchParams }: { searchParams: P
       ) : (
         <Cascade className="pile">
           {mois.map(({ enfant, jours }) => (
-            <section key={enfant.id} className="carte pile" aria-label={`Calendrier de ${enfant.prenom}`}>
+            <section key={enfant.id} className="carte pile" data-enfant={teinteEnfant(enfant.id)} aria-label={`Calendrier de ${enfant.prenom}`}>
               <div className="enfant-tete">
-                <span className="avatar" aria-hidden>{enfant.prenom.slice(0, 1)}</span>
+                <span className="avatar" data-enfant={teinteEnfant(enfant.id)} aria-hidden>{enfant.prenom.slice(0, 1)}</span>
                 <div><strong>{enfant.prenom}</strong><div className="mini t-3">{enfant.ecole} · {enfant.classe}</div></div>
               </div>
               <Calendrier enfantId={enfant.id} prenom={enfant.prenom} jours={jours} euros={tarifs} />

@@ -202,3 +202,7 @@
 .puce-enfant[data-actif] small { color: color-mix(in srgb, var(--accent) 75%, var(--texte)); }
 .puce-avatar, .puce-tous { width: 34px; height: 34px; flex: 0 0 auto; border-radius: 999px; display: grid; place-items: center; font-family: var(--police-titre); font-weight: 800; font-size: 14px; background: linear-gradient(135deg, var(--accent-soft), var(--surface-2)); color: var(--accent); border: 1px solid color-mix(in srgb, var(--accent) 22%, transparent); }
 .puce-tous { background: var(--surface-2); color: var(--texte-2); }
+/* La puce d'un enfant porte SA teinte, active comme au repos. */
+.puce-avatar[data-enfant], .puce-enfant[data-enfant] .puce-avatar { background: color-mix(in srgb, var(--teinte) 14%, var(--surface-2)); color: var(--teinte); border-color: color-mix(in srgb, var(--teinte) 28%, transparent); }
+.puce-enfant[data-enfant][data-actif] { background: color-mix(in srgb, var(--teinte) 10%, var(--surface)); border-color: color-mix(in srgb, var(--teinte) 45%, transparent); color: var(--teinte); }
+.puce-enfant[data-enfant][data-actif] small { color: color-mix(in srgb, var(--teinte) 70%, var(--texte)); }

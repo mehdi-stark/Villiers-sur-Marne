@@ -248,3 +248,13 @@ hr, .filet { border: 0; height: 1px; background: color-mix(in srgb, var(--bord) 
 .champ { display: grid; gap: 5px; min-width: 0; }
 .champ > span { font-size: 11.5px; font-weight: 700; letter-spacing: .03em; text-transform: uppercase; color: var(--texte-3); }
 .grille-champs { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; }
+
+/* Un enfant = une teinte, la même partout (avatar, puce, liseré de sa carte). */
+[data-enfant] { --teinte: var(--enfant-1); }
+[data-enfant="2"] { --teinte: var(--enfant-2) }
+[data-enfant="3"] { --teinte: var(--enfant-3) }
+[data-enfant="4"] { --teinte: var(--enfant-4) }
+[data-enfant="5"] { --teinte: var(--enfant-5) }
+[data-enfant="6"] { --teinte: var(--enfant-6) }
+.avatar[data-enfant] { background: color-mix(in srgb, var(--teinte) 14%, var(--surface)); color: var(--teinte); border-color: color-mix(in srgb, var(--teinte) 30%, transparent); }
+.carte[data-enfant] { border-left: 3px solid color-mix(in srgb, var(--teinte) 55%, transparent); }

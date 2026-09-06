@@ -12,7 +12,8 @@
     "./profil": "./src/profil.tsx",
     "./demo": "./src/demo.tsx",
     "./chargement": "./src/chargement.tsx",
-    "./copier": "./src/copier.tsx"
+    "./copier": "./src/copier.tsx",
+    "./teintes": "./src/teintes.ts"
   },
   "scripts": {
     "typecheck": "tsc --noEmit"

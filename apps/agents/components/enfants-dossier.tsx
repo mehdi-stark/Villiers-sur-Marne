@@ -7,16 +7,19 @@ import { detacher, rattacher } from "@/app/actions";
 
 const CLASSES = ["TPS", "PS", "MS", "GS", "CP", "CE1", "CE2", "CM1", "CM2"];
 
-export function LigneEnfant({ id, familleId, prenom, detail, rattache }: { id: string; familleId: string; prenom: string; detail: string; rattache: boolean }) {
+export function LigneEnfant({ id, familleId, prenom, detail, rattache, teinte }: { id: string; familleId: string; prenom: string; detail: string; rattache: boolean; teinte: number }) {
   const [enAttente, demarrer] = useTransition();
   const [confirme, setConfirme] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
   return (
-    <div className="file-ligne">
-      <div style={{ minWidth: 0 }}>
+    <div className="file-ligne" data-enfant={teinte}>
+      <div style={{ minWidth: 0, display: "flex", gap: 10, alignItems: "center" }}>
+        <span className="avatar avatar-sm" data-enfant={teinte} aria-hidden>{prenom.slice(0, 1)}</span>
+        <div style={{ minWidth: 0 }}>
         <strong>{prenom}</strong>
         <div className="petit t-2">{detail}</div>
         {msg && <div className="mini t-3">{msg}</div>}
+        </div>
       </div>
       <div className="rangee" style={{ justifyContent: "flex-end", gap: 6 }}>
         {!rattache ? (

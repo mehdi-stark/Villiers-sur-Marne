@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { teinteEnfant } from "@ville/ui/teintes";
 import { redirect } from "next/navigation";
 import { familleCourante } from "@/lib/session";
 import { decalerJour, jourEnfant, libelleJour } from "@/lib/jour";
@@ -74,9 +75,9 @@ export default async function PageJour({ searchParams }: { searchParams: Promise
       ) : (
         <Cascade className="pile">
           {journees.map(({ enfant, moments }) => (
-            <section key={enfant.id} className="carte pile" aria-label={`Journée de ${enfant.prenom}`}>
+            <section key={enfant.id} className="carte pile" data-enfant={teinteEnfant(enfant.id)} aria-label={`Journée de ${enfant.prenom}`}>
               <div className="enfant-tete">
-                <span className="avatar" aria-hidden>{enfant.prenom.slice(0, 1)}</span>
+                <span className="avatar" data-enfant={teinteEnfant(enfant.id)} aria-hidden>{enfant.prenom.slice(0, 1)}</span>
                 <div><strong>{enfant.prenom}</strong><div className="mini t-3">{enfant.ecole} · {enfant.classe}</div></div>
               </div>
               {moments.length === 0

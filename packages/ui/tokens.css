@@ -61,3 +61,19 @@
     --el-3: 0 0 0 1px rgb(255 255 255 / 0.08), 0 24px 48px -12px rgb(0 0 0 / 0.7);
   }
 }
+
+/* ---- Teintes d'enfant : six couleurs stables, pour distinguer une fratrie ---- */
+:root {
+  --enfant-1: #4a7411; --enfant-2: #015f89; --enfant-3: #a4501e;
+  --enfant-4: #6b3fa0; --enfant-5: #0f7268; --enfant-6: #a33a5b;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --enfant-1: #8fc44a; --enfant-2: #59b6e4; --enfant-3: #e9a173;
+    --enfant-4: #b58cf0; --enfant-5: #56c7ba; --enfant-6: #ef8fa9;
+  }
+}
+:root[data-theme="dark"] {
+  --enfant-1: #8fc44a; --enfant-2: #59b6e4; --enfant-3: #e9a173;
+  --enfant-4: #b58cf0; --enfant-5: #56c7ba; --enfant-6: #ef8fa9;
+}

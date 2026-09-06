@@ -1,4 +1,4 @@
-import { and, asc, eq, isNull } from "drizzle-orm";
+import { and, asc, desc, eq, isNull } from "drizzle-orm";
 import { db, schema } from "../db";
 import { ECOLES } from "./fictif";
 import type { Enfant } from "./types";
@@ -41,6 +41,7 @@ export async function rattacherEnfant(r: Rattachement): Promise<{ ok: boolean; m
   }
   const id = `enf-${r.familleId}-${Date.now().toString(36)}`;
   await db.insert(schema.enfantsDemo).values({ id, familleId: r.familleId, prenom: r.prenom.trim(), naissance: r.naissance, ecole: r.ecole, classe: r.classe.trim(), acteur: r.acteur });
+  await journaliser(r.familleId, "enfant_rattache", id, `${r.prenom.trim()} rattaché au dossier — ${r.ecole}, ${r.classe.trim()}`, r.acteur);
   return { ok: true, message: `${r.prenom.trim()} est rattaché au dossier (${r.ecole}, ${r.classe.trim()}).`, id };
 }
 
@@ -49,6 +50,23 @@ export async function detacherEnfant(id: string, acteur: string): Promise<{ ok: 
   const [ligne] = await db.select().from(schema.enfantsDemo).where(eq(schema.enfantsDemo.id, id)).limit(1);
   if (!ligne) return { ok: false, message: "Cet enfant ne vient pas d'un rattachement d'agent : il est fourni par la source de données." };
   if (ligne.detacheLe) return { ok: false, message: `${ligne.prenom} est déjà détaché.` };
-  await db.update(schema.enfantsDemo).set({ detacheLe: new Date(), acteur }).where(eq(schema.enfantsDemo.id, id));
+  // On n'écrase PAS `acteur` : c'est celui qui a rattaché. Qui détache est dans le journal.
+  await db.update(schema.enfantsDemo).set({ detacheLe: new Date() }).where(eq(schema.enfantsDemo.id, id));
+  await journaliser(ligne.familleId, "enfant_detache", id, `${ligne.prenom} détaché du dossier — ${ligne.ecole}, ${ligne.classe}`, acteur);
   return { ok: true, message: `${ligne.prenom} est détaché du dossier. Son historique reste consultable.` };
+}
+
+/** Le journal du dossier : une phrase LISIBLE par geste, avec qui et quand. C'est ce
+ *  qu'un agent lit au téléphone quand un parent demande « qui a changé ça ? ». */
+async function journaliser(familleId: string, action: string, cible: string | null, detail: string, acteur: string): Promise<void> {
+  await db.insert(schema.journalDossiers).values({ familleId, action, cible, detail, acteur });
+}
+
+export type LigneJournal = { action: string; detail: string; acteur: string; creeLe: Date };
+
+export async function journalDossier(familleId: string, limite = 20): Promise<LigneJournal[]> {
+  const l = await db.select().from(schema.journalDossiers)
+    .where(eq(schema.journalDossiers.familleId, familleId))
+    .orderBy(desc(schema.journalDossiers.creeLe)).limit(limite);
+  return l.map((x) => ({ action: x.action, detail: x.detail, acteur: x.acteur, creeLe: x.creeLe }));
 }

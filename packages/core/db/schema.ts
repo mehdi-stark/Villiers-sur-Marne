@@ -236,6 +236,22 @@ export const pieces = pgTable("pieces", {
   creeLe: timestamp("cree_le", { withTimezone: true }).notNull().defaultNow(),
 });
 
+// Journal du DOSSIER famille : « qui a changé l'école de mon fils ? » est une question
+// qu'un parent pose au téléphone. Tracer sans pouvoir répondre ne sert à rien.
+export const journalDossiers = pgTable(
+  "journal_dossiers",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    familleId: text("famille_id").notNull(),
+    action: text("action").notNull(), // enfant_rattache | enfant_detache
+    cible: text("cible"), // l'enfant concerné (id)
+    detail: text("detail").notNull(), // phrase lisible, pas un code
+    acteur: text("acteur").notNull(),
+    creeLe: timestamp("cree_le", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("journal_dossiers_famille_idx").on(t.familleId, t.creeLe)],
+);
+
 export const journalDemarches = pgTable("journal_demarches", {
   id: uuid("id").primaryKey().defaultRandom(),
   demarcheId: uuid("demarche_id").notNull(),

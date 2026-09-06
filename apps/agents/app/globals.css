@@ -12,3 +12,29 @@
 .segment { display: inline-flex; background: var(--surface-3); border-radius: var(--r-pill); padding: 3px; gap: 2px; }
 .segment a { padding: 6px 12px; border-radius: var(--r-pill); font-size: var(--t-13); font-weight: 600; color: var(--texte-2); }
 .segment a[data-actif] { background: var(--surface); color: var(--texte); box-shadow: var(--el-1); }
+
+/* ---- Recherche de dossiers ---- */
+.recherche { display: flex; align-items: center; gap: 8px; padding: 0 12px; border: 1px solid var(--bord-fort); border-radius: var(--r-2); background: var(--surface); color: var(--texte-3); transition: border-color var(--d-2), box-shadow var(--d-2); }
+.recherche:focus-within { border-color: var(--accent); box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 18%, transparent); }
+.recherche input { border: 0; background: transparent; padding: 12px 0; }
+.recherche input:focus-visible { outline: none; box-shadow: none; }
+.bouton-icone-sm { width: 28px; height: 28px; border-radius: 999px; }
+.rangee-enfants { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 5px; }
+.jeton-enfant { display: inline-flex; align-items: center; gap: 5px; padding: 2px 9px 2px 7px; border-radius: var(--r-pill); font-size: 12px; font-weight: 600; background: color-mix(in srgb, var(--teinte) 11%, var(--surface-2)); color: color-mix(in srgb, var(--teinte) 80%, var(--texte)); }
+.jeton-enfant small { font-weight: 500; opacity: .75; }
+.jeton-pastille { width: 7px; height: 7px; border-radius: 999px; background: var(--teinte); }
+.avatar-sm { width: 34px; height: 34px; border-radius: 12px; font-size: 14px; }
+.frise { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.frise-ligne { display: grid; grid-template-columns: 18px 1fr; gap: 10px; align-items: start; padding: 8px 0; position: relative; }
+.frise-ligne + .frise-ligne { border-top: 1px solid color-mix(in srgb, var(--bord) 60%, transparent); }
+.frise-point { width: 9px; height: 9px; margin-top: 6px; border-radius: 999px; background: var(--accent); justify-self: center; }
+.frise-ligne[data-action="enfant_detache"] .frise-point { background: var(--texte-3); }
+.frise-ligne strong { font-size: var(--t-13); font-weight: 600; }
+
+/* Sur un téléphone, une ligne de dossier n'est PAS deux colonnes : le nom, les enfants,
+   puis les actions — sinon l'e-mail passe sous le badge et plus rien ne se lit. */
+@media (max-width: 560px) {
+  .file-ligne { grid-template-columns: 1fr; }
+  .file-ligne > .rangee { justify-content: flex-start !important; flex-wrap: wrap; }
+  .file-ligne .petit { overflow-wrap: anywhere; }
+}

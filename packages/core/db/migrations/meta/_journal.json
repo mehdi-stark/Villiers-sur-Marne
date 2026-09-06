@@ -64,6 +64,13 @@
       "when": 1788719916456,
       "tag": "0008_chunky_hex",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1788727125274,
+      "tag": "0009_volatile_solo",
+      "breakpoints": true
     }
   ]
 }

@@ -20,6 +20,7 @@ let code = 1;
 const b = await chromium.launch();
 try {
   await sql`delete from enfants_demo where famille_id = ${FAMILLE} and prenom = ${PRENOM}`;
+  await sql`delete from journal_dossiers where famille_id = ${FAMILLE} and detail like ${"%" + PRENOM + "%"}`;
   const ctx = await b.newContext({ viewport: { width: 1280, height: 900 }, locale: "fr-FR", timezoneId: "Europe/Paris" });
   await ctx.addCookies([{ name: "agents_session", value: Buffer.from(`${corps}|${sig}`).toString("base64url"), url: BASE }]);
   const p = await ctx.newPage();
@@ -66,13 +67,23 @@ try {
   const [apresDetach] = await sql`select detache_le from enfants_demo where id = ${ligne.id}`;
   if (!apresDetach?.detache_le) throw new Error("le détachement n'a pas été horodaté en base");
   console.log(`✓ détachement horodaté (${new Date(apresDetach.detache_le).toISOString().slice(0, 16).replace("T", " ")}), la ligne reste pour l'historique`);
+
+  // 5. Le journal du dossier répond à « qui a fait quoi ? » — les deux gestes y sont.
+  const journal = await sql`select action, detail, acteur from journal_dossiers where famille_id = ${FAMILLE} and detail like ${"%" + PRENOM + "%"} order by cree_le`;
+  const actions = journal.map((l) => l.action);
+  if (!actions.includes("enfant_rattache") || !actions.includes("enfant_detache")) throw new Error(`journal incomplet : ${actions.join(", ") || "vide"}`);
+  if (journal.some((l) => l.acteur !== EMAIL)) throw new Error("un geste du journal n'est pas attribué");
+  const affiche = await p.locator(".frise-ligne").count();
+  if (affiche < 2) throw new Error(`${affiche} ligne(s) d'historique affichée(s) au lieu de 2`);
+  console.log(`✓ historique du dossier : ${actions.join(" → ")}, attribués à ${EMAIL}, ${affiche} lignes à l'écran`);
   code = 0;
 } catch (e) {
   console.error("✗", e.message);
 } finally {
   await b.close();
   const purge = await sql`delete from enfants_demo where famille_id = ${FAMILLE} and prenom = ${PRENOM} returning id`;
-  console.log(`purge : ${purge.length}`);
+  const purgeJournal = await sql`delete from journal_dossiers where famille_id = ${FAMILLE} and detail like ${"%" + PRENOM + "%"} returning id`;
+  console.log(`purge : ${purge.length} enfant(s), ${purgeJournal.length} ligne(s) de journal`);
   await sql.end();
   process.exit(code);
 }

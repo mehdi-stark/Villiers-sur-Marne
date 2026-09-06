@@ -1,4 +1,5 @@
 import { Clock, Info, Palette, Sunrise, Sunset, Utensils } from "lucide-react";
+import { teinteEnfant } from "@ville/ui/teintes";
 import { redirect } from "next/navigation";
 import { familleCourante } from "@/lib/session";
 import { joursDe, lundiDe, servicesDe } from "@/lib/semaine";
@@ -109,9 +110,9 @@ export default async function MaSemaine({ searchParams }: { searchParams: Promis
       ) : (
         <Cascade className="semaine">
           {semaines.map(({ enfant, lignes }) => (
-            <section key={enfant.id} className="carte enfant-carte" aria-label={`Semaine de ${enfant.prenom}`}>
+            <section key={enfant.id} className="carte enfant-carte" data-enfant={teinteEnfant(enfant.id)} aria-label={`Semaine de ${enfant.prenom}`}>
               <div className="enfant-tete">
-                <span className="avatar" aria-hidden>{enfant.prenom.slice(0, 1)}</span>
+                <span className="avatar" data-enfant={teinteEnfant(enfant.id)} aria-hidden>{enfant.prenom.slice(0, 1)}</span>
                 <div style={{ minWidth: 0 }}><strong>{enfant.prenom}</strong><div className="mini t-3">{enfant.ecole} · {enfant.classe}</div></div>
               </div>
               <div className="entete-jours">
