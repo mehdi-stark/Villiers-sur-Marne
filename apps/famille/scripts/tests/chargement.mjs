@@ -37,9 +37,10 @@ await meme.click();
 await p.waitForTimeout(1500);
 
 // 2. La barre de progression se lève au changement de page.
-await p.locator('a[href="/calendrier"]:visible').first().click();
+// Le calendrier s'atteint par le sélecteur d'échelle (Jour · Semaine · Mois).
+await p.locator('a[href^="/calendrier"]:visible').first().click();
 const barre = await p.locator(".barre-route[data-actif]").count().catch(() => 0);
-await p.waitForURL("**/calendrier", { timeout: 15000 });
+await p.waitForURL(/\/calendrier/, { timeout: 15000 });
 console.log(barre > 0 ? "✓ barre de progression levée au clic sur un onglet" : "✓ navigation instantanée (barre non nécessaire)");
 
 // 3. La page visée arrive en squelette, jamais en écran blanc : on ralentit le serveur pour le voir.
@@ -49,7 +50,7 @@ const q = await ctx2.newPage();
 await q.route("**/activites**", async (route) => { await new Promise((r) => setTimeout(r, 1200)); await route.continue(); });
 await q.goto("http://localhost:3001/", { waitUntil: "networkidle" });
 await q.evaluate(() => document.querySelector("nextjs-portal")?.remove());
-await q.locator('a[href="/activites"]:visible').first().click();
+await q.locator('a[href^="/activites"]:visible').first().click();
 const squelette = await q.locator('.squelette').first().waitFor({ state: "visible", timeout: 5000 }).then(() => true, () => false);
 console.log(squelette ? "✓ squelette affiché pendant le chargement de la page" : "✗ aucun squelette pendant le chargement");
 if (!squelette) process.exitCode = 1;

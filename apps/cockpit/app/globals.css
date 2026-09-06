@@ -69,3 +69,8 @@
 .systeme-commande { display: grid; grid-template-columns: minmax(0, auto) 1fr; gap: 10px; align-items: baseline; }
 .systeme-commande code { background: var(--surface-2); padding: 3px 8px; border-radius: var(--r-1); font-size: 12.5px; white-space: nowrap; overflow-x: auto; max-width: 100%; }
 @media (max-width: 620px) { .systeme-commande { grid-template-columns: 1fr; gap: 2px; } }
+.dispo-bande { display: flex; gap: 3px; flex-wrap: wrap; }
+.dispo-jour { width: 14px; height: 26px; border-radius: 4px; background: var(--surface-3); }
+.dispo-jour[data-statut="ok"] { background: color-mix(in srgb, var(--ok) 70%, transparent); }
+.dispo-jour[data-statut="erreur"] { background: var(--danger); }
+.systeme-commande { grid-template-columns: minmax(0, auto) 1fr auto; }

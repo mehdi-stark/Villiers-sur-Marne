@@ -8,11 +8,13 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
 import { BarreRoute } from "./chargement";
 
-export type Destination = { href: string; label: string; Icone: LucideIcon; compteur?: number; tone?: "warn" | "accent" };
+/** `alias` : les autres chemins qui appartiennent à la même destination (les trois
+ *  échelles d'un planning, par exemple) — sans quoi l'onglet s'éteint et on se perd. */
+export type Destination = { href: string; label: string; Icone: LucideIcon; compteur?: number; tone?: "warn" | "accent"; alias?: string[] };
 export type Section = { titre: string; destinations: Destination[] };
 export type Marque = { nom: string; courte: string; initiale: string; sousTitre?: string; logoUrl?: string | null };
 
-const actif = (p: string, href: string) => (href === "/" ? p === "/" : p.startsWith(href));
+const actif = (p: string, href: string, alias: string[] = []) => (href === "/" ? p === "/" || alias.some((a) => p.startsWith(a)) : p.startsWith(href) || alias.some((a) => p.startsWith(a)));
 
 /** Coquille PRODUIT CLIENT : en-tête léger + onglets en bas sur mobile, liens en haut sur desktop. */
 /** La marque : le logo officiel de la commune s'il existe, sinon l'initiale sur l'accent. */
@@ -36,7 +38,7 @@ export function CoquilleClient({ children, marque, destinations, profil, connexi
       <header className="entete">
         <div className="entete-inner">
           <Marque marque={marque} />
-          {!connexion && <nav className="nav-desktop" aria-label="Navigation principale" style={{ marginLeft: 8 }}>{destinations.map(({ href, label, Icone }) => <Link key={href} href={href} className="nav-lien" data-actif={actif(p, href) || undefined}><Icone size={16} aria-hidden />{label}</Link>)}</nav>}
+          {!connexion && <nav className="nav-desktop" aria-label="Navigation principale" style={{ marginLeft: 8 }}>{destinations.map(({ href, label, Icone, alias }) => <Link key={href} href={href} className="nav-lien" data-actif={actif(p, href, alias) || undefined}><Icone size={16} aria-hidden />{label}</Link>)}</nav>}
           {!connexion && profil && <div style={{ marginLeft: "auto", flex: "0 0 auto", maxWidth: 210 }}>{profil}</div>}
           {connexion && action && <div style={{ marginLeft: "auto" }}>{action}</div>}
         </div>
@@ -44,8 +46,8 @@ export function CoquilleClient({ children, marque, destinations, profil, connexi
       <main className="contenu">{children}</main>
       {!connexion && (
         <nav className="onglets" aria-label="Navigation">
-          {destinations.map(({ href, label, Icone, compteur, tone }) => (
-            <Link key={href} href={href} className="onglet" data-actif={actif(p, href) || undefined}>
+          {destinations.map(({ href, label, Icone, compteur, tone, alias }) => (
+            <Link key={href} href={href} className="onglet" data-actif={actif(p, href, alias) || undefined}>
               <span className="onglet-icone">{compteur !== undefined && compteur > 0 && <span className="onglet-pastille" data-tone={tone} aria-hidden />}<Icone size={20} aria-hidden /></span>
               {label}
             </Link>
@@ -66,8 +68,8 @@ export function CoquilleAdmin({ children, marque, sections, profil, deconnecter,
   const menu = (onClick?: () => void) => sections.map((s) => (
     <div key={s.titre} className="nav-section">
       <div className="nav-titre">{s.titre}</div>
-      {s.destinations.map(({ href, label, Icone, compteur, tone }) => (
-        <Link key={href} href={href} className="nav-lien" data-actif={actif(p, href) || undefined} onClick={onClick}>
+      {s.destinations.map(({ href, label, Icone, compteur, tone, alias }) => (
+        <Link key={href} href={href} className="nav-lien" data-actif={actif(p, href, alias) || undefined} onClick={onClick}>
           <Icone size={16} aria-hidden />
           {label}
           {compteur !== undefined && compteur > 0 && <span className="nav-compteur" data-tone={tone}>{compteur}</span>}
@@ -160,4 +162,5 @@ export { IlluAppareil, IlluCalendrier, IlluFacture, IlluFile } from "./illustrat
 export { MenuProfil, LIENS_COMPTE, type Identite, type LienProfil } from "./profil";
 export { BasculeTheme, scriptTheme, type Theme } from "./theme";
 export { BandeauDemo } from "./demo";
+export { BoutonCopier } from "./copier";
 export { BarreRoute, Lien, Rouet, SqueletteCarte, SqueletteLigne, SquelettePage } from "./chargement";

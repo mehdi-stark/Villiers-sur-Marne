@@ -1,6 +1,6 @@
 "use client";
 
-import { Bell, CalendarDays, CalendarRange, FileText, ListChecks, Receipt, Smartphone, Users } from "lucide-react";
+import { Bell, CalendarDays, FileText, ListChecks, Receipt, Smartphone, Users } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { BandeauDemo, CoquilleClient, MenuProfil } from "@ville/ui";
 import { VerrouBiometrique } from "@ville/core/ui/passkeys";
@@ -8,15 +8,18 @@ import { VerrouBiometrique } from "@ville/core/ui/passkeys";
 export function Coquille({ children, commune, famille, email, demarchesActives, demo, presentation }: { children: React.ReactNode; commune: { nom: string; courte: string; initiale: string; telephone: string; logoUrl: string | null; mentionLogo: string | null }; famille: string | null; email: string | null; demarchesActives: number; demo: boolean; presentation: boolean }) {
   const router = useRouter();
   const deconnecter = async () => { await fetch("/api/auth", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "deconnecter" }) }); router.push("/connexion"); router.refresh(); };
+  // Quatre destinations, pas plus (règle du pouce). Le PLANNING est une seule
+  // destination à trois échelles — jour, semaine, mois — qu'on choisit dans la page ;
+  // « Activités et tarifs » remonte des réglages, c'est une question quotidienne.
   const destinations = [
-    { href: "/", label: "Semaine", Icone: CalendarDays },
-    { href: "/calendrier", label: "Calendrier", Icone: CalendarRange },
+    { href: "/", label: "Planning", Icone: CalendarDays, alias: ["/jour", "/calendrier"] },
+    { href: "/activites", label: "Activités", Icone: ListChecks },
     { href: "/factures", label: "Factures", Icone: Receipt },
     { href: "/demarches", label: "Démarches", Icone: FileText, compteur: demarchesActives, tone: "accent" as const },
   ];
   const profil = famille && email ? (
     <MenuProfil cote="bottom" align="end" identite={{ nom: famille, sousTitre: email, initiale: famille.slice(0, 1).toUpperCase() }}
-      liens={[{ href: "/enfants", label: "Mes enfants", Icone: Users }, { href: "/activites", label: "Activités et tarifs", Icone: ListChecks }, { href: "/appareils", label: "Appareils et sécurité", Icone: Smartphone }, { href: "/reglages", label: "Réglages et notifications", Icone: Bell }]}
+      liens={[{ href: "/enfants", label: "Mes enfants", Icone: Users }, { href: "/appareils", label: "Appareils et sécurité", Icone: Smartphone }, { href: "/reglages", label: "Réglages et notifications", Icone: Bell }]}
       deconnecter={deconnecter}
       extra={<div className="profil-item" style={{ cursor: "default", display: "grid", gap: 2 }}><span>Accueil et Facturation — {commune.telephone}</span>{commune.mentionLogo && <span className="mention">{commune.mentionLogo}</span>}</div>} />
   ) : undefined;

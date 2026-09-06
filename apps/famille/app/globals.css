@@ -121,10 +121,20 @@
 .jour-mois[data-ouvert] { background: var(--accent-soft); }
 .jour-mois-num { font-size: var(--t-13); font-weight: 650; font-variant-numeric: tabular-nums; }
 .jour-mois-pastilles { display: flex; gap: 2px; min-height: 6px; }
-.pastille { width: 6px; height: 6px; border-radius: 999px; background: var(--bord-fort); }
-.pastille[data-etat="reservee"] { background: var(--accent); }
-.pastille[data-etat="presence"] { background: var(--ok); }
-.pastille[data-etat="absence"] { background: var(--warn); }
+/* Une pastille = un service, sa COULEUR = le moment de la journée (même vocabulaire
+   que la semaine et la vue jour) ; creuse = pas encore réservé. */
+.pastille { width: 7px; height: 7px; border-radius: 999px; background: var(--m); }
+.pastille[data-moment="matin"] { --m: var(--accent) }
+.pastille[data-moment="midi"] { --m: var(--chaud) }
+.pastille[data-moment="soir"] { --m: var(--institutionnel, var(--info)) }
+.pastille[data-moment="hors_classe"] { --m: var(--loisir) }
+.pastille[data-etat="libre"] { background: transparent; box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--m) 55%, transparent); }
+.pastille[data-etat="absence"] { background: var(--danger); }
+.jour-mois[data-ouvert] { background: var(--surface); box-shadow: inset 0 0 0 2px var(--accent), var(--el-2); }
+.jour-mois[data-ouvert] .jour-mois-num { color: var(--accent); font-weight: 800; }
+.jour-mois[data-aujourdhui]:not([data-ouvert]) { box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--accent) 60%, transparent); }
+.legende-moments { display: flex; flex-wrap: wrap; gap: 10px; font-size: 11.5px; color: var(--texte-3); }
+.legende-moments span { display: inline-flex; align-items: center; gap: 5px; }
 .calendrier-detail { display: grid; gap: 8px; padding: 12px; border-radius: var(--r-2); background: var(--surface-2); }
 .detail-ligne { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; }
 .tarifs-lignes { display: grid; gap: 6px; }
@@ -159,3 +169,25 @@
 .moment[data-maintenant] { border-left-color: var(--ton); }
 .moment[data-maintenant] .moment-icone { background: color-mix(in srgb, var(--ton) 26%, var(--surface)); }
 .moment-maintenant { flex: 0 0 auto; font-size: 10.5px; font-weight: 700; letter-spacing: .03em; text-transform: uppercase; padding: 2px 8px; border-radius: var(--r-pill); background: color-mix(in srgb, var(--ton) 16%, transparent); color: color-mix(in srgb, var(--ton) 82%, var(--texte)); }
+
+/* ---- Le jour se voit : en-tête cliquable, colonne d'aujourd'hui marquée ---- */
+.entete-jour { text-decoration: none; transition: background var(--d-2), transform var(--d-1); }
+.entete-jour:hover { background: var(--surface-2); }
+.entete-jour:active { transform: scale(.97); }
+.entete-jour em { font-style: normal; font-size: 9.5px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--accent); }
+.entete-jour[data-aujourdhui] { background: var(--accent-soft); color: var(--accent); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 35%, transparent); }
+.nav-periode a { text-decoration: none; }
+
+/* ---- Vue Jour : un bloc par moment, un service par ligne ---- */
+.journee { display: grid; gap: var(--e-2); }
+.jour-service { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: var(--r-2); background: var(--surface-2); }
+.jour-service > div { flex: 1 1 auto; }
+.jour-service strong { font-size: var(--t-14); font-weight: 650; letter-spacing: var(--serre); }
+.jour-service > button, .jour-service > .badge { flex: 0 0 auto; }
+.jour-service[data-etat="reservee"], .jour-service[data-etat="presence"] { background: color-mix(in srgb, var(--accent) 8%, var(--surface-2)); }
+.jour-service[data-etat="absence"] { background: color-mix(in srgb, var(--danger) 7%, var(--surface-2)); }
+@media (max-width: 420px) { .jour-service { flex-wrap: wrap; } .jour-service > button { width: 100%; } }
+/* « dimanche 6 septembre » → « Dimanche 6 septembre » : la première lettre seulement,
+   jamais `capitalize` qui met une majuscule à chaque mot (« 6 Septembre »). */
+.capitale::first-letter { text-transform: uppercase; }
+.nav-periode span[data-actif]::first-letter { text-transform: uppercase; }

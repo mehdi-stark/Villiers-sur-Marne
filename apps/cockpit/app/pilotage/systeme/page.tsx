@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { AlertTriangle, Check, Database, ExternalLink, GitBranch, Server, Terminal, X } from "lucide-react";
-import { COMMANDES, COMPTES, etatApplications, etatAutomatismes, etatBase, regionLointaine } from "@/lib/systeme";
+import { BoutonCopier } from "@ville/ui";
+import { COMMANDES, COMPTES, etatApplications, etatAutomatismes, etatBase, historiqueDispo, regionLointaine } from "@/lib/systeme";
 
 export const metadata: Metadata = { title: "Système" };
 export const dynamic = "force-dynamic";
@@ -15,11 +16,14 @@ const ilYA = (d: Date) => {
  *  et par quelle commande reprendre. Tout est lu à l'exécution — une fiche recopiée à la
  *  main ment au bout de trois semaines. */
 export default async function Systeme() {
-  const [apps, base, auto] = await Promise.all([
+  const [apps, base, auto, dispo] = await Promise.all([
     etatApplications(),
     etatBase().catch(() => null),
     etatAutomatismes().catch(() => null),
+    historiqueDispo().catch(() => []),
   ]);
+  const releves = dispo.filter((d) => d.statut !== "aucun");
+  const pannes = releves.filter((d) => d.statut === "erreur");
   const enPanne = apps.filter((a) => !a.enLigne).length;
   const manquantes = apps.flatMap((a) => (a.sante?.manquantes ?? []).map((v) => `${a.nom} : ${v}`));
   const lointaines = apps.filter((a) => regionLointaine(a.sante?.region ?? null));
@@ -65,6 +69,7 @@ export default async function Systeme() {
 
             <div className="systeme-liens">
               <a className="bouton bouton-sm" href={a.url} target="_blank" rel="noreferrer">{a.url.replace("https://", "")} <ExternalLink size={13} aria-hidden /></a>
+              <BoutonCopier valeur={a.url} libelle="Copier l'URL" />
               {a.chemins.map((c) => <a key={c.chemin} className="bouton bouton-sm" data-variant="discret" href={`${a.url}${c.chemin}`} target="_blank" rel="noreferrer">{c.libelle}</a>)}
             </div>
 
@@ -95,6 +100,25 @@ export default async function Systeme() {
             )}
           </article>
         ))}
+      </section>
+
+      {/* ---- Disponibilité ---- */}
+      <section className="pile">
+        <h2>Trente jours de disponibilité</h2>
+        {releves.length === 0 ? (
+          <p className="mini t-3">Aucun relevé encore. Le contrôle tourne chaque jour à 5 h UTC (ordonnanceur Vercel, <code>/api/cron/sante</code>) et journalise dans <code>runs</code>.</p>
+        ) : (
+          <div className="carte pile">
+            <div className="rangee" style={{ alignItems: "baseline", justifyContent: "space-between" }}>
+              <strong>{releves.length} jour{releves.length > 1 ? "s" : ""} relevé{releves.length > 1 ? "s" : ""}</strong>
+              <span className="badge" data-tone={pannes.length ? "warn" : "ok"}>{pannes.length === 0 ? "aucune panne constatée" : `${pannes.length} jour(s) avec panne`}</span>
+            </div>
+            <div className="dispo-bande" role="img" aria-label={`Disponibilité des 30 derniers jours : ${pannes.length} jour(s) en panne, ${releves.length - pannes.length} jour(s) sans incident.`}>
+              {dispo.map((d) => <span key={d.date} className="dispo-jour" data-statut={d.statut} title={`${d.date} — ${d.statut === "ok" ? "tout répondait" : d.statut === "erreur" ? d.detail ?? "panne" : "pas de relevé"}`} />)}
+            </div>
+            <p className="tiny">Un relevé qui trouve une application à terre ÉCHOUE volontairement : c'est ce qui pose l'alerte et noircit la case.</p>
+          </div>
+        )}
       </section>
 
       {/* ---- La base ---- */}
@@ -194,6 +218,7 @@ export default async function Systeme() {
             <div key={c.commande} className="ligne systeme-commande">
               <code>{c.commande}</code>
               <span className="tiny">{c.role}</span>
+              <BoutonCopier valeur={c.commande} libelle="Copier" />
             </div>
           ))}
           <div className="rangee">

@@ -237,3 +237,9 @@ hr, .filet { border: 0; height: 1px; background: color-mix(in srgb, var(--bord) 
   .squelette { animation: none; }
   .barre-route[data-actif] { transition: opacity .12s ease; width: 82%; }
 }
+
+/* ---- Bouton de copie : discret, réponse immédiate ---- */
+.bouton-copier { display: inline-flex; align-items: center; gap: 5px; border: 1px solid var(--bord); background: var(--surface); color: var(--texte-2); border-radius: var(--r-1); padding: 4px 9px; font: inherit; font-size: 11.5px; font-weight: 600; cursor: pointer; transition: background var(--d-2), color var(--d-2), border-color var(--d-2); }
+.bouton-copier:hover { background: var(--surface-2); color: var(--texte); }
+.bouton-copier:active { transform: scale(.97); }
+.bouton-copier-sm { padding: 3px 8px; }

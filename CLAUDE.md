@@ -15,9 +15,11 @@ Puis relire `.claude-consignes.md` et `.claude-resume.txt`.
   cadrage, direction artistique, marché, backlog, données et tarifs, journal des présentations,
   et **`/pilotage/systeme`** : l'état RÉEL (apps en ligne, commit déployé, variables posées ou
   manquantes, base, cron, alertes, comptes, commandes). À ouvrir en premier après une absence.
-- **Portail famille** `apps/famille` → https://villiers-famille.vercel.app — PWA : Ma semaine,
-  Calendrier (mois), Factures, Démarches, Activités et tarifs, Enfants, Appareils, Réglages ;
-  vitrine publique `/decouvrir` + dossier PDF ; lien de présentation borné `/presentation`.
+- **Portail famille** `apps/famille` → https://villiers-famille.vercel.app — PWA, quatre
+  onglets : **Planning** (une destination, trois échelles : `/jour`, `/` semaine, `/calendrier`
+  mois — sélecteur unique, vocabulaire de MOMENTS partout), **Activités** et tarifs, Factures,
+  Démarches ; Enfants, Appareils, Réglages au menu profil ; vitrine publique `/decouvrir`
+  + dossier PDF ; lien de présentation borné `/presentation`.
 - **Back-office agents** `apps/agents` → https://villiers-agents.vercel.app — PWA : file du
   jour et pointage, démarches à valider, activités, familles, réglages (réinitialiser la démo).
 
@@ -37,6 +39,11 @@ d'heure Paris — enregistré et actif côté Vercel).
 **Ce qui n'existe PAS** : le numéro client PayFIP (différé par Mehdi, mode MVP), l'accord
 écrit de la ville sur son logo, l'auto-déploiement GitHub→Vercel, toute source de données
 réelle (Agora+ / API ville).
+
+**Navigation, décidé** : onglets pour le portail famille (grand public, mobile d'abord,
+4 destinations), barre latérale par sections pour cockpit et agents (outils denses). Une
+échelle de temps n'est JAMAIS une destination — c'est un sélecteur dans la page (`alias` sur
+la destination pour que l'onglet reste allumé).
 
 **Régions** : les trois apps tournent à `cdg1` (Paris), au plus près de la base Neon
 (`eu-central-1`) — `regions` dans chaque `vercel.json`. Ne jamais laisser le défaut `iad1`.

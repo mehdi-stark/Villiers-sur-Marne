@@ -1,11 +1,11 @@
 import type { Activite, Enfant, Reservation } from "@ville/core/donnees/types";
 import { verdictDelai } from "@ville/core/donnees/regles";
-import { grouperParService, service } from "@ville/core/donnees/services";
+import { grouperParService, service, type Moment } from "@ville/core/donnees/services";
 
 // Vue MOIS : le calendrier que l'on attend d'un portail famille — un mois d'un coup d'œil,
 // chaque jour portant ses services (pastilles), et le détail au tap.
 export type EtatJour = "reservee" | "presence" | "absence" | "libre" | "non_servi";
-export type ServiceDuJour = { activiteId: string; groupe: string; nom: string; nomCourt: string; ton: string; etat: EtatJour; possible: boolean; verdict: string; tarif: number };
+export type ServiceDuJour = { activiteId: string; groupe: string; nom: string; nomCourt: string; ton: string; moment: Moment; etat: EtatJour; possible: boolean; verdict: string; tarif: number };
 export type JourMois = { date: string; jour: number; dansLeMois: boolean; aujourdhui: boolean; weekend: boolean; services: ServiceDuJour[] };
 
 export function moisDe(ancre: Date): { debut: Date; fin: Date; libelle: string } {
@@ -45,7 +45,7 @@ export function moisEnfant(enfant: Enfant, activites: Activite[], reservations: 
         if (etat === "libre" && services.some((s) => s.groupe === g.groupe)) continue;
         const v = verdictDelai(a, date, maintenant);
         const s = service(a);
-        services.push({ activiteId: a.id, groupe: g.groupe, nom: s.nomGroupe, nomCourt: s.formule ?? s.nomCourt, ton: s.ton, etat, possible: v.possible, verdict: v.libelle, tarif: 0 });
+        services.push({ activiteId: a.id, groupe: g.groupe, nom: s.nomGroupe, nomCourt: s.formule ?? s.nomCourt, ton: s.ton, moment: s.moment, etat, possible: v.possible, verdict: v.libelle, tarif: 0 });
         if (etat !== "libre") break; // un service réservé masque ses autres formules
       }
     }

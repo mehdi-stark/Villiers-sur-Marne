@@ -8,6 +8,7 @@ import type { JourMois } from "@/lib/mois";
 
 const LIBELLE: Record<string, string> = { reservee: "Réservé", presence: "Présent", absence: "Absent", libre: "Libre" };
 const JOURS = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"];
+const MOMENTS_LEGENDE = [["matin", "Matin"], ["midi", "Midi"], ["soir", "Soir"], ["hors_classe", "Mercredi et vacances"]] as const;
 const fmtJour = new Intl.DateTimeFormat("fr-FR", { weekday: "long", day: "numeric", month: "long", timeZone: "Europe/Paris" });
 
 /** Le mois d'un coup d'œil : une pastille par service et par jour ; le détail au tap,
@@ -17,6 +18,7 @@ export function Calendrier({ enfantId, prenom, jours, euros }: { enfantId: strin
   const [message, setMessage] = useState<string | null>(null);
   const [enCours, setEnCours] = useState<string | null>(null); // l'activité qu'on enregistre
   const jour = jours.find((j) => j.date === ouvert) ?? null;
+  const presents = new Set(jours.flatMap((j) => j.services.map((s) => s.moment)));
   const taper = async (activiteId: string, date: string, etat: string) => {
     setEnCours(activiteId);
     const actuel: EtatReservation | null = etat === "libre" ? null : (etat as EtatReservation);
@@ -35,14 +37,17 @@ export function Calendrier({ enfantId, prenom, jours, euros }: { enfantId: strin
             aria-label={`${fmtJour.format(new Date(`${j.date}T12:00:00Z`))} : ${j.services.length ? j.services.map((s) => `${s.nom} ${LIBELLE[s.etat]}`).join(", ") : "aucun service"}`}>
             <span className="jour-mois-num">{j.jour}</span>
             <span className="jour-mois-pastilles">
-              {j.services.slice(0, 3).map((s) => <span key={s.activiteId} className="pastille" data-ton={s.ton} data-etat={s.etat} />)}
+              {j.services.slice(0, 4).map((s) => <span key={s.activiteId} className="pastille" data-moment={s.moment} data-etat={s.etat} />)}
             </span>
           </button>
         ))}
       </div>
       {jour && (
         <div className="calendrier-detail" role="region" aria-live="polite">
-          <strong>{fmtJour.format(new Date(`${jour.date}T12:00:00Z`))}</strong>
+          <div className="rangee" style={{ justifyContent: "space-between", alignItems: "baseline" }}>
+            <strong>{fmtJour.format(new Date(`${jour.date}T12:00:00Z`))}</strong>
+            <a className="bouton bouton-sm" data-variant="discret" href={`/jour?d=${jour.date}`}>Voir la journée →</a>
+          </div>
           {jour.services.length === 0 ? (
             <p className="petit t-2">Aucun service réservable ce jour pour {prenom}.</p>
           ) : (
@@ -67,12 +72,17 @@ export function Calendrier({ enfantId, prenom, jours, euros }: { enfantId: strin
           {message && <p className="petit" role="status" style={{ color: "var(--accent)" }}>{message}</p>}
         </div>
       )}
-      <div className="legende" aria-hidden>
-        <span style={{ "--x": "var(--accent)" } as React.CSSProperties}>Réservé</span>
-        <span style={{ "--x": "var(--ok)" } as React.CSSProperties}>Présent</span>
-        <span style={{ "--x": "var(--warn)" } as React.CSSProperties}>Absent</span>
-        <span style={{ "--x": "var(--bord-fort)" } as React.CSSProperties}>Libre</span>
+      {/* La légende dit ce que veut dire une pastille : sa COULEUR = le moment, son
+          remplissage = réservé ou non. Même vocabulaire que la semaine et la vue jour. */}
+      {/* La légende ne montre QUE les moments présents dans ce mois : une couleur qu'on
+          ne voit nulle part dans la grille est une promesse non tenue. */}
+      <div className="legende-moments" aria-hidden>
+        {MOMENTS_LEGENDE.filter(([cle]) => presents.has(cle)).map(([cle, label]) => (
+          <span key={cle}><span className="pastille" data-moment={cle} data-etat="reservee" />{label}</span>
+        ))}
+        <span><span className="pastille" data-moment={[...presents][0] ?? "midi"} data-etat="libre" />pas encore réservé</span>
       </div>
+      <p className="mini t-3">Seuls les services <b>à réserver</b> apparaissent ici. L&apos;accueil du matin, du soir et l&apos;étude sont à l&apos;inscription annuelle : ils figurent dans la vue Jour et la vue Semaine.</p>
     </div>
   );
 }

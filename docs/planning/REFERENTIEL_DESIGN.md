@@ -113,3 +113,26 @@ une page atteinte depuis un menu profil n'a pas d'onglet actif, donc pas de chem
 Mesuré, pas estimé : `scripts/tests/alignement-semaine.mjs` échoue si les colonnes de jours
 se décalent des créneaux (± 1 px, à 390 et à 1440) ; `scripts/tests/chargement.mjs` échoue
 s'il n'y a pas exactement UN contrôle en attente, ou pas de squelette pendant la navigation.
+
+### Rubrique du 06/09/2026 — le planning à trois échelles (portail famille)
+**Décision de navigation, assumée** : le portail garde ses **onglets** (bas sur mobile, barre
+en haut sur desktop) et NON une barre latérale. Raison : produit grand public, mobile d'abord,
+quatre destinations — la barre latérale est le gabarit des outils denses (cockpit, agents),
+où l'on compte dix entrées et où la souris est acquise. Ce qui a changé : les quatre onglets
+sont désormais **Planning · Activités · Factures · Démarches**. « Calendrier » n'est plus un
+onglet — c'est une ÉCHELLE du planning ; « Activités et tarifs » remonte du menu profil,
+parce que « ça coûte combien ? » est une question quotidienne, pas un réglage.
+
+| Axe | Jour | Semaine | Mois |
+|---|---|---|---|
+| Hiérarchie | 5 — un bloc par moment, un service par ligne | 5 — une ligne par service, cinq colonnes | 5 — une grille, une pastille par service |
+| Contraste | 5 | 5 | 5 — pastille pleine = réservé, creuse = non réservé |
+| Densité | 5 — tout tient sur un écran | 4 — 4 écrans à 390 px pour deux enfants | 5 |
+| Cohérence | 5 — même sélecteur Jour/Semaine/Mois sur les trois, même vocabulaire de moments | 5 | 5 |
+| Identité | 4 | 4 | 4 |
+| Mouvement | 5 — la réservation bascule en 21 ms (optimiste) | 5 | 4 |
+| États | 5 — journée sans accueil : la prochaine journée est proposée | 5 — semaine passée en lecture seule | 5 — légende limitée aux moments présents |
+
+Trois choses qu'on refuse désormais : une couleur de légende qui n'apparaît nulle part dans
+la grille ; `text-transform: capitalize` sur une date (« 6 Septembre ») ; un onglet qui
+s'éteint quand on navigue dans sa propre section (d'où `alias` sur les destinations).

@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { familleCourante } from "@/lib/session";
 import { moisDe, moisEnfant } from "@/lib/mois";
 import { euros, tarif, trancheDe } from "@ville/core/donnees/regles";
 import { Calendrier } from "@/components/calendrier";
 import { Cascade, EtatVide, IlluCalendrier } from "@ville/ui";
+import { NavPeriode, SelecteurVue } from "@/components/selecteur-vue";
 
 export const metadata: Metadata = { title: "Calendrier" };
 export const dynamic = "force-dynamic";
@@ -33,20 +33,15 @@ export default async function PageCalendrier({ searchParams }: { searchParams: P
       <div className="page-tete">
         <div>
           <span className="salut">Calendrier</span>
-          <h1 style={{ textTransform: "capitalize" }}>{libelle}</h1>
+          <h1 className="capitale">{libelle}</h1>
           <p className="petit t-2">{reserves} service{reserves > 1 ? "s" : ""} réservé{reserves > 1 ? "s" : ""} ce mois-ci · tranche {tranche}</p>
         </div>
-        <div className="segmente">
-          <a href={`/calendrier?m=${prec}`} aria-label="Mois précédent">←</a>
-          <span data-actif style={{ textTransform: "capitalize" }}>{libelle.split(" ")[0]}</span>
-          <a href={`/calendrier?m=${suiv}`} aria-label="Mois suivant">→</a>
-        </div>
+        <NavPeriode precedent={`/calendrier?m=${prec}`} suivant={`/calendrier?m=${suiv}`} titre={libelle.split(" ")[0]!}
+          libellePrecedent="Mois précédent" libelleSuivant="Mois suivant" />
       </div>
 
-      <div className="segmente" style={{ justifySelf: "start" }}>
-        <Link href="/">Semaine</Link>
-        <span data-actif>Mois</span>
-      </div>
+      <SelecteurVue vue="mois" jour={debut <= new Date(`${aujourdhui}T00:00:00Z`) && new Date(`${aujourdhui}T00:00:00Z`) <= fin ? aujourdhui : debut.toISOString().slice(0, 10)}
+        semaine={debut.toISOString().slice(0, 10)} mois={cle(debut)} />
 
       {enfants.length === 0 ? (
         <EtatVide illustration={<IlluCalendrier />} titre="Aucun enfant sur ce dossier" enfants={<>L'Espace Accueil et Facturation peut rattacher vos enfants au {f.commune.telephoneAccueil}.</>} />

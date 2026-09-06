@@ -1,6 +1,7 @@
 import { sql } from "drizzle-orm";
 import { db, schema } from "@ville/core/db";
 import { dernierRun } from "@ville/core/runs";
+import { desc, eq } from "drizzle-orm";
 import type { RapportSante } from "@ville/core/sante";
 
 /* CE QU'IL FAUT POUR REPRENDRE LE PROJET DANS UN MOIS (demande Mehdi, 06/09/2026).
@@ -147,3 +148,26 @@ export const COMMANDES = [
   { commande: "cd apps/famille && node scripts/lien-presentation.mjs", role: "Deux liens de démonstration signés, valables 2 h." },
   { commande: "cd apps/<app> && pnpm capturer --forger mehdi.stark@gmail.com [--dark]", role: "Captures 1440 et 390 avec détection de débordement." },
 ];
+
+export type JourDispo = { date: string; statut: "ok" | "erreur" | "aucun"; detail: string | null };
+
+/** Trente jours de disponibilité, lus dans le journal des runs : un instantané ne dit
+ *  pas si une application est tombée pendant qu'on regardait ailleurs. */
+export async function historiqueDispo(jours = 30): Promise<JourDispo[]> {
+  const lignes = await db.select().from(schema.runs).where(eq(schema.runs.code, "sante_apps")).orderBy(desc(schema.runs.debutLe)).limit(120);
+  const parJour = new Map<string, { statut: "ok" | "erreur"; detail: string | null }>();
+  const j = (d: Date) => new Intl.DateTimeFormat("sv-SE", { timeZone: "Europe/Paris" }).format(d);
+  for (const l of lignes) {
+    const cle = j(l.debutLe);
+    const actuel = parJour.get(cle);
+    // Une panne dans la journée prime sur un relevé réussi : on montre le pire.
+    if (!actuel || (actuel.statut === "ok" && l.statut === "erreur")) parJour.set(cle, { statut: l.statut === "erreur" ? "erreur" : "ok", detail: l.erreur ?? null });
+  }
+  const out: JourDispo[] = [];
+  for (let i = jours - 1; i >= 0; i--) {
+    const cle = j(new Date(Date.now() - i * 86_400_000));
+    const v = parJour.get(cle);
+    out.push({ date: cle, statut: v?.statut ?? "aucun", detail: v?.detail ?? null });
+  }
+  return out;
+}

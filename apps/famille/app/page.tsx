@@ -9,6 +9,7 @@ import { ActiverNotifications } from "@ville/core/ui/push";
 import { Cascade, EtatVide, IlluCalendrier } from "@ville/ui";
 import { LigneService } from "@/components/ligne-service";
 import { SemaineType } from "@/components/semaine-type";
+import { NavPeriode, SelecteurVue } from "@/components/selecteur-vue";
 import Link from "next/link";
 
 export const dynamic = "force-dynamic";
@@ -59,11 +60,8 @@ export default async function MaSemaine({ searchParams }: { searchParams: Promis
           <h1>Ma semaine</h1>
           <p className="petit t-2">Du {fmtSemaine.format(lundi)} au {fmtSemaine.format(vendredi)} · tranche {tranche}{f.famille.quotientFamilial === null ? " (quotient non calculé)" : ""}</p>
         </div>
-        <div className="segmente">
-          <a href={`/?s=${prec}`} aria-label="Semaine précédente">←</a>
-          <span data-actif>{fmtSemaine.format(lundi).replace(/ \d{4}$/, "")}</span>
-          <a href={`/?s=${suiv}`} aria-label="Semaine suivante">→</a>
-        </div>
+        <NavPeriode precedent={`/?s=${prec}`} suivant={`/?s=${suiv}`} titre={fmtSemaine.format(lundi).replace(/ \d{4}$/, "")}
+          libellePrecedent="Semaine précédente" libelleSuivant="Semaine suivante" />
       </div>
 
       <div className="carte carte-haut carte-accent resume-semaine">
@@ -81,10 +79,7 @@ export default async function MaSemaine({ searchParams }: { searchParams: Promis
         <span className="petit t-2">Facturé à terme échu, payable par PayFIP. Les services « inscrit à l'année » sont facturés à la fréquentation réelle.</span>
       </div>
 
-      <div className="segmente" style={{ justifySelf: "start" }}>
-        <span data-actif>Semaine</span>
-        <Link href="/calendrier">Mois</Link>
-      </div>
+      <SelecteurVue vue="semaine" jour={jours.some((j) => j.date === aujourdhui) ? aujourdhui : jours[0]!.date} semaine={iso(lundi)} mois={iso(lundi).slice(0, 7)} />
       <div className="pile" style={{ gap: 8 }}>
         <ActiverFaceId cle="famille-passkey" />
         <SemaineType />
@@ -114,10 +109,16 @@ export default async function MaSemaine({ searchParams }: { searchParams: Promis
                 <span className="avatar" aria-hidden>{enfant.prenom.slice(0, 1)}</span>
                 <div style={{ minWidth: 0 }}><strong>{enfant.prenom}</strong><div className="mini t-3">{enfant.ecole} · {enfant.classe}</div></div>
               </div>
-              <div className="entete-jours" aria-hidden>
+              <div className="entete-jours">
                 {jours.map((j) => {
                   const d = new Date(`${j.date}T12:00:00Z`);
-                  return <div key={j.date} className="entete-jour" data-aujourdhui={j.date === aujourdhui || undefined}><span>{fmtJour.format(d).replace(".", "")}</span><b>{d.getUTCDate()}</b></div>;
+                  return (
+                    <Link key={j.date} href={`/jour?d=${j.date}`} className="entete-jour" data-aujourdhui={j.date === aujourdhui || undefined}
+                      aria-label={`Voir la journée du ${new Intl.DateTimeFormat("fr-FR", { weekday: "long", day: "numeric", month: "long", timeZone: "UTC" }).format(d)}`}>
+                      <span>{fmtJour.format(d).replace(".", "")}</span><b>{d.getUTCDate()}</b>
+                      {j.date === aujourdhui && <em>aujourd&apos;hui</em>}
+                    </Link>
+                  );
                 })}
               </div>
               <div className="services">

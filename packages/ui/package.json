@@ -11,7 +11,8 @@
     "./theme": "./src/theme.tsx",
     "./profil": "./src/profil.tsx",
     "./demo": "./src/demo.tsx",
-    "./chargement": "./src/chargement.tsx"
+    "./chargement": "./src/chargement.tsx",
+    "./copier": "./src/copier.tsx"
   },
   "scripts": {
     "typecheck": "tsc --noEmit"
