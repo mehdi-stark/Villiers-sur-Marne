@@ -10,6 +10,7 @@ import { Cascade, EtatVide, IlluCalendrier } from "@ville/ui";
 import { LigneService } from "@/components/ligne-service";
 import { SemaineType } from "@/components/semaine-type";
 import { NavPeriode, SelecteurVue } from "@/components/selecteur-vue";
+import { SelecteurEnfant } from "@/components/selecteur-enfant";
 import Link from "next/link";
 
 export const dynamic = "force-dynamic";
@@ -17,10 +18,10 @@ const fmtJour = new Intl.DateTimeFormat("fr-FR", { weekday: "short", timeZone: "
 const fmtSemaine = new Intl.DateTimeFormat("fr-FR", { day: "numeric", month: "long", timeZone: "Europe/Paris" });
 const ICONE_MOMENT = { sunrise: Sunrise, utensils: Utensils, sunset: Sunset, palette: Palette, book: Sunset } as const;
 
-export default async function MaSemaine({ searchParams }: { searchParams: Promise<{ s?: string }> }) {
+export default async function MaSemaine({ searchParams }: { searchParams: Promise<{ s?: string; e?: string }> }) {
   const f = await familleCourante();
   if (!f) redirect("/connexion");
-  const { s } = await searchParams;
+  const { s, e: enfantChoisi } = await searchParams;
   const maintenant = new Date();
   const aujourdhui = new Intl.DateTimeFormat("sv-SE", { timeZone: "Europe/Paris" }).format(maintenant);
   const lundi = lundiDe(s ? new Date(`${s}T00:00:00Z`) : new Date(maintenant.getTime() + 7 * 86_400_000));
@@ -29,7 +30,9 @@ export default async function MaSemaine({ searchParams }: { searchParams: Promis
   const iso = (d: Date) => d.toISOString().slice(0, 10);
   const [enfants, activites] = await Promise.all([f.source.enfants(f.famille.id), f.source.activites()]);
   const tranche = trancheDe(f.famille.quotientFamilial, f.famille.exterieur);
-  const semaines = await Promise.all(enfants.map(async (e) => ({ enfant: e, lignes: servicesDe(e, activites, await f.source.reservations(e.id, iso(lundi), iso(vendredi)), lundi, maintenant) })));
+  const choisi = enfants.some((e) => e.id === enfantChoisi) ? enfantChoisi! : null;
+  const affiches = choisi ? enfants.filter((e) => e.id === choisi) : enfants;
+  const semaines = await Promise.all(affiches.map(async (e) => ({ enfant: e, lignes: servicesDe(e, activites, await f.source.reservations(e.id, iso(lundi), iso(vendredi)), lundi, maintenant) })));
   const prec = iso(new Date(lundi.getTime() - 7 * 86_400_000)), suiv = iso(new Date(lundi.getTime() + 7 * 86_400_000));
 
   // Semaine passée : tout y est figé. On le DIT au lieu de laisser taper des boutons morts.
@@ -60,12 +63,12 @@ export default async function MaSemaine({ searchParams }: { searchParams: Promis
           <h1>Ma semaine</h1>
           <p className="petit t-2">Du {fmtSemaine.format(lundi)} au {fmtSemaine.format(vendredi)} · tranche {tranche}{f.famille.quotientFamilial === null ? " (quotient non calculé)" : ""}</p>
         </div>
-        <NavPeriode precedent={`/?s=${prec}`} suivant={`/?s=${suiv}`} titre={fmtSemaine.format(lundi).replace(/ \d{4}$/, "")}
+        <NavPeriode precedent={`/?s=${prec}${choisi ? `&e=${choisi}` : ""}`} suivant={`/?s=${suiv}${choisi ? `&e=${choisi}` : ""}`} titre={fmtSemaine.format(lundi).replace(/ \d{4}$/, "")}
           libellePrecedent="Semaine précédente" libelleSuivant="Semaine suivante" />
       </div>
 
       <div className="carte carte-haut carte-accent resume-semaine">
-        <span className="petit t-2">Cette semaine, pour {enfants.length} enfant{enfants.length > 1 ? "s" : ""}</span>
+        <span className="petit t-2">Cette semaine, pour {affiches.length === enfants.length ? `${enfants.length} enfant${enfants.length > 1 ? "s" : ""}` : affiches[0]!.prenom}</span>
         {parService.size === 0 ? (
           <strong>Rien de réservé pour l'instant</strong>
         ) : (
@@ -79,7 +82,9 @@ export default async function MaSemaine({ searchParams }: { searchParams: Promis
         <span className="petit t-2">Facturé à terme échu, payable par PayFIP. Les services « inscrit à l'année » sont facturés à la fréquentation réelle.</span>
       </div>
 
-      <SelecteurVue vue="semaine" jour={jours.some((j) => j.date === aujourdhui) ? aujourdhui : jours[0]!.date} semaine={iso(lundi)} mois={iso(lundi).slice(0, 7)} />
+      <SelecteurVue vue="semaine" jour={jours.some((j) => j.date === aujourdhui) ? aujourdhui : jours[0]!.date} semaine={iso(lundi)} mois={iso(lundi).slice(0, 7)} enfant={choisi} />
+      <SelecteurEnfant enfants={enfants.map((e) => ({ id: e.id, prenom: e.prenom, classe: e.classe }))} choisi={choisi}
+        href={(id) => `/?s=${iso(lundi)}${id ? `&e=${id}` : ""}`} />
       <div className="pile" style={{ gap: 8 }}>
         <ActiverFaceId cle="famille-passkey" />
         <SemaineType />
@@ -113,7 +118,7 @@ export default async function MaSemaine({ searchParams }: { searchParams: Promis
                 {jours.map((j) => {
                   const d = new Date(`${j.date}T12:00:00Z`);
                   return (
-                    <Link key={j.date} href={`/jour?d=${j.date}`} className="entete-jour" data-aujourdhui={j.date === aujourdhui || undefined}
+                    <Link key={j.date} href={`/jour?d=${j.date}${choisi ? `&e=${choisi}` : ""}`} className="entete-jour" data-aujourdhui={j.date === aujourdhui || undefined}
                       aria-label={`Voir la journée du ${new Intl.DateTimeFormat("fr-FR", { weekday: "long", day: "numeric", month: "long", timeZone: "UTC" }).format(d)}`}>
                       <span>{fmtJour.format(d).replace(".", "")}</span><b>{d.getUTCDate()}</b>
                       {j.date === aujourdhui && <em>aujourd&apos;hui</em>}

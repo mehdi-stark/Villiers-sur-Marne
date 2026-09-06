@@ -7,23 +7,26 @@ import { euros, tarif, trancheDe } from "@ville/core/donnees/regles";
 import { Cascade, EtatVide, IlluCalendrier } from "@ville/ui";
 import { Journee } from "@/components/journee";
 import { NavPeriode, SelecteurVue } from "@/components/selecteur-vue";
+import { SelecteurEnfant } from "@/components/selecteur-enfant";
 
 export const metadata: Metadata = { title: "Ma journée" };
 export const dynamic = "force-dynamic";
 
 /** LA VUE LA PLUS SIMPLE : une journée, du matin au soir, pour chaque enfant. */
-export default async function PageJour({ searchParams }: { searchParams: Promise<{ d?: string }> }) {
+export default async function PageJour({ searchParams }: { searchParams: Promise<{ d?: string; e?: string }> }) {
   const f = await familleCourante();
   if (!f) redirect("/connexion");
   const maintenant = new Date();
   const aujourdhui = new Intl.DateTimeFormat("sv-SE", { timeZone: "Europe/Paris" }).format(maintenant);
-  const { d } = await searchParams;
+  const { d, e: enfantChoisi } = await searchParams;
   const date = /^\d{4}-\d{2}-\d{2}$/.test(d ?? "") ? d! : aujourdhui;
   const { titre, relatif } = libelleJour(date, aujourdhui);
   const [enfants, activites] = await Promise.all([f.source.enfants(f.famille.id), f.source.activites()]);
   const tranche = trancheDe(f.famille.quotientFamilial, f.famille.exterieur);
   const tarifs = Object.fromEntries(activites.map((a) => [a.id, euros(tarif(a, tranche))]));
-  const journees = await Promise.all(enfants.map(async (e) => ({ enfant: e, moments: jourEnfant(e, activites, await f.source.reservations(e.id, date, date), date, maintenant) })));
+  const choisi = enfants.some((e) => e.id === enfantChoisi) ? enfantChoisi! : null;
+  const affiches = choisi ? enfants.filter((e) => e.id === choisi) : enfants;
+  const journees = await Promise.all(affiches.map(async (e) => ({ enfant: e, moments: jourEnfant(e, activites, await f.source.reservations(e.id, date, date), date, maintenant) })));
   const lundi = lundiDe(new Date(`${date}T00:00:00Z`)).toISOString().slice(0, 10);
   const reserves = journees.reduce((s, j) => s + j.moments.reduce((a, m) => a + m.services.filter((x) => x.etat === "reservee" || x.etat === "presence").length, 0), 0);
   const passe = date < aujourdhui;
@@ -34,7 +37,7 @@ export default async function PageJour({ searchParams }: { searchParams: Promise
   if (vide && enfants.length > 0) {
     for (let i = 1; i <= 10 && !prochaine; i++) {
       const d = decalerJour(date, i);
-      if (enfants.some((e) => jourEnfant(e, activites, [], d, maintenant).length > 0)) prochaine = d;
+      if (affiches.some((e) => jourEnfant(e, activites, [], d, maintenant).length > 0)) prochaine = d;
     }
   }
 
@@ -46,12 +49,14 @@ export default async function PageJour({ searchParams }: { searchParams: Promise
           <h1 className="capitale">{titre}</h1>
           <p className="petit t-2">{reserves === 0 ? "Rien de réservé ce jour" : `${reserves} service${reserves > 1 ? "s" : ""} réservé${reserves > 1 ? "s" : ""}`} · tranche {tranche}</p>
         </div>
-        <NavPeriode precedent={`/jour?d=${decalerJour(date, -1)}`} suivant={`/jour?d=${decalerJour(date, 1)}`}
+        <NavPeriode precedent={`/jour?d=${decalerJour(date, -1)}${choisi ? `&e=${choisi}` : ""}`} suivant={`/jour?d=${decalerJour(date, 1)}${choisi ? `&e=${choisi}` : ""}`}
           titre={relatif ?? new Intl.DateTimeFormat("fr-FR", { day: "numeric", month: "short", timeZone: "UTC" }).format(new Date(`${date}T12:00:00Z`))}
           libellePrecedent="Jour précédent" libelleSuivant="Jour suivant" />
       </div>
 
-      <SelecteurVue vue="jour" jour={date} semaine={lundi} mois={date.slice(0, 7)} />
+      <SelecteurVue vue="jour" jour={date} semaine={lundi} mois={date.slice(0, 7)} enfant={choisi} />
+      <SelecteurEnfant enfants={enfants.map((e) => ({ id: e.id, prenom: e.prenom, classe: e.classe }))} choisi={choisi}
+        href={(id) => `/jour?d=${date}${id ? `&e=${id}` : ""}`} />
 
       {prochaine && (
         <div className="bandeau" data-tone="accent" role="status">

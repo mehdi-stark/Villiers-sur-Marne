@@ -4,11 +4,13 @@ import Link from "next/link";
  * on doit savoir OÙ on est et pouvoir changer d'échelle sans réapprendre. */
 export type Vue = "jour" | "semaine" | "mois";
 
-export function SelecteurVue({ vue, jour, semaine, mois }: { vue: Vue; jour: string; semaine: string; mois: string }) {
+export function SelecteurVue({ vue, jour, semaine, mois, enfant }: { vue: Vue; jour: string; semaine: string; mois: string; enfant?: string | null }) {
+  // L'enfant choisi SUIT le changement d'échelle : on ne le reperd pas en passant au mois.
+  const e = enfant ? `&e=${enfant}` : "";
   const liens: { cle: Vue; label: string; href: string }[] = [
-    { cle: "jour", label: "Jour", href: `/jour?d=${jour}` },
-    { cle: "semaine", label: "Semaine", href: `/?s=${semaine}` },
-    { cle: "mois", label: "Mois", href: `/calendrier?m=${mois}` },
+    { cle: "jour", label: "Jour", href: `/jour?d=${jour}${e}` },
+    { cle: "semaine", label: "Semaine", href: `/?s=${semaine}${e}` },
+    { cle: "mois", label: "Mois", href: `/calendrier?m=${mois}${e}` },
   ];
   return (
     <div className="segmente" role="group" aria-label="Échelle d'affichage" style={{ justifySelf: "start" }}>

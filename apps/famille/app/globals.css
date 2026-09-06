@@ -191,3 +191,14 @@
    jamais `capitalize` qui met une majuscule à chaque mot (« 6 Septembre »). */
 .capitale::first-letter { text-transform: uppercase; }
 .nav-periode span[data-actif]::first-letter { text-transform: uppercase; }
+
+/* ---- Choix de l'enfant : une rangée qui défile au pouce, des cibles de 44 px ---- */
+.enfants-choix { display: flex; gap: 6px; overflow-x: auto; padding: 2px 2px 6px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+.enfants-choix::-webkit-scrollbar { display: none; }
+.puce-enfant { display: inline-flex; align-items: center; gap: 8px; flex: 0 0 auto; min-height: 44px; padding: 5px 14px 5px 5px; border-radius: var(--r-pill); background: var(--surface); border: 1px solid var(--bord); color: var(--texte-2); text-decoration: none; font-size: var(--t-13); font-weight: 600; transition: background var(--d-2), border-color var(--d-2), color var(--d-2); }
+.puce-enfant:hover { background: var(--surface-2); }
+.puce-enfant[data-actif] { background: var(--accent-soft); border-color: color-mix(in srgb, var(--accent) 45%, transparent); color: var(--accent); box-shadow: var(--el-1); }
+.puce-enfant small { display: block; font-size: 10.5px; font-weight: 500; color: var(--texte-3); letter-spacing: .01em; }
+.puce-enfant[data-actif] small { color: color-mix(in srgb, var(--accent) 75%, var(--texte)); }
+.puce-avatar, .puce-tous { width: 34px; height: 34px; flex: 0 0 auto; border-radius: 999px; display: grid; place-items: center; font-family: var(--police-titre); font-weight: 800; font-size: 14px; background: linear-gradient(135deg, var(--accent-soft), var(--surface-2)); color: var(--accent); border: 1px solid color-mix(in srgb, var(--accent) 22%, transparent); }
+.puce-tous { background: var(--surface-2); color: var(--texte-2); }

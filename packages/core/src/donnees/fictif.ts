@@ -1,10 +1,16 @@
 import type { Activite, Enfant, Facture, Famille, Reservation, SourceDonnees } from "./types";
 import { tarif, trancheDe } from "./regles";
 import { fusionner, reservationsPersistees } from "./reservations";
+import { enfantsRattaches } from "./enfants";
 
 // La couche persistée (base) se remplace en test unitaire : la fixture reste pure, la base reste vraie ailleurs.
 let persistance: (enfantId: string, du: string, au: string) => Promise<Reservation[]> = reservationsPersistees;
 export function definirPersistance(fn: typeof persistance) { persistance = fn; }
+// Même mécanique pour les enfants rattachés par un agent : les tests unitaires tournent
+// SANS base, la source doit rester injectable (leçon : un test qui exige Postgres n'est
+// plus un test unitaire).
+let rattaches: (familleId: string) => Promise<Enfant[]> = enfantsRattaches;
+export function definirRattaches(fn: typeof rattaches) { rattaches = fn; }
 
 // SOURCE FICTIVE — le démonstrateur tourne dessus tant qu'aucune interop Agora+ n'existe.
 // RÉEL (sources datées) : écoles et accueils (villiers94.fr, accueils périscolaires, 04/09/2026),
@@ -118,7 +124,8 @@ export const sourceFictive: SourceDonnees = {
   disponible: async () => ({ ok: true }),
   famille: async (id) => FAMILLES.find((f) => f.id === id) ?? null,
   familles: async () => FAMILLES,
-  enfants: async (familleId) => ENFANTS.filter((e) => e.familleId === familleId),
+  // Fixture + enfants rattachés par un agent (le parent n'en crée jamais).
+  enfants: async (familleId) => [...ENFANTS.filter((e) => e.familleId === familleId), ...(await rattaches(familleId))],
   activites: async () => ACTIVITES,
   // Fixture + écritures persistées (réservations du parent, pointages de l'agent).
   reservations: async (enfantId, du, au) => fusionner(reservationsFictives(enfantId).filter((r) => r.date >= du && r.date <= au), await persistance(enfantId, du, au)),

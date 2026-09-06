@@ -6,14 +6,15 @@ import { euros, tarif, trancheDe } from "@ville/core/donnees/regles";
 import { Calendrier } from "@/components/calendrier";
 import { Cascade, EtatVide, IlluCalendrier } from "@ville/ui";
 import { NavPeriode, SelecteurVue } from "@/components/selecteur-vue";
+import { SelecteurEnfant } from "@/components/selecteur-enfant";
 
 export const metadata: Metadata = { title: "Calendrier" };
 export const dynamic = "force-dynamic";
 
-export default async function PageCalendrier({ searchParams }: { searchParams: Promise<{ m?: string }> }) {
+export default async function PageCalendrier({ searchParams }: { searchParams: Promise<{ m?: string; e?: string }> }) {
   const f = await familleCourante();
   if (!f) redirect("/connexion");
-  const { m } = await searchParams;
+  const { m, e: enfantChoisi } = await searchParams;
   const maintenant = new Date();
   const ancre = m ? new Date(`${m}-01T00:00:00Z`) : maintenant;
   const { debut, fin, libelle } = moisDe(ancre);
@@ -21,7 +22,9 @@ export default async function PageCalendrier({ searchParams }: { searchParams: P
   const [enfants, activites] = await Promise.all([f.source.enfants(f.famille.id), f.source.activites()]);
   const tranche = trancheDe(f.famille.quotientFamilial, f.famille.exterieur);
   const marge = (d: Date, n: number) => new Date(d.getTime() + n * 86_400_000).toISOString().slice(0, 10);
-  const mois = await Promise.all(enfants.map(async (e) => ({ enfant: e, jours: moisEnfant(e, activites, await f.source.reservations(e.id, marge(debut, -7), marge(fin, 7)), ancre, maintenant, aujourdhui) })));
+  const choisi = enfants.some((e) => e.id === enfantChoisi) ? enfantChoisi! : null;
+  const affiches = choisi ? enfants.filter((e) => e.id === choisi) : enfants;
+  const mois = await Promise.all(affiches.map(async (e) => ({ enfant: e, jours: moisEnfant(e, activites, await f.source.reservations(e.id, marge(debut, -7), marge(fin, 7)), ancre, maintenant, aujourdhui) })));
   const cle = (d: Date) => d.toISOString().slice(0, 7);
   const prec = cle(new Date(Date.UTC(debut.getUTCFullYear(), debut.getUTCMonth() - 1, 1)));
   const suiv = cle(new Date(Date.UTC(debut.getUTCFullYear(), debut.getUTCMonth() + 1, 1)));
@@ -36,12 +39,14 @@ export default async function PageCalendrier({ searchParams }: { searchParams: P
           <h1 className="capitale">{libelle}</h1>
           <p className="petit t-2">{reserves} service{reserves > 1 ? "s" : ""} réservé{reserves > 1 ? "s" : ""} ce mois-ci · tranche {tranche}</p>
         </div>
-        <NavPeriode precedent={`/calendrier?m=${prec}`} suivant={`/calendrier?m=${suiv}`} titre={libelle.split(" ")[0]!}
+        <NavPeriode precedent={`/calendrier?m=${prec}${choisi ? `&e=${choisi}` : ""}`} suivant={`/calendrier?m=${suiv}${choisi ? `&e=${choisi}` : ""}`} titre={libelle.split(" ")[0]!}
           libellePrecedent="Mois précédent" libelleSuivant="Mois suivant" />
       </div>
 
       <SelecteurVue vue="mois" jour={debut <= new Date(`${aujourdhui}T00:00:00Z`) && new Date(`${aujourdhui}T00:00:00Z`) <= fin ? aujourdhui : debut.toISOString().slice(0, 10)}
-        semaine={debut.toISOString().slice(0, 10)} mois={cle(debut)} />
+        semaine={debut.toISOString().slice(0, 10)} mois={cle(debut)} enfant={choisi} />
+      <SelecteurEnfant enfants={enfants.map((e) => ({ id: e.id, prenom: e.prenom, classe: e.classe }))} choisi={choisi}
+        href={(id) => `/calendrier?m=${cle(debut)}${id ? `&e=${id}` : ""}`} />
 
       {enfants.length === 0 ? (
         <EtatVide illustration={<IlluCalendrier />} titre="Aucun enfant sur ce dossier" enfants={<>L'Espace Accueil et Facturation peut rattacher vos enfants au {f.commune.telephoneAccueil}.</>} />

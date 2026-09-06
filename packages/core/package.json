@@ -31,7 +31,8 @@
     "./marche": "./src/marche.ts",
     "./demonstration": "./src/demonstration.ts",
     "./demo-seed": "./src/demo-seed.ts",
-    "./sante": "./src/sante.ts"
+    "./sante": "./src/sante.ts",
+    "./donnees/enfants": "./src/donnees/enfants.ts"
   },
   "scripts": {
     "db:generate": "drizzle-kit generate",

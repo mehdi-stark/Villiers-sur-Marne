@@ -26,3 +26,28 @@ export async function reinitialiserDemo(): Promise<{ ok: boolean; message: strin
   revalidatePath("/"); revalidatePath("/demarches");
   return { ok: true, message: `Démonstration remise à zéro : ${r.demarches} démarches, ${r.pointages} pointages du ${r.jour}.` };
 }
+
+/** Rattacher un enfant à un dossier famille. C'est un geste D'AGENT : le parent ne crée
+ *  jamais un enfant — la ville tient le dossier (inscription scolaire), le périscolaire
+ *  en découle. Tracé avec l'agent qui l'a fait. */
+export async function rattacher(p: { familleId: string; prenom: string; naissance: string; ecole: string; classe: string }): Promise<{ ok: boolean; message: string }> {
+  const a = await agentCourant();
+  if (!a) return { ok: false, message: "Session expirée." };
+  const { rattacherEnfant } = await import("@ville/core/donnees/enfants");
+  const r = await rattacherEnfant({ ...p, acteur: a.email });
+  revalidatePath("/familles");
+  revalidatePath(`/familles/${p.familleId}`);
+  return { ok: r.ok, message: r.message };
+}
+
+/** Détacher (déménagement, fin de scolarité) : jamais de suppression sèche, l'historique
+ *  de facturation doit rester lisible. */
+export async function detacher(p: { id: string; familleId: string }): Promise<{ ok: boolean; message: string }> {
+  const a = await agentCourant();
+  if (!a) return { ok: false, message: "Session expirée." };
+  const { detacherEnfant } = await import("@ville/core/donnees/enfants");
+  const r = await detacherEnfant(p.id, a.email);
+  revalidatePath("/familles");
+  revalidatePath(`/familles/${p.familleId}`);
+  return r;
+}

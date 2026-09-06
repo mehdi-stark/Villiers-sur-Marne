@@ -113,6 +113,26 @@ export const reservationsDemo = pgTable(
   (t) => [uniqueIndex("reservations_demo_cle").on(t.enfantId, t.activiteId, t.date)],
 );
 
+// ---- Enfants rattachés par un AGENT ----
+// Un parent ne crée jamais un enfant : la ville tient le dossier (inscription scolaire en
+// mairie), le périscolaire en découle. Tant que la source réelle (Agora+ / export ville)
+// n'est pas branchée, c'est l'agent qui rattache — et chaque geste est tracé.
+export const enfantsDemo = pgTable(
+  "enfants_demo",
+  {
+    id: text("id").primaryKey(), // « enf-… », stable, lisible dans les journaux
+    familleId: text("famille_id").notNull(),
+    prenom: text("prenom").notNull(),
+    naissance: text("naissance").notNull(), // AAAA-MM-JJ
+    ecole: text("ecole").notNull(),
+    classe: text("classe").notNull(),
+    detacheLe: timestamp("detache_le", { withTimezone: true }), // jamais de suppression sèche
+    creeLe: timestamp("cree_le", { withTimezone: true }).notNull().defaultNow(),
+    acteur: text("acteur").notNull(), // l'agent qui a rattaché
+  },
+  (t) => [index("enfants_demo_famille_idx").on(t.familleId)],
+);
+
 export const journalReservations = pgTable("journal_reservations", {
   id: uuid("id").primaryKey().defaultRandom(),
   enfantId: text("enfant_id").notNull(),
