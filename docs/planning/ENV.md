@@ -18,6 +18,7 @@
 | `LANCEUR_URL` / `LANCEUR_SECRET` / `LANCEUR_DOSSIER` | « Prévenir l'agent maintenant » dépose une consigne au Lanceur (même secret que l'écouteur du Mac, `~/.config/trames/lanceur.env`) | Vercel · `.env.local` | non (sans elles, le bouton le dit) |
 | `PASSKEY_RP_ID` | RP ID WebAuthn (défaut : hôte de la requête — `villiers-sur-marne.vercel.app`) ; à poser quand un domaine propre arrive | Vercel | non |
 | `EMAIL_FROM` | Expéditeur (`Ville <…@domaine-vérifié>`) ; défaut `onboarding@resend.dev` (tests seulement) | Vercel | non |
+| `SANTE_SECRET` | Protège `/api/sante` (rapport d'exploitation lu par `/pilotage/systeme`) — **le même sur les 3 projets** | Vercel · `.env.local` | oui |
 
 Modèle : `.env.example`. Le test `scripts/tests/tap-decision.mjs` exige `test@ville.local` dans `ADMIN_EMAILS` du serveur visé — **dev uniquement**, jamais en prod.
 
@@ -34,6 +35,7 @@ Modèle : `.env.example`. Le test `scripts/tests/tap-decision.mjs` exige `test@v
 | `AGENTS_URL` | URL du back-office, pour la porte « côté agents » de la vitrine | Vercel | non |
 | `CRON_SECRET` | Autorise `POST /api/cron/rappels` (rappel hebdomadaire des créneaux réservables) | Vercel · `.env.local` | pour le rappel |
 | `PAYFIP_NUMCLI` / `PAYFIP_MODE` | numéro client de la régie (DGFiP) ; `T` test (défaut) ou `M` | Vercel | pour payer |
+| `SANTE_SECRET` | Protège `/api/sante` — même valeur que sur le cockpit | Vercel · `.env.local` | oui |
 Comptes : table `comptes_familles` (e-mail → famille de la source) — seed de démo `apps/famille/scripts/seed-familles.mjs email=familleId`.
 
 ## Back-office agents (`apps/agents`, port 3002 en dev)
@@ -43,6 +45,7 @@ Comptes : table `comptes_familles` (e-mail → famille de la source) — seed de
 | `AGENTS_AUTH_SECRET` | secret de session PROPRE au back-office | Vercel · `.env.local` | oui |
 | `AGENT_EMAILS` | liste blanche des agents (virgules) | Vercel · `.env.local` | oui |
 | `COMMUNE_ID`, `SOURCE_DONNEES`, `RESEND_API_KEY` | comme ci-dessus | Vercel | — |
+| `SANTE_SECRET` | Protège `/api/sante` — même valeur que sur le cockpit | Vercel · `.env.local` | oui |
 
 ## Accès & comptes — qui possède quoi
 | Service | Compte | Propriétaire | Récupération |
@@ -52,5 +55,10 @@ Comptes : table `comptes_familles` (e-mail → famille de la source) — seed de
 | Resend (e-mail) | compte Resend de Mehdi (domaine vérifié `croscel.com`) — **clé dédiée `ville-…` créée par API le 04/09/2026** (permission envoi), posée sur les 3 projets ; expéditeur provisoire `Ville <contact@croscel.com>` jusqu'à un domaine du projet | Mehdi | dashboard Resend → API Keys |
 | GitHub (CI) | `mehdi-stark/Villiers-sur-Marne` — créé par Mehdi le 04/09/2026, `main` poussée | Mehdi (mehdi-stark) | SSH du Mac authentifié comme mehdi-stark |
 | Vercel (hébergement) | **`mehdi-starks-projects/villiers-sur-marne`** (id `prj_YuePUUnNhWN7aGyr6mfmLHsTNFfY`), prod `https://villiers-sur-marne.vercel.app`, déployé par jeton `VERCEL_ACCESS_TOKEN` (`.env.local`, jamais commité). **Ce jeton a été affiché par la CLI dans une erreur le 04/09/2026 → à révoquer et régénérer.** L'ancien projet `yuqots-projects/ville` reste en place (à supprimer par Mehdi). | Mehdi (mehdi-stark) | dashboard Vercel |
+
+**Où lire l'état réel** : `/pilotage/systeme` dans le cockpit dit, à l'instant, quelles variables
+sont posées sur chaque application (jamais leur valeur), quel commit est déployé, où en est la base,
+quand le cron est passé et quelles alertes sont ouvertes. Ce tableau ci-dessus décrit ce qui EST
+ATTENDU ; la page dit ce qui EST. En cas de désaccord, c'est la page qui a raison.
 
 Règles : jamais de `NEXT_PUBLIC_*` pour un secret ; `.env*` jamais commité (`.gitignore`) ; fichier append-only si plusieurs mains.

@@ -30,7 +30,8 @@
     "./documents/proposition": "./src/documents/proposition.ts",
     "./marche": "./src/marche.ts",
     "./demonstration": "./src/demonstration.ts",
-    "./demo-seed": "./src/demo-seed.ts"
+    "./demo-seed": "./src/demo-seed.ts",
+    "./sante": "./src/sante.ts"
   },
   "scripts": {
     "db:generate": "drizzle-kit generate",

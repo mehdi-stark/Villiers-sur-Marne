@@ -50,3 +50,22 @@
 
 
 
+
+/* ---- Page Système : la fiche d'exploitation, relevée à l'exécution ---- */
+.systeme-app { gap: 12px; }
+.systeme-liens { display: flex; flex-wrap: wrap; gap: 6px; }
+.systeme-faits { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px 16px; margin: 0; }
+.systeme-faits > div { min-width: 0; }
+.systeme-faits dt { font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--texte-3); }
+.systeme-faits dd { margin: 2px 0 0; font-size: var(--t-13); overflow-wrap: anywhere; }
+.systeme-details summary { cursor: pointer; font-size: var(--t-13); font-weight: 600; }
+.systeme-etat { width: 20px; height: 20px; border-radius: 999px; display: grid; place-items: center; background: var(--danger-soft, color-mix(in srgb, var(--danger) 14%, transparent)); color: var(--danger); }
+.systeme-etat[data-ok] { background: color-mix(in srgb, var(--ok) 14%, transparent); color: var(--ok); }
+.systeme-volumes { display: flex; flex-wrap: wrap; gap: 8px; }
+.systeme-volume { display: grid; gap: 1px; padding: 8px 12px; border-radius: var(--r-2); background: var(--surface-2); min-width: 96px; }
+.systeme-volume b { font-size: var(--t-18); font-variant-numeric: tabular-nums; letter-spacing: var(--serre); }
+.systeme-volume span { font-size: 11.5px; color: var(--texte-3); }
+.systeme-compte { display: block; }
+.systeme-commande { display: grid; grid-template-columns: minmax(0, auto) 1fr; gap: 10px; align-items: baseline; }
+.systeme-commande code { background: var(--surface-2); padding: 3px 8px; border-radius: var(--r-1); font-size: 12.5px; white-space: nowrap; overflow-x: auto; max-width: 100%; }
+@media (max-width: 620px) { .systeme-commande { grid-template-columns: 1fr; gap: 2px; } }
