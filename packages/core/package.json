@@ -32,7 +32,8 @@
     "./demonstration": "./src/demonstration.ts",
     "./demo-seed": "./src/demo-seed.ts",
     "./sante": "./src/sante.ts",
-    "./donnees/enfants": "./src/donnees/enfants.ts"
+    "./donnees/enfants": "./src/donnees/enfants.ts",
+    "./garde": "./src/garde.ts"
   },
   "scripts": {
     "db:generate": "drizzle-kit generate",

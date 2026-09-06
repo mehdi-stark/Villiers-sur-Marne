@@ -5,9 +5,13 @@ import { DUREE_SESSION_MS } from "@ville/core/auth";
 import { db, schema } from "@ville/core/db";
 import { envoyerEmail } from "@ville/core/email";
 import { auth } from "@/lib/auth";
+import { alerterMartelement, garderDemandeOtp, ipDe, quota, repondreEnAuMoins } from "@ville/core/garde";
+import { poserAlerte } from "@ville/core/alertes";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+/** Toute réponse de « envoyer » dure au moins ça : sinon la latence dit ce que le corps tait. */
+const PLANCHER_MS = 350;
 const APP = "famille", MAX_ESSAIS = 5, VALIDITE_MS = 10 * 60 * 1000, ENVOIS_PAR_HEURE = 5;
 
 async function journal(email: string, evenement: string, detail?: Record<string, unknown>) {
@@ -20,16 +24,29 @@ export async function POST(req: NextRequest) {
   const email = String(b.email ?? "").trim().toLowerCase().slice(0, 120);
   const formatOk = /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email);
   if (b.action === "envoyer") {
-    if (!formatOk || !(await auth.emailAutorise(email))) return NextResponse.json({ ok: true });
+    // GARDE D'ENTRÉE : format, quota IP, quota adresse, autorisation en cache — la base
+    // n'est atteinte qu'après. Réponse et délai IDENTIQUES quel que soit le verdict.
+    const debut = Date.now();
+    const verdict = await garderDemandeOtp({ app: "famille", email, ip: ipDe(req), autorise: (e) => auth.emailAutorise(e) });
+    if (!verdict.passe) {
+      // Un martèlement se SIGNALE (une alerte par quart d'heure au plus) : sans ça, on
+      // découvre l'attaque sur la facture du fournisseur d'e-mails.
+      if (verdict.motif === "quota_ip" && alerterMartelement("famille")) {
+        await poserAlerte("warn", "connexion_martelee_famille", "Tentatives de connexion en rafale bloquées avant la base", { ip: ipDe(req) });
+      }
+      return repondreEnAuMoins(debut, PLANCHER_MS, NextResponse.json({ ok: true }));
+    }
     const recents = await db.select({ id: schema.otpCodes.id }).from(schema.otpCodes).where(and(eq(schema.otpCodes.app, APP), eq(schema.otpCodes.email, email), gt(schema.otpCodes.creeLe, new Date(Date.now() - 3600_000))));
     if (recents.length >= ENVOIS_PAR_HEURE) return NextResponse.json({ ok: true });
     const code = String(crypto.getRandomValues(new Uint32Array(1))[0]! % 1_000_000).padStart(6, "0");
     await db.insert(schema.otpCodes).values({ app: APP, email, hash: await auth.empreinteOtp(email, code), expireLe: new Date(Date.now() + VALIDITE_MS) });
     const envoi = await envoyerEmail({ a: email, sujet: `${code} — votre code Portail Famille`, texte: `Votre code de connexion au Portail Famille : ${code}\nValable 10 minutes.`, html: `<p>Votre code de connexion au <strong>Portail Famille</strong> :</p><p style="font-size:32px;font-weight:800;letter-spacing:8px;font-family:ui-monospace,monospace">${code}</p><p>Valable 10 minutes. Si vous n'êtes pas à l'origine de cette demande, ignorez ce message.</p>` });
     await journal(email, envoi.ok ? "otp_envoye" : "envoi_echec", envoi.ok ? undefined : { cause: envoi.cause });
-    return NextResponse.json({ ok: true });
+    return repondreEnAuMoins(debut, PLANCHER_MS, NextResponse.json({ ok: true }));
   }
   if (b.action === "valider") {
+    // Le code aussi se martèle : 20 essais par IP en 10 min, comptés AVANT toute lecture.
+    if (!formatOk || !quota(`valider|famille|${ipDe(req)}`, 20, 10 * 60_000).ok) return NextResponse.json({ ok: false }, { status: 429 });
     const code = String(b.code ?? "").replace(/\D/g, "").slice(0, 6);
     const [otp] = await db.select().from(schema.otpCodes).where(and(eq(schema.otpCodes.app, APP), eq(schema.otpCodes.email, email), isNull(schema.otpCodes.consommeLe))).orderBy(desc(schema.otpCodes.creeLe)).limit(1);
     const valide = code.length === 6 && (await auth.emailAutorise(email)) && !!otp && otp.expireLe.getTime() > Date.now() && otp.essais < MAX_ESSAIS && otp.hash === (await auth.empreinteOtp(email, code));

@@ -2,11 +2,15 @@ import { NextResponse, type NextRequest } from "next/server";
 import { cookies } from "next/headers";
 import { and, desc, eq, gt, isNull } from "drizzle-orm";
 import { COOKIE, DUREE_SESSION_MS, emailAutorise, empreinteOtp, signerSession } from "@ville/core/auth";
+import { alerterMartelement, garderDemandeOtp, ipDe, quota, repondreEnAuMoins } from "@ville/core/garde";
+import { poserAlerte } from "@ville/core/alertes";
 import { db, schema } from "@ville/core/db";
 import { envoyerEmail } from "@ville/core/email";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+/** Toute réponse de « envoyer » dure au moins ça : sinon la latence dit ce que le corps tait. */
+const PLANCHER_MS = 350;
 
 const MAX_ESSAIS = 5;
 const VALIDITE_MS = 10 * 60 * 1000;
@@ -24,7 +28,18 @@ export async function POST(req: NextRequest) {
   const formatOk = /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email);
 
   if (b.action === "envoyer") {
-    if (!formatOk || !emailAutorise(email)) return NextResponse.json({ ok: true });
+    // GARDE D'ENTRÉE : format, quota IP, quota adresse, autorisation en cache — la base
+    // n'est atteinte qu'après. Réponse et délai IDENTIQUES quel que soit le verdict.
+    const debut = Date.now();
+    const verdict = await garderDemandeOtp({ app: "cockpit", email, ip: ipDe(req), autorise: emailAutorise });
+    if (!verdict.passe) {
+      // Un martèlement se SIGNALE (une alerte par quart d'heure au plus) : sans ça, on
+      // découvre l'attaque sur la facture du fournisseur d'e-mails.
+      if (verdict.motif === "quota_ip" && alerterMartelement("cockpit")) {
+        await poserAlerte("warn", "connexion_martelee_cockpit", "Tentatives de connexion en rafale bloquées avant la base", { ip: ipDe(req) });
+      }
+      return repondreEnAuMoins(debut, PLANCHER_MS, NextResponse.json({ ok: true }));
+    }
     const recents = await db
       .select({ id: schema.otpCodes.id })
       .from(schema.otpCodes)
@@ -40,10 +55,12 @@ export async function POST(req: NextRequest) {
       html: `<p>Code de connexion au cockpit <strong>Ville</strong> :</p><p style="font-size:32px;font-weight:800;letter-spacing:8px;font-family:ui-monospace,monospace">${code}</p><p>Valable 10 minutes. Si vous n'êtes pas à l'origine de cette demande, ignorez ce message.</p>`,
     });
     await journal(email, envoi.ok ? "otp_envoye" : "envoi_echec", envoi.ok ? undefined : { cause: envoi.cause });
-    return NextResponse.json({ ok: true });
+    return repondreEnAuMoins(debut, PLANCHER_MS, NextResponse.json({ ok: true }));
   }
 
   if (b.action === "valider") {
+    // Le code aussi se martèle : 20 essais par IP en 10 min, comptés AVANT toute lecture.
+    if (!formatOk || !quota(`valider|cockpit|${ipDe(req)}`, 20, 10 * 60_000).ok) return NextResponse.json({ ok: false }, { status: 429 });
     const code = String(b.code ?? "").replace(/\D/g, "").slice(0, 6);
     const [otp] = await db
       .select()
