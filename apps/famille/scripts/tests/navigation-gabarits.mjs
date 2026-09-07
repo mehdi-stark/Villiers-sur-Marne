@@ -21,6 +21,12 @@ try {
     const p = await ctx.newPage();
     await p.goto(`${BASE}/`, { waitUntil: "networkidle" });
     await p.evaluate(() => document.querySelector("nextjs-portal")?.remove());
+    // Sans session, la navigation privée n'existe pas : on le DIT plutôt que d'échouer
+    // sur un `getComputedStyle(null)` incompréhensible. (Le jeton est signé avec le
+    // secret LOCAL : viser la production demande le secret de la production.)
+    if (!(await p.locator(".onglets").count())) {
+      throw new Error(`session non reconnue sur ${BASE} — ce test vise l'application lancée en local, avec FAMILLE_AUTH_SECRET de ce .env.local`);
+    }
     return p;
   };
 
