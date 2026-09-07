@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Rouet } from "@ville/ui";
 import { basculerCreneau } from "@/app/actions";
@@ -14,6 +15,7 @@ const fmtJour = new Intl.DateTimeFormat("fr-FR", { weekday: "long", day: "numeri
 /** Le mois d'un coup d'œil : une pastille par service et par jour ; le détail au tap,
  *  avec le verdict de délai — et la réservation depuis le même écran. */
 export function Calendrier({ enfantId, prenom, jours, euros }: { enfantId: string; prenom: string; jours: JourMois[]; euros: Record<string, string> }) {
+  const router = useRouter();
   const [ouvert, setOuvert] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [enCours, setEnCours] = useState<string | null>(null); // l'activité qu'on enregistre
@@ -37,8 +39,10 @@ export function Calendrier({ enfantId, prenom, jours, euros }: { enfantId: strin
       <div className="calendrier-grille">
         {jours.map((j) => (
           <button key={j.date} type="button" className="jour-mois" data-hors={!j.dansLeMois || undefined} data-aujourdhui={j.aujourdhui || undefined} data-weekend={j.weekend || undefined} data-ouvert={ouvert === j.date || undefined}
-            onClick={() => setOuvert(ouvert === j.date ? null : j.date)}
-            aria-label={`${fmtJour.format(new Date(`${j.date}T12:00:00Z`))} : ${j.services.length ? j.services.map((s) => `${s.nom} ${LIBELLE[s.etat]}`).join(", ") : "aucun service"}`}>
+            // Premier tap : le détail s'ouvre sous la grille. Second tap sur le MÊME jour :
+            // on ouvre la journée entière — le geste naturel quand on veut « y aller ».
+            onClick={() => (ouvert === j.date ? router.push(`/jour?d=${j.date}`) : setOuvert(j.date))}
+            aria-label={`${fmtJour.format(new Date(`${j.date}T12:00:00Z`))} : ${j.services.length ? j.services.map((s) => `${s.nom} ${LIBELLE[s.etat]}`).join(", ") : "aucun service"}${ouvert === j.date ? ". Toucher à nouveau pour ouvrir la journée" : ""}`}>
             <span className="jour-mois-num">{j.jour}</span>
             <span className="jour-mois-pastilles">
               {/* Une pastille NOMMÉE : l'initiale du service (R repas, J journée, M matin…).
@@ -92,7 +96,7 @@ export function Calendrier({ enfantId, prenom, jours, euros }: { enfantId: strin
         ))}
         <span><span className="pastille" data-moment={[...presents][0] ?? "midi"} data-etat="libre">R</span>pas encore réservé</span>
       </div>
-      <p className="mini t-3">Seuls les services <b>à réserver</b> apparaissent ici. L&apos;accueil du matin, du soir et l&apos;étude sont à l&apos;inscription annuelle : ils figurent dans la vue Jour et la vue Semaine.</p>
+      <p className="mini t-3">Touchez un jour pour voir ses services ; touchez-le à nouveau pour ouvrir la journée entière. Seuls les services <b>à réserver</b> apparaissent ici. L&apos;accueil du matin, du soir et l&apos;étude sont à l&apos;inscription annuelle : ils figurent dans la vue Jour et la vue Semaine.</p>
     </div>
   );
 }

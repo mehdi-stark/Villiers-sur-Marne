@@ -14,6 +14,11 @@ export default async function PageDonnees() {
   const activites = await active.activites();
   const famille = await active.famille("fam-demo-1");
   const tranche = trancheDe(famille?.quotientFamilial ?? null, famille?.exterieur ?? false);
+  // Réservable ou acquis : la frontière vient de la RÈGLE de la ville (jours de prévenance).
+  const aReserver = activites.filter((a) => a.prevenance.joursAvant > 0);
+  const annuels = activites.filter((a) => a.prevenance.joursAvant === 0);
+  const decisionsParSemaine = aReserver.reduce((n, a) => n + a.joursServis.length, 0);
+  const decisionsSiTout = activites.reduce((n, a) => n + a.joursServis.length, 0);
   const maintenant = new Date();
   const prochainLundi = (() => { const d = new Date(maintenant); d.setUTCDate(d.getUTCDate() + ((8 - d.getUTCDay()) % 7 || 7)); return d.toISOString().slice(0, 10); })();
   const prochainMercredi = (() => { const d = new Date(maintenant); d.setUTCDate(d.getUTCDate() + ((10 - d.getUTCDay()) % 7 || 7)); return d.toISOString().slice(0, 10); })();
@@ -66,6 +71,40 @@ export default async function PageDonnees() {
       </section>
 
       <SimulateurQF activites={activites} />
+
+      {/* CE QUI SE DÉCIDE, CE QUI EST ACQUIS — la frontière n'est pas technique : c'est
+          une règle de la ville, portée par `prevenance.joursAvant`. La voir en clair permet
+          de poser la bonne question au service : « voulez-vous que l'étude se réserve ? ». */}
+      <section className="carte pile">
+        <h2>Ce qui se réserve, ce qui est à l&apos;année</h2>
+        <p className="muted">
+          {aReserver.length} service{aReserver.length > 1 ? "s" : ""} demande{aReserver.length > 1 ? "nt" : ""} une réservation, {annuels.length} {annuels.length > 1 ? "sont acquis" : "est acquis"} par l&apos;inscription annuelle.
+          C&apos;est une règle de la commune, pas une limite du produit : rendre un service réservable ne demande que de poser un délai de prévenance.
+        </p>
+        <div className="doc"><div className="tableau-defile"><table style={{ minWidth: 620 }}>
+          <thead><tr><th>Service</th><th>Régime</th><th>Décisions par semaine et par enfant</th><th>Ce que ça changerait</th></tr></thead>
+          <tbody>
+            {[...aReserver, ...annuels].map((a) => {
+              const jours = a.joursServis.length;
+              const reservable = a.prevenance.joursAvant > 0;
+              return (
+                <tr key={a.id}>
+                  <td><strong>{a.libelle}</strong><div className="tiny">{a.joursServis.map((j) => ["", "lun", "mar", "mer", "jeu", "ven"][j]).join(" · ")}</div></td>
+                  <td>{reservable ? <span className="badge" data-tone="accent">à réserver · {a.prevenance.joursAvant} j {a.prevenance.type}</span> : <span className="badge" data-tone="ok">inscription annuelle</span>}</td>
+                  <td>{reservable ? `${jours} par semaine` : "aucune"}</td>
+                  <td className="tiny">{reservable
+                    ? "Facturé à la réservation ; non consommé reste dû, non réservé facturé ×2."
+                    : `Le rendre réservable ajouterait ${jours} décision(s) hebdomadaires par enfant — et permettrait de facturer à la réservation plutôt qu'à la fréquentation constatée.`}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table></div></div>
+        <p className="tiny">
+          Total actuel : <strong>{decisionsParSemaine} décision(s) par semaine et par enfant</strong>. Si TOUS les services devenaient réservables, ce serait <strong>{decisionsSiTout}</strong> —
+          soit {Math.round((decisionsSiTout / Math.max(1, decisionsParSemaine)) * 10) / 10} × plus de gestes demandés aux familles. À arbitrer avec le service, pas à décider ici.
+        </p>
+      </section>
 
       <section className="carte pile">
         <h2>Grille tarifaire 2025-2026 (réelle)</h2>

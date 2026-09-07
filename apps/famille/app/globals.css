@@ -237,3 +237,10 @@
 .jour-bloc h3 em { font-style: normal; margin-left: 7px; font-size: 10px; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; color: var(--accent); }
 .bilan-session { margin: 4px 0 0; padding: 9px 12px; border-radius: var(--r-2); font-size: var(--t-13); background: var(--accent-soft); color: color-mix(in srgb, var(--accent) 85%, var(--texte)); }
 .bilan-session b { font-weight: 700; }
+
+/* L'en-tête d'enfant COLLE en haut de sa carte : sur une vue « Tous », deux calendriers
+   ou deux semaines s'enchaînent et, en défilant, on ne sait plus de qui on parle.
+   (Colorer les pastilles à la teinte de l'enfant aurait détruit le code couleur des
+   services — l'ancre, c'est le nom, pas la pastille.) */
+.enfant-tete { position: sticky; top: 0; z-index: 2; padding: 6px 0; background: linear-gradient(var(--surface) 78%, transparent); backdrop-filter: blur(2px); }
+@media (min-width: 1024px) { .enfant-tete { top: 8px; } }

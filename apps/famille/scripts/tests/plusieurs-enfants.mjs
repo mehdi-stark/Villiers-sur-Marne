@@ -54,4 +54,21 @@ await propre();
 const tous = await p.locator("section[aria-label^='Calendrier de']").count();
 if (tous !== total) { console.error(`✗ « Tous » ne rend pas les ${total} enfants (${tous})`); process.exit(1); }
 console.log(`✓ « Tous » revient aux ${total} enfants`);
+// L'ancre visuelle : en défilant une vue « Tous », on doit toujours savoir de quel enfant
+// il s'agit — l'en-tête de sa carte reste collé en haut.
+const colle = await p.evaluate(() => {
+  const e = document.querySelector(".enfant-tete");
+  return e ? getComputedStyle(e).position : "absent";
+});
+if (colle !== "sticky") { console.error(`✗ l'en-tête d'enfant ne suit pas le défilement (${colle})`); process.exit(1); }
+console.log("✓ l'en-tête d'enfant reste visible en défilant (position: sticky)");
+
+// Second tap sur un jour déjà ouvert : on ouvre la journée entière.
+const jour = p.locator(".jour-mois:not([data-hors])").nth(10);
+await jour.click();
+await p.waitForTimeout(400);
+await jour.click();
+await p.waitForURL(/\/jour\?d=/, { timeout: 8000 });
+console.log(`✓ second tap sur un jour ouvert → la journée entière (${new URL(p.url()).search})`);
+
 await nav.close();

@@ -98,3 +98,7 @@
 | « Tout réserver » sur la semaine affichée, nombre et total annoncés avant le tap (proposé 07/09/2026, Feature) | Le geste hebdomadaire en une fois, sans réserver en aveugle | ~3 h | **Fait le 07/09/2026** (`reserverEnSerie`, borné à 40 créneaux, chaque créneau repasse par le verdict) |
 | Repère « aujourd'hui » dans la liste des jours (proposé 07/09/2026, Design) | L'ancre visuelle qui manquait à la vue mobile | ~1 h | **Fait le 07/09/2026** |
 | Bilan de session : ce qu'on vient de changer et son effet sur la facture (proposé 07/09/2026, UX) | On sait ce qu'on a décidé avant de fermer l'onglet | ~3 h | **Fait le 07/09/2026** |
+| Cockpit : « ce qui se réserve, ce qui est à l'année » avec le coût en gestes d'un basculement (proposé 07/09/2026, Feature) | Poser la bonne question au service : voulez-vous que l'étude se réserve ? | ~3 h | **Fait le 07/09/2026** (`/pilotage/donnees` — 6 décisions/semaine aujourd'hui, 22 si tout basculait) |
+| En-tête d'enfant collant en vue « Tous » (proposé 07/09/2026, Design, ajusté) | On sait de quel enfant on parle en défilant — sans casser le code couleur des services | ~2 h | **Fait le 07/09/2026** (vérifié par test : `position: sticky`) |
+| Second tap sur un jour du calendrier → la journée entière (proposé 07/09/2026, UX) | Le geste naturel quand on veut « y aller » | ~2 h | **Fait le 07/09/2026** (test réel) |
+| Rendre l'étude ou les accueils réservables | Décision de la commune, pas du produit | question au service | En attente — l'écran cockpit donne le chiffre pour la poser |
