@@ -45,3 +45,19 @@ test("non réservé = 2 × le tarif ; repas non réservé sans QF = 11,02 €", 
   assert.equal(tarifNonReserve(cantine, 6, true), 856);
   assert.equal(tarifNonReserve(cantine, 9, false), 1102);
 });
+
+test("une journée passée le DIT — ce n'est pas un « délai dépassé » qu'un appel pourrait rattraper", () => {
+  const passe = verdictDelai(cantine, "2026-01-12", new Date("2026-03-01T10:00:00Z"));
+  assert.equal(passe.possible, false);
+  assert.equal(passe.passe, true);
+  assert.match(passe.libelle, /Journée passée/);
+  assert.doesNotMatch(passe.libelle, /01 49 41 28 00/, "on n'envoie pas téléphoner pour une journée écoulée");
+});
+
+test("un délai dépassé sur une date À VENIR renvoie vers l'accueil", () => {
+  // Le 11 mars 13 h pour un repas du 12 : 2 jours ouvrés avant 12 h, c'est trop tard.
+  const tard = verdictDelai(cantine, "2026-03-12", new Date("2026-03-11T13:00:00Z"));
+  assert.equal(tard.possible, false);
+  assert.equal(tard.passe, false);
+  assert.match(tard.libelle, /Délai dépassé/);
+});

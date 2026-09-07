@@ -56,6 +56,26 @@ try {
   const compteur = (await bloc.locator(".badge").first().textContent())?.trim();
   console.log(`✓ l'annulation fonctionne et le jour le dit : « ${compteur} »`);
 
+  // --- « Tout réserver » annonce le nombre ET le total avant le tap ---
+  const tout = m.locator('button:has-text("Tout réserver")').first();
+  if (await tout.count()) {
+    const libelle = (await tout.textContent())?.trim() ?? "";
+    if (!/\d+ créneaux? · \d+,\d{2} €/.test(libelle)) throw new Error(`« Tout réserver » ne dit pas combien ni combien ça coûte : « ${libelle} »`);
+    console.log(`✓ réservation en série annoncée avant le geste : « ${libelle} »`);
+  }
+
+  // --- Une semaine PASSÉE ne se réserve ni ne s'annule, et le dit sans faire téléphoner ---
+  const passee = new Date(Date.now() - 21 * 86_400_000);
+  passee.setUTCDate(passee.getUTCDate() - ((passee.getUTCDay() || 7) - 1));
+  await m.goto(`${BASE}/?s=${passee.toISOString().slice(0, 10)}`, { waitUntil: "networkidle" });
+  await m.evaluate(() => document.querySelector("nextjs-portal")?.remove());
+  const actifs = await m.locator(".semaine-jours button:not([disabled])").count();
+  if (actifs > 0) throw new Error(`${actifs} action(s) encore possible(s) sur une semaine passée`);
+  const dits = await m.locator(".jour-bloc .tiny").allTextContents();
+  if (!dits.some((x) => /Journée passée/.test(x))) throw new Error(`une semaine passée ne s'explique pas : ${JSON.stringify(dits.slice(0, 2))}`);
+  if (dits.some((x) => /01 49 41 28 00/.test(x))) throw new Error("on envoie téléphoner pour une journée déjà écoulée");
+  console.log("✓ semaine passée : aucune action possible, et le motif est « journée passée » — pas « délai dépassé »");
+
   // --- Ordinateur : la grille revient, la liste par jour disparaît ---
   const d = await ouvrir(1440);
   const etat = await d.evaluate(() => ({

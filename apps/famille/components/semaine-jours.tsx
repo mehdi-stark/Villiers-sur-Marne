@@ -2,7 +2,7 @@
 
 import { BookOpen, Check, Palette, Sunrise, Sunset, Utensils, X } from "lucide-react";
 import { useOptimistic, useState, useTransition } from "react";
-import { basculerCreneau } from "@/app/actions";
+import { basculerCreneau, reserverEnSerie } from "@/app/actions";
 import { Rouet } from "@ville/ui";
 import type { CelluleClient, FormuleClient } from "./ligne-service";
 import type { EtatReservation } from "@ville/core/donnees/types";
@@ -22,20 +22,30 @@ const ICONES = { utensils: Utensils, sunrise: Sunrise, sunset: Sunset, book: Boo
 const JOURS = ["", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi"];
 
 export type ServiceSemaine = {
-  groupe: string; nom: string; icone: keyof typeof ICONES; ton: string;
+  groupe: string; nom: string; nomCourt: string; icone: keyof typeof ICONES; ton: string;
   reservable: boolean; formules: FormuleClient[];
 };
 
 type Ligne = { service: ServiceSemaine; formule: FormuleClient; cellule: CelluleClient };
 
-export function SemaineParJour({ enfantId, services, jours }: { enfantId: string; services: ServiceSemaine[]; jours: { date: string; jour: number }[] }) {
+export function SemaineParJour({ enfantId, services, jours, aujourdhui }: { enfantId: string; services: ServiceSemaine[]; jours: { date: string; jour: number }[]; aujourdhui: string }) {
   const [enAttente, demarrer] = useTransition();
   const [message, setMessage] = useState<string | null>(null);
+  // Ce qu'on a changé DEPUIS SON ARRIVÉE : un parent enchaîne les taps puis ferme
+  // l'onglet. Le compte et le montant net lui disent ce qu'il vient de décider.
+  const [bilan, setBilan] = useState({ ajouts: 0, retraits: 0, euros: 0 });
+  const compter = (etatAvant: string, tarif: string) => {
+    const prix = Number(tarif.replace(/[^\d,]/g, "").replace(",", ".") || 0);
+    setBilan((b) => etatAvant === "libre"
+      ? { ajouts: b.ajouts + 1, retraits: b.retraits, euros: b.euros + prix }
+      : { ajouts: b.ajouts, retraits: b.retraits + 1, euros: b.euros - prix });
+  };
   const cle = (activiteId: string, date: string) => `${activiteId}|${date}`;
   const initial = Object.fromEntries(services.flatMap((s) => s.formules.flatMap((f) => f.cellules.map((c) => [cle(f.activiteId, c.date), c.etat] as const))));
   const [etats, poserOptimiste] = useOptimistic(initial as Record<string, string>, (courant, maj: { k: string; etat: string }) => ({ ...courant, [maj.k]: maj.etat }));
 
-  const taper = (activiteId: string, date: string, etat: string) => demarrer(async () => {
+  const taper = (activiteId: string, date: string, etat: string, tarif: string) => demarrer(async () => {
+    compter(etat, tarif);
     poserOptimiste({ k: cle(activiteId, date), etat: etat === "libre" ? "reservee" : "libre" });
     const actuel: EtatReservation | null = etat === "libre" ? null : (etat as EtatReservation);
     const r = await basculerCreneau({ enfantId, activiteId, date, actuel });
@@ -49,8 +59,30 @@ export function SemaineParJour({ enfantId, services, jours }: { enfantId: string
   const annuels = services.filter((s) => !s.reservable);
   const aDecider = services.filter((s) => s.reservable);
 
+  // « Tout réserver » : ce qui est encore réservable et pas déjà pris, sur la semaine
+  // affichée. Le total est annoncé AVANT le tap — on ne demande pas un geste en aveugle.
+  const restants = aDecider.flatMap((s) => s.formules.flatMap((f) => f.cellules
+    .filter((c) => c.etat === "libre" && c.possible)
+    .map((c) => ({ activiteId: f.activiteId, date: c.date, tarif: f.tarif, groupe: s.groupe }))))
+    // Un service à plusieurs formules ne se réserve qu'une fois par jour : on garde la première.
+    .filter((x, i, tous) => tous.findIndex((y) => y.groupe === x.groupe && y.date === x.date) === i);
+  const total = restants.reduce((s, x) => s + Number(x.tarif.replace(/[^\d,]/g, "").replace(",", ".") || 0), 0);
+  const toutReserver = () => demarrer(async () => {
+    for (const r of restants) poserOptimiste({ k: cle(r.activiteId, r.date), etat: "reservee" });
+    const r = await reserverEnSerie({ enfantId, creneaux: restants.map(({ activiteId, date }) => ({ activiteId, date })) });
+    setBilan((b) => ({ ajouts: b.ajouts + r.reservees, retraits: b.retraits, euros: b.euros + total }));
+    setMessage(r.message);
+    setTimeout(() => setMessage(null), 5000);
+  });
+
   return (
     <div className="semaine-jours" aria-busy={enAttente}>
+      {restants.length > 0 && (
+        <button type="button" className="bouton bouton-pleine" data-variant="primaire" data-charge={enAttente || undefined} disabled={enAttente} onClick={toutReserver}>
+          Tout réserver — {restants.length} créneau{restants.length > 1 ? "x" : ""} · {total.toFixed(2).replace(".", ",")} €
+          {enAttente && <Rouet />}
+        </button>
+      )}
       {jours.map((j) => {
         // Ce que l'enfant a CE jour-là : une formule non servie ne s'affiche pas.
         const lignes: Ligne[] = aDecider.flatMap((s) => s.formules
@@ -65,13 +97,17 @@ export function SemaineParJour({ enfantId, services, jours }: { enfantId: string
           if (!dedans || pris) if (!dedans || pris) vues.set(l.service.groupe, l);
         }
         const dujour = [...vues.values()];
-        const reserves = dujour.filter((l) => ["reservee", "presence"].includes(etats[cle(l.formule.activiteId, j.date)] ?? l.cellule.etat)).length;
+        // Le badge NOMME ce qui est réservé : « 2 réservés » ne dit pas QUOI. Un parent
+        // veut lire « Cantine · Loisirs » sans ouvrir le jour.
+        const prisCeJour = dujour.filter((l) => ["reservee", "presence"].includes(etats[cle(l.formule.activiteId, j.date)] ?? l.cellule.etat));
+        const noms = prisCeJour.map((l) => l.service.nomCourt);
+        const passe = dujour.some((l) => l.cellule.verdict.startsWith("Journée passée"));
         const d = new Date(`${j.date}T12:00:00Z`);
         return (
-          <section key={j.date} className="jour-bloc" aria-label={`${JOURS[j.jour]} ${d.getUTCDate()}`}>
+          <section key={j.date} className="jour-bloc" data-aujourdhui={j.date === aujourdhui || undefined} aria-label={`${JOURS[j.jour]} ${d.getUTCDate()}${j.date === aujourdhui ? " (aujourd\u2019hui)" : ""}`}>
             <div className="jour-bloc-tete">
-              <h3>{JOURS[j.jour]} {d.getUTCDate()}</h3>
-              <span className="badge" data-tone={reserves ? "accent" : undefined}>{reserves === 0 ? "rien de réservé" : `${reserves} réservé${reserves > 1 ? "s" : ""}`}</span>
+              <h3>{JOURS[j.jour]} {d.getUTCDate()}{j.date === aujourdhui && <em>aujourd&apos;hui</em>}</h3>
+              <span className="badge" data-tone={noms.length ? "accent" : undefined}>{noms.length === 0 ? (passe ? "rien ce jour-là" : "rien de réservé") : noms.join(" · ")}</span>
             </div>
             {dujour.length === 0 ? (
               <p className="mini t-3">Rien à réserver ce jour.</p>
@@ -90,7 +126,7 @@ export function SemaineParJour({ enfantId, services, jours }: { enfantId: string
                   </div>
                   {service.reservable ? (
                     <button type="button" className="bouton bouton-sm" data-variant={etat === "libre" ? "primaire" : undefined} data-choisi={etat === "reservee" || undefined}
-                      data-charge={enregistre || undefined} disabled={!tapable || enAttente} onClick={() => taper(formule.activiteId, j.date, etat)}
+                      data-charge={enregistre || undefined} disabled={!tapable || enAttente} onClick={() => taper(formule.activiteId, j.date, etat, formule.tarif)}
                       title={cellule.verdict}
                       aria-label={`${service.nom}, ${JOURS[j.jour]} ${d.getUTCDate()} : ${etat === "libre" ? "réserver" : etat === "reservee" ? "annuler la réservation" : etat}. ${cellule.verdict}`}>
                       {etat === "presence" && <Check size={13} aria-hidden />}
@@ -104,29 +140,26 @@ export function SemaineParJour({ enfantId, services, jours }: { enfantId: string
                 </div>
               );
             })}
+            {/* Les services à l'année reviennent CHAQUE jour d'école : une ligne suffit,
+                mais elle doit être là — sinon on ne sait pas ce qui est prévu ce jour. */}
+            {annuels.length > 0 && dujour.length > 0 && (
+              <p className="tiny jour-annuels">
+                <b>Aussi ce jour</b> — {annuels.map((s) => `${s.nomCourt} ${s.formules[0]!.horaires}`).join(" · ")} · sans réservation
+              </p>
+            )}
             {dujour.some((l) => l.service.reservable && !l.cellule.possible) && (
               <p className="tiny">{dujour.find((l) => l.service.reservable && !l.cellule.possible)!.cellule.verdict}</p>
             )}
           </section>
         );
       })}
-      {annuels.length > 0 && (
-        <div className="jour-bloc" data-annuel>
-          <div className="jour-bloc-tete"><h3>Tous les jours d&apos;école</h3><span className="badge" data-tone="ok">sans réservation</span></div>
-          {annuels.map((s) => {
-            const Icone = ICONES[s.icone];
-            const f = s.formules[0]!;
-            return (
-              <div key={s.groupe} className="jour-service" data-ton={s.ton}>
-                <span className="service-icone" aria-hidden><Icone size={15} /></span>
-                <div style={{ minWidth: 0 }}>
-                  <strong>{s.nom}</strong>
-                  <div className="mini t-3">{f.horaires} · {f.tarif} · facturé à la fréquentation réelle</div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
+      {(bilan.ajouts > 0 || bilan.retraits > 0) && (
+        <p className="bilan-session" role="status">
+          <b>Depuis votre arrivée</b> — {bilan.ajouts > 0 && `${bilan.ajouts} réservation${bilan.ajouts > 1 ? "s" : ""}`}
+          {bilan.ajouts > 0 && bilan.retraits > 0 && ", "}
+          {bilan.retraits > 0 && `${bilan.retraits} annulation${bilan.retraits > 1 ? "s" : ""}`}
+          {" · "}{bilan.euros >= 0 ? "+" : "−"}{Math.abs(bilan.euros).toFixed(2).replace(".", ",")} € sur la facture à venir
+        </p>
       )}
       {message && <p className="petit" role="status" style={{ color: "var(--accent)" }}>{message}</p>}
     </div>

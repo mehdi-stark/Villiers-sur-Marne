@@ -153,9 +153,9 @@ export default async function MaSemaine({ searchParams }: { searchParams: Promis
               {/* Sur un téléphone, la même semaine se lit PAR JOUR : le jour est écrit,
                   l'action est nommée (« Réserver » / « Annuler »), rien n'est à deviner. */}
               <div className="v-etroit">
-                <SemaineParJour enfantId={enfant.id} jours={jours}
+                <SemaineParJour enfantId={enfant.id} jours={jours} aujourdhui={aujourdhui}
                   services={lignes.map((l) => ({
-                    groupe: l.groupe, nom: l.service.nomGroupe, icone: l.service.icone, ton: l.service.ton, reservable: l.reservable,
+                    groupe: l.groupe, nom: l.service.nomGroupe, nomCourt: l.service.nomCourt, icone: l.service.icone, ton: l.service.ton, reservable: l.reservable,
                     formules: l.formules.map((x) => ({ activiteId: x.activite.id, libelle: x.libelle, horaires: x.activite.horaires, tarif: euros(tarif(x.activite, tranche)), cellules: x.cellules, reserves: x.reserves })),
                   }))} />
               </div>

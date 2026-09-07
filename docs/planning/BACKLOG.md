@@ -93,3 +93,8 @@
 | La barre latérale porte l'état : réservé aujourd'hui, factures dues (proposé 07/09/2026, Feature) | La navigation devient un tableau de bord | ~3 h | **Fait le 07/09/2026** |
 | Liseré d'accent sur l'entrée active de la barre latérale (proposé 07/09/2026, Design) | On sait où on est même après avoir défilé | ~2 h | **Fait le 07/09/2026** |
 | Raccourcis clavier du back-office : « / » chercher, « Échap » effacer, « Entrée » ouvrir (proposé 07/09/2026, UX) | Un agent enchaîne les dossiers sans toucher la souris | ~3 h | **Fait le 07/09/2026** (test réel étendu) |
+| Journée passée distinguée du délai dépassé, dans le verdict et dans les écrans (retour Mehdi 07/09/2026) | Plus d'appels inutiles à l'accueil pour une journée écoulée | ~2 h | **Fait le 07/09/2026** (2 tests unitaires + vérification réelle sur une semaine passée) |
+| Nommer ce qui est réservé, chaque jour et dans le mois (retour Mehdi 07/09/2026) | On sait QUOI est réservé quel jour, pas seulement combien | ~3 h | **Fait le 07/09/2026** (badge nommé, initiales de service dans le calendrier, ligne « aussi ce jour » pour les services à l'année) |
+| « Tout réserver » sur la semaine affichée, nombre et total annoncés avant le tap (proposé 07/09/2026, Feature) | Le geste hebdomadaire en une fois, sans réserver en aveugle | ~3 h | **Fait le 07/09/2026** (`reserverEnSerie`, borné à 40 créneaux, chaque créneau repasse par le verdict) |
+| Repère « aujourd'hui » dans la liste des jours (proposé 07/09/2026, Design) | L'ancre visuelle qui manquait à la vue mobile | ~1 h | **Fait le 07/09/2026** |
+| Bilan de session : ce qu'on vient de changer et son effet sur la facture (proposé 07/09/2026, UX) | On sait ce qu'on a décidé avant de fermer l'onglet | ~3 h | **Fait le 07/09/2026** |

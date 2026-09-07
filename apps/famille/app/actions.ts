@@ -47,6 +47,35 @@ export async function appliquerSemaineType(p: { semaines: number; jours: number[
   return { ok: true, message: `${reservees} repas réservé${reservees > 1 ? "s" : ""}${deja ? `, ${deja} déjà réservé${deja > 1 ? "s" : ""}` : ""}${refusees ? `, ${refusees} refusé${refusees > 1 ? "s" : ""} (délai dépassé)` : ""}.`, reservees, refusees, dejaReservees: deja };
 }
 
+/** RÉSERVER LA SEMAINE AFFICHÉE, en une fois. Le parent voit d'abord le nombre et le
+ *  total ; ici le serveur repasse chaque créneau par le MÊME verdict de délai — rien
+ *  n'est réservé en douce, et ce qui est refusé est compté et dit. */
+export async function reserverEnSerie(p: { enfantId: string; creneaux: { activiteId: string; date: string }[] }): Promise<{ ok: boolean; message: string; reservees: number; refusees: number }> {
+  const f = await familleCourante();
+  if (!f) return { ok: false, message: "Session expirée.", reservees: 0, refusees: 0 };
+  const creneaux = p.creneaux.slice(0, 40); // borne : un tap ne déclenche pas 500 écritures
+  const enfants = await f.source.enfants(f.famille.id);
+  if (!enfants.some((e) => e.id === p.enfantId)) return { ok: false, message: "Enfant inconnu sur ce dossier.", reservees: 0, refusees: 0 };
+  const activites = await f.source.activites();
+  const dates = creneaux.map((c) => c.date).sort();
+  const existantes = await f.source.reservations(p.enfantId, dates[0] ?? "", dates[dates.length - 1] ?? "");
+  let reservees = 0, refusees = 0;
+  for (const c of creneaux) {
+    const activite = activites.find((a) => a.id === c.activiteId);
+    if (!activite) { refusees++; continue; }
+    const actuel = existantes.find((r) => r.activiteId === c.activiteId && r.date === c.date)?.etat ?? null;
+    if (actuel === "reservee" || actuel === "presence") continue;
+    const r = await reserverOuAnnuler({ enfantId: p.enfantId, activite, date: c.date, actuel, voulu: "reservee", acteur: f.email });
+    if (r.ok) reservees++; else refusees++;
+  }
+  revalidatePath("/");
+  return {
+    ok: true,
+    reservees, refusees,
+    message: `${reservees} réservation${reservees > 1 ? "s" : ""} enregistrée${reservees > 1 ? "s" : ""}${refusees ? `, ${refusees} refusée${refusees > 1 ? "s" : ""} (délai dépassé)` : ""}.`,
+  };
+}
+
 /** Attestation de paiement : données + PDF figé stockés ensemble, servis par /attestations/[id]. */
 export async function genererAttestation(factureId: string): Promise<{ ok: true; id: string } | { ok: false; message: string }> {
   const f = await familleCourante();

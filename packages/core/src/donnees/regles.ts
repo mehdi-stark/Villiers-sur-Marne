@@ -32,14 +32,24 @@ export function dateLimite(activite: Activite, dateISO: string): Date {
   return new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate(), (h ?? 0) - decalageParis(d), m ?? 0));
 }
 
-export type VerdictDelai = { possible: boolean; jusquA: Date; libelle: string };
+/** `passe` : la journée a EU LIEU. Ce n'est pas la même chose qu'un délai dépassé —
+ *  dans un cas la mairie peut encore aider, dans l'autre il n'y a plus rien à décider.
+ *  Dire « délai dépassé » sur une journée écoulée envoie le parent téléphoner pour rien. */
+export type VerdictDelai = { possible: boolean; jusquA: Date; libelle: string; passe: boolean };
 const fmt = new Intl.DateTimeFormat("fr-FR", { weekday: "long", day: "numeric", month: "long", hour: "2-digit", minute: "2-digit", timeZone: "Europe/Paris" });
 
 /** Peut-on encore réserver/annuler cette activité à cette date, maintenant ? Le libellé dit JUSQU'À QUAND. */
 export function verdictDelai(activite: Activite, dateISO: string, maintenant: Date): VerdictDelai {
   const limite = dateLimite(activite, dateISO);
   const possible = maintenant < limite;
-  return { possible, jusquA: limite, libelle: possible ? `Modifiable jusqu'au ${fmt.format(limite)} (heure de Paris)` : `Délai dépassé depuis le ${fmt.format(limite)} — l'Espace Accueil et Facturation peut encore aider au 01 49 41 28 00` };
+  const aujourdhui = new Intl.DateTimeFormat("sv-SE", { timeZone: "Europe/Paris" }).format(maintenant);
+  const passe = dateISO < aujourdhui;
+  const libelle = passe
+    ? `Journée passée — elle est facturée telle qu'elle a été pointée`
+    : possible
+      ? `Modifiable jusqu'au ${fmt.format(limite)} (heure de Paris)`
+      : `Délai dépassé depuis le ${fmt.format(limite)} — l'Espace Accueil et Facturation peut encore aider au 01 49 41 28 00`;
+  return { possible, jusquA: limite, libelle, passe };
 }
 
 /** Tranches de quotient familial 2025-2026 (10 = extérieurs à la commune). Sans QF calculé : tranche 9. */

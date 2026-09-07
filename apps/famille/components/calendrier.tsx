@@ -19,6 +19,10 @@ export function Calendrier({ enfantId, prenom, jours, euros }: { enfantId: strin
   const [enCours, setEnCours] = useState<string | null>(null); // l'activité qu'on enregistre
   const jour = jours.find((j) => j.date === ouvert) ?? null;
   const presents = new Set(jours.flatMap((j) => j.services.map((s) => s.moment)));
+  // La légende se construit sur ce que le mois contient VRAIMENT : une lettre qu'on ne
+  // voit nulle part dans la grille serait une promesse non tenue.
+  const initiales = new Map<string, { nom: string; moment: string }>();
+  for (const j of jours) for (const s of j.services) initiales.set(s.nomCourt.slice(0, 1).toUpperCase(), { nom: s.nom, moment: s.moment });
   const taper = async (activiteId: string, date: string, etat: string) => {
     setEnCours(activiteId);
     const actuel: EtatReservation | null = etat === "libre" ? null : (etat as EtatReservation);
@@ -37,7 +41,13 @@ export function Calendrier({ enfantId, prenom, jours, euros }: { enfantId: strin
             aria-label={`${fmtJour.format(new Date(`${j.date}T12:00:00Z`))} : ${j.services.length ? j.services.map((s) => `${s.nom} ${LIBELLE[s.etat]}`).join(", ") : "aucun service"}`}>
             <span className="jour-mois-num">{j.jour}</span>
             <span className="jour-mois-pastilles">
-              {j.services.slice(0, 4).map((s) => <span key={s.activiteId} className="pastille" data-moment={s.moment} data-etat={s.etat} />)}
+              {/* Une pastille NOMMÉE : l'initiale du service (R repas, J journée, M matin…).
+                  Un point coloré ne dit pas CE QUI est réservé — c'était le retour du 07/09. */}
+              {j.services.slice(0, 4).map((s) => (
+                <span key={s.activiteId} className="pastille" data-moment={s.moment} data-etat={s.etat} title={`${s.nom} — ${LIBELLE[s.etat] ?? s.etat}`}>
+                  {s.nomCourt.slice(0, 1).toUpperCase()}
+                </span>
+              ))}
             </span>
           </button>
         ))}
@@ -77,10 +87,10 @@ export function Calendrier({ enfantId, prenom, jours, euros }: { enfantId: strin
       {/* La légende ne montre QUE les moments présents dans ce mois : une couleur qu'on
           ne voit nulle part dans la grille est une promesse non tenue. */}
       <div className="legende-moments" aria-hidden>
-        {MOMENTS_LEGENDE.filter(([cle]) => presents.has(cle)).map(([cle, label]) => (
-          <span key={cle}><span className="pastille" data-moment={cle} data-etat="reservee" />{label}</span>
+        {[...initiales.entries()].map(([lettre, s]) => (
+          <span key={lettre}><span className="pastille" data-moment={s.moment} data-etat="reservee">{lettre}</span>{s.nom}</span>
         ))}
-        <span><span className="pastille" data-moment={[...presents][0] ?? "midi"} data-etat="libre" />pas encore réservé</span>
+        <span><span className="pastille" data-moment={[...presents][0] ?? "midi"} data-etat="libre">R</span>pas encore réservé</span>
       </div>
       <p className="mini t-3">Seuls les services <b>à réserver</b> apparaissent ici. L&apos;accueil du matin, du soir et l&apos;étude sont à l&apos;inscription annuelle : ils figurent dans la vue Jour et la vue Semaine.</p>
     </div>
