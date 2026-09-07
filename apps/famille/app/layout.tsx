@@ -25,13 +25,27 @@ export default async function Layout({ children }: { children: React.ReactNode }
   const f = await familleCourante();
   const actives = f ? (await demarchesDe(f.famille.id).catch(() => [])).filter((d) => d.etat === "deposee" || d.etat === "en_cours" || d.etat === "refusee").length : 0;
   const presentation = (await cookies()).get("famille_presentation")?.value === "1";
+  // La navigation PORTE L'ÉTAT, elle ne se contente pas de mener quelque part : ce qui est
+  // réservé aujourd'hui, et ce qui reste à payer. Deux lectures bornées, tolérantes à
+  // l'échec — une barre de navigation ne tombe pas parce qu'une requête a échoué.
+  const aujourdhui = new Intl.DateTimeFormat("sv-SE", { timeZone: "Europe/Paris" }).format(new Date());
+  let reservesAujourdhui = 0, facturesDues = 0;
+  if (f) {
+    const [enfants, factures] = await Promise.all([
+      f.source.enfants(f.famille.id).catch(() => []),
+      f.source.factures(f.famille.id).catch(() => []),
+    ]);
+    const parEnfant = await Promise.all(enfants.map((e) => f.source.reservations(e.id, aujourdhui, aujourdhui).catch(() => [])));
+    reservesAujourdhui = parEnfant.flat().filter((r) => r.etat === "reservee" || r.etat === "presence").length;
+    facturesDues = factures.filter((x) => x.etat === "a_payer").length;
+  }
   return (
     <html lang="fr" data-registre="client" className={`${inter.variable} ${display.variable}`}>
       <head>
         <style dangerouslySetInnerHTML={{ __html: jetonsCommune(c) }} />
         <script dangerouslySetInnerHTML={{ __html: scriptTheme }} />
       </head>
-      <body><Coquille commune={{ nom: c.nom, courte: c.courte, initiale: c.logoInitiale, telephone: c.telephoneAccueil, logoUrl: c.logoUrl, mentionLogo: c.mentionLogo }} famille={f?.famille.nom ?? null} email={f?.email ?? null} demarchesActives={actives} demo={surDonneesFictives()} presentation={presentation}>{children}</Coquille></body>
+      <body><Coquille commune={{ nom: c.nom, courte: c.courte, initiale: c.logoInitiale, telephone: c.telephoneAccueil, logoUrl: c.logoUrl, mentionLogo: c.mentionLogo }} famille={f?.famille.nom ?? null} email={f?.email ?? null} demarchesActives={actives} reservesAujourdhui={reservesAujourdhui} facturesDues={facturesDues} demo={surDonneesFictives()} presentation={presentation}>{children}</Coquille></body>
     </html>
   );
 }

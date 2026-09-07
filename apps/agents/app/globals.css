@@ -38,3 +38,5 @@
   .file-ligne > .rangee { justify-content: flex-start !important; flex-wrap: wrap; }
   .file-ligne .petit { overflow-wrap: anywhere; }
 }
+.touche { flex: 0 0 auto; font: inherit; font-size: 11px; font-weight: 700; color: var(--texte-3); border: 1px solid var(--bord); border-bottom-width: 2px; border-radius: 5px; padding: 1px 6px; background: var(--surface-2); }
+.recherche:focus-within .touche { display: none; }

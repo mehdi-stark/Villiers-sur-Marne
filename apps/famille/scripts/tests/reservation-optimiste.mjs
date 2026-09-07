@@ -10,7 +10,8 @@ const sig = createHmac("sha256", secret).update(`famille|${corps}`).digest("base
 const jeton = Buffer.from(`${corps}|${sig}`).toString("base64url");
 
 const nav = await chromium.launch();
-const ctx = await nav.newContext({ viewport: { width: 390, height: 844 } });
+// La grille de créneaux est le gabarit des grands écrans (07/09/2026).
+const ctx = await nav.newContext({ viewport: { width: 1440, height: 900 } });
 await ctx.addCookies([{ name: "famille_session", value: jeton, domain: "localhost", path: "/" }]);
 const p = await ctx.newPage();
 await p.goto("http://localhost:3001/", { waitUntil: "networkidle" });

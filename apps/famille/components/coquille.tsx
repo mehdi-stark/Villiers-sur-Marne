@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { BandeauDemo, CoquilleClient, MenuProfil, type Section } from "@ville/ui";
 import { VerrouBiometrique } from "@ville/core/ui/passkeys";
 
-export function Coquille({ children, commune, famille, email, demarchesActives, demo, presentation }: { children: React.ReactNode; commune: { nom: string; courte: string; initiale: string; telephone: string; logoUrl: string | null; mentionLogo: string | null }; famille: string | null; email: string | null; demarchesActives: number; demo: boolean; presentation: boolean }) {
+export function Coquille({ children, commune, famille, email, demarchesActives, reservesAujourdhui = 0, facturesDues = 0, demo, presentation }: { children: React.ReactNode; commune: { nom: string; courte: string; initiale: string; telephone: string; logoUrl: string | null; mentionLogo: string | null }; famille: string | null; email: string | null; demarchesActives: number; reservesAujourdhui?: number; facturesDues?: number; demo: boolean; presentation: boolean }) {
   const router = useRouter();
   const deconnecter = async () => { await fetch("/api/auth", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "deconnecter" }) }); router.push("/connexion"); router.refresh(); };
   // Quatre destinations, pas plus (règle du pouce). Le PLANNING est une seule
@@ -21,13 +21,13 @@ export function Coquille({ children, commune, famille, email, demarchesActives, 
   // deviennent des entrées à part entière — c'est la place gagnée qui le permet.
   const sections: Section[] = [
     { titre: "Planning", destinations: [
-      { href: "/jour", label: "Aujourd'hui", Icone: Sun },
+      { href: "/jour", label: "Aujourd'hui", Icone: Sun, compteur: reservesAujourdhui, tone: "accent" as const },
       { href: "/", label: "Ma semaine", Icone: CalendarDays },
       { href: "/calendrier", label: "Le mois", Icone: CalendarRange },
     ] },
     { titre: "Mon dossier", destinations: [
       { href: "/activites", label: "Activités et tarifs", Icone: ListChecks },
-      { href: "/factures", label: "Factures", Icone: Receipt },
+      { href: "/factures", label: "Factures", Icone: Receipt, compteur: facturesDues, tone: "warn" as const },
       { href: "/demarches", label: "Démarches", Icone: FileText, compteur: demarchesActives, tone: "accent" as const },
       { href: "/enfants", label: "Mes enfants", Icone: Users },
     ] },

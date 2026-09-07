@@ -10,7 +10,8 @@ const sig = createHmac("sha256", secret).update(`famille|${corps}`).digest("base
 const jeton = Buffer.from(`${corps}|${sig}`).toString("base64url");
 
 const nav = await chromium.launch();
-const ctx = await nav.newContext({ viewport: { width: 390, height: 844 } });
+// La grille de créneaux est le gabarit des grands écrans (07/09/2026) : on l'ouvre là.
+const ctx = await nav.newContext({ viewport: { width: 1440, height: 900 } });
 await ctx.addCookies([{ name: "famille_session", value: jeton, domain: "localhost", path: "/" }]);
 const p = await ctx.newPage();
 const nettoyer = () => p.evaluate(() => document.querySelector("nextjs-portal")?.remove());
@@ -44,7 +45,7 @@ await p.waitForURL(/\/calendrier/, { timeout: 15000 });
 console.log(barre > 0 ? "✓ barre de progression levée au clic sur un onglet" : "✓ navigation instantanée (barre non nécessaire)");
 
 // 3. La page visée arrive en squelette, jamais en écran blanc : on ralentit le serveur pour le voir.
-const ctx2 = await nav.newContext({ viewport: { width: 390, height: 844 } });
+const ctx2 = await nav.newContext({ viewport: { width: 1440, height: 900 } });
 await ctx2.addCookies([{ name: "famille_session", value: jeton, domain: "localhost", path: "/" }]);
 const q = await ctx2.newPage();
 await q.route("**/activites**", async (route) => { await new Promise((r) => setTimeout(r, 1200)); await route.continue(); });

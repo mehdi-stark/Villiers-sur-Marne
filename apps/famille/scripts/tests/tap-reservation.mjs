@@ -17,7 +17,8 @@ const sql = postgres(process.env.DATABASE_URL, { max: 1, prepare: false });
 const l = new Date(Date.now() + 35 * 86_400_000); l.setUTCDate(l.getUTCDate() - ((l.getUTCDay() + 6) % 7)); const lundi = l.toISOString().slice(0, 10);
 let code = 1; const b = await chromium.launch();
 try {
-  const ctx = await b.newContext({ viewport: { width: 390, height: 844 }, locale: "fr-FR", timezoneId: "Europe/Paris" });
+  // La grille de créneaux est le gabarit des grands écrans (07/09/2026).
+  const ctx = await b.newContext({ viewport: { width: 1440, height: 900 }, locale: "fr-FR", timezoneId: "Europe/Paris" });
   await ctx.addCookies([{ name: "famille_session", value: Buffer.from(`${corps}|${sig}`).toString("base64url"), url: BASE }]);
   const p = await ctx.newPage();
   await p.goto(`${BASE}/?s=${lundi}`, { waitUntil: "networkidle" });
@@ -42,7 +43,10 @@ try {
   const j = await sql`SELECT accepte FROM journal_reservations WHERE acteur = ${EMAIL} ORDER BY cree_le`;
   // Hors délai : la semaine courante → tous les créneaux repas désactivés
   await p.goto(`${BASE}/?s=${new Date().toISOString().slice(0, 10)}`, { waitUntil: "networkidle" });
-  const actifs = await p.locator("button.creneau:not(:disabled)").count();
+  // On vise le REPAS, dont le délai est de 7 jours francs : il est forcément dépassé pour
+  // la semaine en cours. Exiger « aucun créneau tapable » était fragile — l'accueil de
+  // loisirs du mercredi (2 jours francs) reste réservable selon le jour où le test tourne.
+  const actifs = await p.locator('button.creneau:not(:disabled)[aria-label^="Pause méridienne"]').count();
   if (actifs !== 0) throw new Error(`${actifs} créneau(x) repas encore tapables hors délai`);
   console.log(`✓ réservation puis annulation constatées en base (${j.length} lignes de journal, ${j.filter((x) => x.accepte).length} acceptées) ; créneau testé : ${label?.slice(0, 60)} ; hors délai : 0 tapable`);
   code = 0;

@@ -9,6 +9,7 @@ import { ActiverFaceId } from "@ville/core/ui/passkeys";
 import { ActiverNotifications } from "@ville/core/ui/push";
 import { Cascade, EtatVide, IlluCalendrier } from "@ville/ui";
 import { LigneService } from "@/components/ligne-service";
+import { SemaineParJour } from "@/components/semaine-jours";
 import { SemaineType } from "@/components/semaine-type";
 import { NavPeriode, SelecteurVue } from "@/components/selecteur-vue";
 import { SelecteurEnfant } from "@/components/selecteur-enfant";
@@ -115,7 +116,7 @@ export default async function MaSemaine({ searchParams }: { searchParams: Promis
                 <span className="avatar" data-enfant={teinteEnfant(enfant.id)} aria-hidden>{enfant.prenom.slice(0, 1)}</span>
                 <div style={{ minWidth: 0 }}><strong>{enfant.prenom}</strong><div className="mini t-3">{enfant.ecole} · {enfant.classe}</div></div>
               </div>
-              <div className="entete-jours">
+              <div className="entete-jours v-large">
                 {jours.map((j) => {
                   const d = new Date(`${j.date}T12:00:00Z`);
                   return (
@@ -127,7 +128,7 @@ export default async function MaSemaine({ searchParams }: { searchParams: Promis
                   );
                 })}
               </div>
-              <div className="services">
+              <div className="services v-large">
                 {grouperParMoment(lignes, (l) => l.service.moment).map(({ moment, lignes: ls }) => {
                   const IconeMoment = ICONE_MOMENT[moment.icone];
                   const plage = plageHoraire(ls.flatMap((l) => l.formules.map((x) => x.activite.horaires)));
@@ -147,6 +148,16 @@ export default async function MaSemaine({ searchParams }: { searchParams: Promis
                     </div>
                   );
                 })}
+              </div>
+
+              {/* Sur un téléphone, la même semaine se lit PAR JOUR : le jour est écrit,
+                  l'action est nommée (« Réserver » / « Annuler »), rien n'est à deviner. */}
+              <div className="v-etroit">
+                <SemaineParJour enfantId={enfant.id} jours={jours}
+                  services={lignes.map((l) => ({
+                    groupe: l.groupe, nom: l.service.nomGroupe, icone: l.service.icone, ton: l.service.ton, reservable: l.reservable,
+                    formules: l.formules.map((x) => ({ activiteId: x.activite.id, libelle: x.libelle, horaires: x.activite.horaires, tarif: euros(tarif(x.activite, tranche)), cellules: x.cellules, reserves: x.reserves })),
+                  }))} />
               </div>
             </section>
           ))}

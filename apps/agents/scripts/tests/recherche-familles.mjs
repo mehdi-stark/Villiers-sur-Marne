@@ -44,8 +44,25 @@ try {
   if (vide !== 0 || message === 0) throw new Error("une recherche sans résultat ne s'explique pas");
   console.log("✓ recherche sans résultat : la page dit sur quoi porte la recherche, au lieu d'être vide");
 
+  // Raccourcis clavier : « / » pour chercher, « Échap » pour effacer, « Entrée » pour
+  // ouvrir le premier résultat — un agent enchaîne les dossiers sans toucher la souris.
+  await p.getByLabel("Rechercher un dossier").fill("");
+  await p.waitForTimeout(700);
+  await p.locator("body").click({ position: { x: 5, y: 5 } });
+  await p.keyboard.press("/");
+  const focus = await p.evaluate(() => document.activeElement?.getAttribute("aria-label"));
+  if (focus !== "Rechercher un dossier") throw new Error(`« / » ne met pas le curseur dans la recherche (focus : ${focus})`);
+  await p.keyboard.type(jeton.slice(0, 3));
+  await p.waitForTimeout(700);
+  await p.keyboard.press("Enter");
+  await p.waitForURL(/\/familles\/[^/]+$/, { timeout: 10000 });
+  console.log(`✓ clavier : « / » cherche, « Entrée » ouvre le premier dossier (${new URL(p.url()).pathname})`);
+  await p.goBack();
+  await p.waitForTimeout(500);
+
   // Le texte cherché voyage dans l'URL : la recherche est partageable.
-  if (!new URL(p.url()).searchParams.get("q")) throw new Error("la recherche n'est pas dans l'URL");
+  await p.getByLabel("Rechercher un dossier").fill("zzzzz");
+  await p.waitForURL(/[?&]q=zzzzz/, { timeout: 10000 });
   console.log(`✓ la recherche reste dans l'URL (${new URL(p.url()).search}) — envoyable à un collègue`);
   code = 0;
 } catch (e) {
