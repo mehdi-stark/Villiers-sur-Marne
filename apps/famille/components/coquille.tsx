@@ -1,8 +1,8 @@
 "use client";
 
-import { Bell, CalendarDays, FileText, ListChecks, Receipt, Smartphone, Users } from "lucide-react";
+import { Bell, CalendarDays, CalendarRange, FileText, ListChecks, Receipt, Smartphone, Sun, Users } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { BandeauDemo, CoquilleClient, MenuProfil } from "@ville/ui";
+import { BandeauDemo, CoquilleClient, MenuProfil, type Section } from "@ville/ui";
 import { VerrouBiometrique } from "@ville/core/ui/passkeys";
 
 export function Coquille({ children, commune, famille, email, demarchesActives, demo, presentation }: { children: React.ReactNode; commune: { nom: string; courte: string; initiale: string; telephone: string; logoUrl: string | null; mentionLogo: string | null }; famille: string | null; email: string | null; demarchesActives: number; demo: boolean; presentation: boolean }) {
@@ -17,6 +17,25 @@ export function Coquille({ children, commune, famille, email, demarchesActives, 
     { href: "/factures", label: "Factures", Icone: Receipt },
     { href: "/demarches", label: "Démarches", Icone: FileText, compteur: demarchesActives, tone: "accent" as const },
   ];
+  // ORDINATEUR : tout est visible, avec ses sous-entrées. Les trois échelles du planning
+  // deviennent des entrées à part entière — c'est la place gagnée qui le permet.
+  const sections: Section[] = [
+    { titre: "Planning", destinations: [
+      { href: "/jour", label: "Aujourd'hui", Icone: Sun },
+      { href: "/", label: "Ma semaine", Icone: CalendarDays },
+      { href: "/calendrier", label: "Le mois", Icone: CalendarRange },
+    ] },
+    { titre: "Mon dossier", destinations: [
+      { href: "/activites", label: "Activités et tarifs", Icone: ListChecks },
+      { href: "/factures", label: "Factures", Icone: Receipt },
+      { href: "/demarches", label: "Démarches", Icone: FileText, compteur: demarchesActives, tone: "accent" as const },
+      { href: "/enfants", label: "Mes enfants", Icone: Users },
+    ] },
+    { titre: "Mon compte", destinations: [
+      { href: "/appareils", label: "Appareils et sécurité", Icone: Smartphone },
+      { href: "/reglages", label: "Réglages et notifications", Icone: Bell },
+    ] },
+  ];
   const profil = famille && email ? (
     <MenuProfil cote="bottom" align="end" identite={{ nom: famille, sousTitre: email, initiale: famille.slice(0, 1).toUpperCase() }}
       liens={[{ href: "/enfants", label: "Mes enfants", Icone: Users }, { href: "/appareils", label: "Appareils et sécurité", Icone: Smartphone }, { href: "/reglages", label: "Réglages et notifications", Icone: Bell }]}
@@ -24,5 +43,5 @@ export function Coquille({ children, commune, famille, email, demarchesActives, 
       extra={<div className="profil-item" style={{ cursor: "default", display: "grid", gap: 2 }}><span>Accueil et Facturation — {commune.telephone}</span>{commune.mentionLogo && <span className="mention">{commune.mentionLogo}</span>}</div>} />
   ) : undefined;
   const action = <a className="bouton bouton-sm" data-variant="primaire" href="/connexion">Se connecter</a>;
-  return <CoquilleClient action={action} marque={{ nom: `Portail Famille — ${commune.nom}`, courte: "Famille", initiale: commune.initiale, sousTitre: commune.courte, logoUrl: commune.logoUrl }} destinations={destinations} profil={profil}><VerrouBiometrique cle="famille-passkey" />{demo && <BandeauDemo presentation={presentation} />}{children}</CoquilleClient>;
+  return <CoquilleClient action={action} sections={sections} marque={{ nom: `Portail Famille — ${commune.nom}`, courte: "Famille", initiale: commune.initiale, sousTitre: commune.courte, logoUrl: commune.logoUrl }} destinations={destinations} profil={profil}><VerrouBiometrique cle="famille-passkey" />{demo && <BandeauDemo presentation={presentation} />}{children}</CoquilleClient>;
 }

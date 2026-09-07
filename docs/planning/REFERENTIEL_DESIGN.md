@@ -136,3 +136,27 @@ parce que « ça coûte combien ? » est une question quotidienne, pas un régla
 Trois choses qu'on refuse désormais : une couleur de légende qui n'apparaît nulle part dans
 la grille ; `text-transform: capitalize` sur une date (« 6 Septembre ») ; un onglet qui
 s'éteint quand on navigue dans sa propre section (d'où `alias` sur les destinations).
+
+
+### Décision de navigation RÉVISÉE — 07/09/2026 (challenge de l'opérateur)
+
+Le 06/09 j'avais tranché « onglets, pas de barre latérale » pour le portail famille.
+L'opérateur a challengé : « une sidebar serait plus intuitive pour avoir une vue directe
+sur les menus, et permettrait des sous-menus, des catégories ». **Il a raison — pour
+l'ordinateur.** Ce qui était faux dans ma décision, ce n'était pas le choix des onglets,
+c'était de faire porter UN seul gabarit à deux contextes très différents.
+
+| | Téléphone (< 1024 px) | Ordinateur (≥ 1024 px) |
+|---|---|---|
+| Gabarit | **onglets en bas** | **barre latérale à sections** |
+| Pourquoi | 4 gestes fréquents à portée de pouce, zéro tap supplémentaire ; une barre latérale y devient un tiroir, et le hamburger en grand public est un anti-pattern écrit dans la trame | la place existe ; la barre du haut à 4 liens cachait le reste (enfants, appareils, réglages) derrière un menu profil |
+| Ce qu'on voit | Planning · Activités · Factures · Démarches | **9 entrées**, en 3 sections : Planning (Aujourd'hui, Ma semaine, Le mois) · Mon dossier (Activités et tarifs, Factures, Démarches, Mes enfants) · Mon compte (Appareils et sécurité, Réglages) |
+
+Ce n'est pas un compromis mou : chaque contexte reçoit le gabarit qui lui convient, et le
+MÊME arbre de navigation nourrit les deux. La règle générale de la trame devient :
+**le registre ne décide pas seul du gabarit — la largeur aussi.** Un produit grand public
+sur ordinateur mérite sa barre latérale ; sur téléphone, jamais de tiroir.
+
+Prouvé : `apps/famille/scripts/tests/navigation-gabarits.mjs` échoue si l'un des deux
+gabarits disparaît, si un tiroir apparaît sur téléphone, ou si une destination cesse
+d'être visible sur ordinateur.

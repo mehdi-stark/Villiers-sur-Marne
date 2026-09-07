@@ -40,10 +40,12 @@ d'heure Paris — enregistré et actif côté Vercel).
 écrit de la ville sur son logo, l'auto-déploiement GitHub→Vercel, toute source de données
 réelle (Agora+ / API ville).
 
-**Navigation, décidé** : onglets pour le portail famille (grand public, mobile d'abord,
-4 destinations), barre latérale par sections pour cockpit et agents (outils denses). Une
-échelle de temps n'est JAMAIS une destination — c'est un sélecteur dans la page (`alias` sur
-la destination pour que l'onglet reste allumé).
+**Navigation, décidé (révisé le 07/09/2026)** : le registre ne décide pas seul du gabarit,
+**la largeur aussi**. Portail famille : onglets en bas sur téléphone (pouce, jamais de
+tiroir), **barre latérale à sections dès 1024 px** (9 entrées visibles, sous-entrées) — un
+seul arbre de navigation pour les deux. Cockpit et agents : barre latérale (outils denses).
+Une échelle de temps n'est JAMAIS une destination — c'est un sélecteur dans la page
+(`alias` sur la destination pour que l'onglet reste allumé).
 
 **Régions** : les trois apps tournent à `cdg1` (Paris), au plus près de la base Neon
 (`eu-central-1`) — `regions` dans chaque `vercel.json`. Ne jamais laisser le défaut `iad1`.

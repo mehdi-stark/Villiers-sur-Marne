@@ -258,3 +258,17 @@ hr, .filet { border: 0; height: 1px; background: color-mix(in srgb, var(--bord) 
 [data-enfant="6"] { --teinte: var(--enfant-6) }
 .avatar[data-enfant] { background: color-mix(in srgb, var(--teinte) 14%, var(--surface)); color: var(--teinte); border-color: color-mix(in srgb, var(--teinte) 30%, transparent); }
 .carte[data-enfant] { border-left: 3px solid color-mix(in srgb, var(--teinte) 55%, transparent); }
+
+/* ---- Portail grand public sur ORDINATEUR : barre latérale à sections et sous-entrées.
+   Sur téléphone elle n'existe pas : les onglets du bas restent le chemin le plus court. ---- */
+.laterale-client { display: none; }
+@media (min-width: 1024px) {
+  .coquille[data-laterale] { flex-direction: row; }
+  .coquille[data-laterale] .laterale-client { display: flex; flex-direction: column; gap: var(--e-1); width: 250px; flex: 0 0 auto; position: sticky; top: 0; height: 100dvh; padding: var(--e-4) var(--e-3) var(--e-3); border-right: 1px solid color-mix(in srgb, var(--bord) 70%, transparent); background: color-mix(in srgb, var(--surface) 70%, var(--fond)); }
+  .coquille[data-laterale] .laterale-client .nav-lien { border-radius: var(--r-1); }
+  .coquille[data-laterale] .laterale-pied { margin-top: auto; padding-top: var(--e-2); border-top: 1px solid color-mix(in srgb, var(--bord) 60%, transparent); }
+  .coquille[data-laterale] .principal { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+  /* La marque et le profil vivent dans la barre : l'en-tête ne double pas l'information. */
+  .coquille[data-laterale] .entete { display: none; }
+}
+.principal { display: flex; flex-direction: column; flex: 1; min-width: 0; }

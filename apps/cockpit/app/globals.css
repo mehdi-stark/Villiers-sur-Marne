@@ -75,3 +75,15 @@
 .dispo-jour[data-statut="erreur"] { background: var(--danger); }
 .systeme-commande { grid-template-columns: minmax(0, auto) 1fr auto; }
 .grille-tuiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: var(--e-2); }
+
+/* ---- Santé du système, sur le premier écran ---- */
+.sante-rapide { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 8px; }
+.sante-puce { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: var(--r-2); background: var(--surface); border: 1px solid var(--bord); text-decoration: none; color: var(--texte); transition: background var(--d-2), border-color var(--d-2); }
+.sante-puce:hover { background: var(--surface-2); }
+.sante-puce b { display: block; font-size: var(--t-13); font-weight: 650; letter-spacing: var(--serre); }
+.sante-puce small { display: block; font-size: 11.5px; color: var(--texte-3); }
+.sante-point { width: 9px; height: 9px; border-radius: 999px; flex: 0 0 auto; background: var(--texte-3); }
+.sante-puce[data-etat="ok"] .sante-point { background: var(--ok); }
+.sante-puce[data-etat="warn"] .sante-point { background: var(--warn); }
+.sante-puce[data-etat="danger"] .sante-point { background: var(--danger); }
+.sante-puce[data-etat="danger"] { border-color: color-mix(in srgb, var(--danger) 45%, transparent); }

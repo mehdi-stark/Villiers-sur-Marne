@@ -27,33 +27,65 @@ function Marque({ marque, style }: { marque: Marque; style?: React.CSSProperties
   );
 }
 
-export function CoquilleClient({ children, marque, destinations, profil, connexionPath = "/connexion", action }: { children: ReactNode; marque: Marque; destinations: Destination[]; profil?: ReactNode; connexionPath?: string; action?: ReactNode }) {
+/* NAVIGATION D'UN PRODUIT GRAND PUBLIC — deux gabarits, un par contexte, décidé le
+ * 07/09/2026 après challenge de l'opérateur (« une sidebar serait plus intuitive ») :
+ *   • TÉLÉPHONE : onglets en bas. Quatre gestes fréquents, à portée de pouce, sans un
+ *     tap de plus. Une barre latérale sur mobile devient un tiroir à ouvrir — un tap
+ *     supplémentaire pour CHAQUE navigation, et le hamburger en grand public est un
+ *     anti-pattern écrit dans la trame.
+ *   • ORDINATEUR : barre latérale, avec SECTIONS et SOUS-ENTRÉES. L'opérateur a raison
+ *     sur ce point : la place existe, et une barre du haut à quatre liens cachait le
+ *     reste (enfants, appareils, réglages) derrière un menu profil. Tout est visible.
+ * Ce n'est pas un compromis mou : chaque contexte reçoit le gabarit qui lui convient,
+ * et le MÊME arbre de navigation nourrit les deux. */
+export function CoquilleClient({ children, marque, destinations, sections, profil, connexionPath = "/connexion", action }: { children: ReactNode; marque: Marque; destinations: Destination[]; sections?: Section[]; profil?: ReactNode; connexionPath?: string; action?: ReactNode }) {
   const p = usePathname();
   // Pas de profil = pas de session : la navigation privée disparaît (page publique).
   const connexion = p === connexionPath || !profil;
+  const laterale = !connexion && !!sections?.length;
   useEffect(() => { if ("serviceWorker" in navigator) navigator.serviceWorker.register("/sw.js").catch(() => {}); }, []);
   return (
-    <div className="coquille">
+    <div className="coquille" data-laterale={laterale || undefined}>
       <BarreRoute />
-      <header className="entete">
-        <div className="entete-inner">
-          <Marque marque={marque} />
-          {!connexion && <nav className="nav-desktop" aria-label="Navigation principale" style={{ marginLeft: 8 }}>{destinations.map(({ href, label, Icone, alias }) => <Link key={href} href={href} className="nav-lien" data-actif={actif(p, href, alias) || undefined}><Icone size={16} aria-hidden />{label}</Link>)}</nav>}
-          {!connexion && profil && <div style={{ marginLeft: "auto", flex: "0 0 auto", maxWidth: 210 }}>{profil}</div>}
-          {connexion && action && <div style={{ marginLeft: "auto" }}>{action}</div>}
-        </div>
-      </header>
-      <main className="contenu">{children}</main>
-      {!connexion && (
-        <nav className="onglets" aria-label="Navigation">
-          {destinations.map(({ href, label, Icone, compteur, tone, alias }) => (
-            <Link key={href} href={href} className="onglet" data-actif={actif(p, href, alias) || undefined}>
-              <span className="onglet-icone">{compteur !== undefined && compteur > 0 && <span className="onglet-pastille" data-tone={tone} aria-hidden />}<Icone size={20} aria-hidden /></span>
-              {label}
-            </Link>
+      {laterale && (
+        <aside className="laterale-client" aria-label="Navigation">
+          <Marque marque={marque} style={{ padding: "0 8px 4px" }} />
+          {sections!.map((s) => (
+            <div key={s.titre} className="nav-section">
+              <div className="nav-titre">{s.titre}</div>
+              {s.destinations.map(({ href, label, Icone, compteur, tone, alias }) => (
+                <Link key={href} href={href} className="nav-lien" data-actif={actif(p, href, alias) || undefined}>
+                  <Icone size={16} aria-hidden />
+                  {label}
+                  {compteur !== undefined && compteur > 0 && <span className="nav-compteur" data-tone={tone}>{compteur}</span>}
+                </Link>
+              ))}
+            </div>
           ))}
-        </nav>
+          {profil && <div className="laterale-pied">{profil}</div>}
+        </aside>
       )}
+      <div className="principal">
+        <header className="entete">
+          <div className="entete-inner">
+            <Marque marque={marque} />
+            {!connexion && !laterale && <nav className="nav-desktop" aria-label="Navigation principale" style={{ marginLeft: 8 }}>{destinations.map(({ href, label, Icone, alias }) => <Link key={href} href={href} className="nav-lien" data-actif={actif(p, href, alias) || undefined}><Icone size={16} aria-hidden />{label}</Link>)}</nav>}
+            {!connexion && profil && <div style={{ marginLeft: "auto", flex: "0 0 auto", maxWidth: 210 }}>{profil}</div>}
+            {connexion && action && <div style={{ marginLeft: "auto" }}>{action}</div>}
+          </div>
+        </header>
+        <main className="contenu">{children}</main>
+        {!connexion && (
+          <nav className="onglets" aria-label="Navigation">
+            {destinations.map(({ href, label, Icone, compteur, tone, alias }) => (
+              <Link key={href} href={href} className="onglet" data-actif={actif(p, href, alias) || undefined}>
+                <span className="onglet-icone">{compteur !== undefined && compteur > 0 && <span className="onglet-pastille" data-tone={tone} aria-hidden />}<Icone size={20} aria-hidden /></span>
+                {label}
+              </Link>
+            ))}
+          </nav>
+        )}
+      </div>
     </div>
   );
 }

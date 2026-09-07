@@ -5,6 +5,7 @@ import { origineBase } from "@ville/core/db";
 import { compteurs, decisionsPrises } from "@/lib/decisions";
 import { backlogOuvert, extraireBacklog, extraireDecisions, lireDoc } from "@/lib/docs";
 import { analyse } from "@/lib/marche";
+import { etatApplications, historiqueDispo, regionLointaine } from "@/lib/systeme";
 
 import { ActiverFaceId } from "@ville/core/ui/passkeys";
 import { TuileChiffre } from "@ville/ui";
@@ -33,6 +34,17 @@ export default async function Accueil() {
     compteurs(),
     alertesOuvertes(),
   ]);
+  // L'état du système en une ligne, sur le PREMIER écran : sans ça, il faut aller le
+  // chercher. Les appels sont bornés (6 s) et le tableau de bord reste lisible s'ils
+  // échouent — un pilotage ne tombe pas parce qu'une sonde ne répond pas.
+  const [apps, dispo] = await Promise.all([
+    etatApplications().catch(() => []),
+    historiqueDispo(7).catch(() => []),
+  ]);
+  const enLigne = apps.filter((a) => a.enLigne).length;
+  const manquantes = apps.reduce((n, a) => n + (a.sante?.manquantes.length ?? 0), 0);
+  const lointaines = apps.filter((a) => regionLointaine(a.sante?.region ?? null)).length;
+  const pannes = dispo.filter((d) => d.statut === "erreur").length;
   const marche = analyse();
   const marcheTranche = prisesMarche.has("marche:verdict");
   const dCadrage = extraireDecisions(cadrageMd);
@@ -60,6 +72,22 @@ export default async function Accueil() {
           </div>
         </div>
       ))}
+
+      {/* Santé du système — la question « est-ce que tout tourne ? » se répond ici. */}
+      <div className="sante-rapide">
+        <Link className="sante-puce" href="/pilotage/systeme" data-etat={apps.length === 0 ? "inconnu" : enLigne === apps.length ? "ok" : "danger"}>
+          <span className="sante-point" aria-hidden />
+          <span><b>{apps.length === 0 ? "État inconnu" : `${enLigne}/${apps.length} applications en ligne`}</b><small>{apps.length === 0 ? "sondes injoignables" : apps.map((a) => a.nom.replace("Back-office ", "")).join(" · ")}</small></span>
+        </Link>
+        <Link className="sante-puce" href="/pilotage/systeme" data-etat={manquantes + lointaines === 0 ? "ok" : "warn"}>
+          <span className="sante-point" aria-hidden />
+          <span><b>{manquantes + lointaines === 0 ? "Configuration saine" : `${manquantes + lointaines} point(s) à corriger`}</b><small>{manquantes ? `${manquantes} variable(s) manquante(s)` : "variables complètes"}{lointaines ? ` · ${lointaines} app loin de la base` : ""}</small></span>
+        </Link>
+        <Link className="sante-puce" href="/pilotage/securite" data-etat={alertes.length === 0 && pannes === 0 ? "ok" : "warn"}>
+          <span className="sante-point" aria-hidden />
+          <span><b>{alertes.length === 0 ? "Aucune alerte ouverte" : `${alertes.length} alerte(s) ouverte(s)`}</b><small>{pannes === 0 ? "aucune panne sur 7 jours" : `${pannes} jour(s) avec panne sur 7`}</small></span>
+        </Link>
+      </div>
 
       <div className="tuiles">
         <TuileChiffre href="/pilotage/cadrage" libelle="Cadrage" valeur={restCadrage} tone={restCadrage ? "warn" : "ok"} detail={`${restCadrage ? "décisions à trancher" : "tout est tranché"} · ${dCadrage.length - restCadrage}/${dCadrage.length} prises`} />

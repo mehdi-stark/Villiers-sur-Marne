@@ -30,6 +30,7 @@ export function FormulaireConnexion({ textes, suite, avant, apres }: { textes: T
   const [occupe, setOccupe] = useState(false);
   const [reste, setReste] = useState<number | null>(null);
   const [attente, setAttente] = useState(0);
+  const [code, setCode] = useState("");
   const minuteur = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => () => { if (minuteur.current) clearInterval(minuteur.current); }, []);
@@ -55,17 +56,19 @@ export function FormulaireConnexion({ textes, suite, avant, apres }: { textes: T
     } finally {
       setOccupe(false);
     }
+    setCode("");
     setEtape("code");
     lancerAttente();
   };
 
   const valider = async (code: string) => {
     setOccupe(true);
+    setMsg(null);
     const r = await fetch("/api/auth", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "valider", email, code }) });
     setOccupe(false);
     if (r.ok) window.location.href = suite.startsWith("/") ? suite : "/";
     else if (r.status === 429) setMsg("Trop d'essais depuis cet appareil. Patientez quelques minutes.");
-    else setMsg("Code refusé — vérifiez le code, ou demandez-en un nouveau.");
+    else { setMsg("Code refusé — vérifiez le code, ou demandez-en un nouveau."); setCode(""); }
   };
 
   return (
@@ -89,14 +92,25 @@ export function FormulaireConnexion({ textes, suite, avant, apres }: { textes: T
           <>
             {/* On ne confirme JAMAIS que le compte existe : c'est la même phrase pour tous. */}
             <p className="petit t-2">{textes.apresEnvoi.replace("{email}", email)}</p>
-            <input className="code-input" inputMode="numeric" autoComplete="one-time-code" maxLength={6} placeholder="······"
-              aria-label="Code à 6 chiffres" autoFocus disabled={occupe}
-              onChange={(e) => { const v = e.target.value.replace(/\D/g, ""); if (v.length === 6) valider(v); }} />
+            {/* Le geste le plus fréquent est le COLLER : on normalise tout ce qui arrive
+                (espaces, tirets, texte autour) et on valide dès qu'on tient six chiffres.
+                `maxLength` bloquait un collage plus long que six caractères. */}
+            <input className="code-input" inputMode="numeric" autoComplete="one-time-code" placeholder="······"
+              aria-label="Code à 6 chiffres" autoFocus disabled={occupe} value={code}
+              onChange={(e) => {
+                const chiffres = e.target.value.replace(/\D/g, "").slice(0, 6);
+                setCode(chiffres);
+                if (chiffres.length === 6) valider(chiffres);
+              }}
+              onPaste={(e) => {
+                const colle = (e.clipboardData.getData("text") ?? "").replace(/\D/g, "").slice(0, 6);
+                if (colle.length === 6) { e.preventDefault(); setCode(colle); valider(colle); }
+              }} />
             <div className="rangee" style={{ justifyContent: "center" }}>
               <button type="button" className="bouton bouton-sm" data-variant="discret" onClick={envoyer} disabled={occupe || attente > 0 || reste === 0}>
                 {attente > 0 ? `Renvoyer dans ${attente} s` : reste === 0 ? "Limite atteinte" : "Renvoyer un code"}
               </button>
-              <button type="button" className="bouton bouton-sm" data-variant="discret" onClick={() => { setEtape("email"); setMsg(null); setReste(null); }}>Changer d&apos;adresse</button>
+              <button type="button" className="bouton bouton-sm" data-variant="discret" onClick={() => { setEtape("email"); setMsg(null); setReste(null); setCode(""); }}>Changer d&apos;adresse</button>
             </div>
             {reste !== null && (
               <p className="mini t-3" role="status">

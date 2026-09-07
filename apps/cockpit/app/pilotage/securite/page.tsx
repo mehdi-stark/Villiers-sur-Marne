@@ -15,6 +15,7 @@ const EVENEMENTS: Record<string, { libelle: string; ton?: "ok" | "warn" | "dange
   envoi_echec: { libelle: "envoi impossible", ton: "danger" },
   passkey_activee: { libelle: "appareil de confiance ajouté (Face ID / Touch ID)", ton: "ok" },
   passkey_revoquee: { libelle: "appareil de confiance révoqué", ton: "warn" },
+  export_securite: { libelle: "export nominatif du journal", ton: "warn" },
   presentation: { libelle: "ouverture d'un lien de démonstration" },
 };
 
@@ -113,6 +114,23 @@ export default async function Securite() {
               <span className="tiny">{a.dernierUsageLe ? `utilisée ${fmt.format(a.dernierUsageLe)}` : `ajoutée ${fmt.format(a.creeLe)}`}</span>
             </div>
           ))}
+        </div>
+      </section>
+
+      <section className="pile">
+        <h2>Export pour un audit</h2>
+        <div className="carte pile">
+          <p className="mini t-2">
+            Une mairie demandera des preuves d&apos;accès lors d&apos;un audit ou d&apos;une demande de droit d&apos;accès.
+            L&apos;export <b>masqué</b> suffit à prouver un comportement ; l&apos;export <b>nominatif</b> est réservé
+            aux cas qui l&apos;exigent — il est lui-même journalisé, avec la date et le demandeur.
+          </p>
+          <div className="rangee">
+            <a className="bouton bouton-sm" href="/api/securite/export?jours=30">Export 30 jours (masqué)</a>
+            <a className="bouton bouton-sm" data-variant="discret" href="/api/securite/export?jours=90">90 jours (masqué)</a>
+            <a className="bouton bouton-sm" data-variant="danger" href="/api/securite/export?jours=30&complet=1">30 jours nominatif — tracé</a>
+          </div>
+          <p className="tiny">CSV point-virgule, horodatage Europe/Paris, 5 000 lignes au plus. Rien ne sort sans session du cockpit.</p>
         </div>
       </section>
 
