@@ -171,3 +171,45 @@ export async function historiqueDispo(jours = 30): Promise<JourDispo[]> {
   }
   return out;
 }
+
+export type EtatSecurite = {
+  parApp: { app: string; connexions: number; envois: number; refus: number; echecs: number }[];
+  recents: { app: string; email: string; evenement: string; creeLe: Date; detail: Record<string, unknown> | null }[];
+  appareils: { app: string; email: string; appareil: string | null; creeLe: Date; dernierUsageLe: Date | null }[];
+  martelements: { code: string; message: string; creeLe: Date }[];
+};
+
+/** CE QUI SE PASSE À LA PORTE — sur 7 jours. Les adresses sont MASQUÉES : cet écran sert
+ *  à voir un comportement (rafales, échecs d'envoi), pas à lire qui se connecte. */
+export function masquer(email: string): string {
+  const [avant = "", domaine = ""] = email.split("@");
+  const tete = avant.slice(0, 2);
+  return `${tete}${"•".repeat(Math.max(1, avant.length - 2))}@${domaine}`;
+}
+
+export async function etatSecurite(jours = 7): Promise<EtatSecurite> {
+  const depuis = new Date(Date.now() - jours * 86_400_000);
+  const [compte, recents, appareils, alertes] = await Promise.all([
+    db.execute<{ app: string; evenement: string; n: number }>(sql`
+      select app, evenement, count(*)::int as n from journal_connexions
+      where cree_le > ${depuis.toISOString()} group by app, evenement`),
+    db.select().from(schema.journalConnexions).where(sql`cree_le > ${depuis.toISOString()}`).orderBy(desc(schema.journalConnexions.creeLe)).limit(25),
+    db.select().from(schema.passkeys).orderBy(desc(schema.passkeys.creeLe)).limit(20),
+    db.select().from(schema.alertes).where(sql`code like 'connexion_martelee%'`).orderBy(desc(schema.alertes.creeLe)).limit(10),
+  ]);
+  const apps = new Map<string, { app: string; connexions: number; envois: number; refus: number; echecs: number }>();
+  for (const l of [...compte]) {
+    const e = apps.get(l.app) ?? { app: l.app, connexions: 0, envois: 0, refus: 0, echecs: 0 };
+    if (l.evenement === "connexion") e.connexions += l.n;
+    else if (l.evenement === "otp_envoye") e.envois += l.n;
+    else if (l.evenement === "otp_refuse") e.refus += l.n;
+    else if (l.evenement === "envoi_echec") e.echecs += l.n;
+    apps.set(l.app, e);
+  }
+  return {
+    parApp: [...apps.values()].sort((a, b) => a.app.localeCompare(b.app)),
+    recents: recents.map((r) => ({ app: r.app, email: masquer(r.email), evenement: r.evenement, creeLe: r.creeLe, detail: r.detail ?? null })),
+    appareils: appareils.map((a) => ({ app: a.app, email: masquer(a.email), appareil: a.appareil, creeLe: a.creeLe, dernierUsageLe: a.dernierUsageLe })),
+    martelements: alertes.map((a) => ({ code: a.code, message: a.message, creeLe: a.creeLe })),
+  };
+}

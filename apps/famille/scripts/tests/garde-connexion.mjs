@@ -35,7 +35,13 @@ try {
   // 1 & 2 — inconnu vs connu : même réponse, latence comparable, aucun code pour l'inconnu.
   const a = await poster({ action: "envoyer", email: INCONNU });
   const b = await poster({ action: "envoyer", email: CONNU });
-  if (a.statut !== b.statut || a.texte !== b.texte) throw new Error(`réponses différentes : ${a.statut} ${a.texte} vs ${b.statut} ${b.texte}`);
+  // La réponse doit être structurellement identique : même statut, mêmes CHAMPS. La valeur
+  // de `reste` peut différer d'une adresse à l'autre (c'est un quota par adresse), mais sa
+  // présence et le champ `ok` ne doivent rien trahir.
+  const champs = (s) => Object.keys(JSON.parse(s)).sort().join(",");
+  if (a.statut !== b.statut || champs(a.texte) !== champs(b.texte) || JSON.parse(a.texte).ok !== JSON.parse(b.texte).ok) {
+    throw new Error(`réponses différentes : ${a.statut} ${a.texte} vs ${b.statut} ${b.texte}`);
+  }
   const ecart = Math.abs(a.ms - b.ms);
   if (ecart > 400) throw new Error(`la latence trahit l'existence du compte : ${a.ms} ms (inconnu) vs ${b.ms} ms (connu)`);
   const nInconnu = await codesDe(INCONNU);

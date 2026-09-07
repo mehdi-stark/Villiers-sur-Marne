@@ -1,87 +1,28 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { Suspense, useState } from "react";
+import { Suspense } from "react";
 import { BoutonFaceId } from "@ville/core/ui/passkeys";
+import { FormulaireConnexion } from "@ville/core/ui/connexion";
 
 function Formulaire() {
-  const params = useSearchParams();
-  const suite = params.get("suite") ?? "/";
-  const [email, setEmail] = useState("");
-  const [etape, setEtape] = useState<"email" | "code">("email");
-  const [msg, setMsg] = useState<string | null>(null);
-  const [occupe, setOccupe] = useState(false);
-
-  const envoyer = async () => {
-    setOccupe(true);
-    await fetch("/api/auth", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "envoyer", email }) });
-    setOccupe(false);
-    setEtape("code");
-    setMsg(null);
-  };
-  const valider = async (code: string) => {
-    setOccupe(true);
-    const r = await fetch("/api/auth", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "valider", email, code }) });
-    setOccupe(false);
-    if (r.ok) window.location.href = suite.startsWith("/") ? suite : "/";
-    else setMsg("Code refusé — vérifie le code, ou demande-en un nouveau.");
-  };
-
+  const suite = useSearchParams().get("suite") ?? "/";
+  const cible = suite.startsWith("/") ? suite : "/";
   return (
-    <div className="connexion" style={{ minHeight: "calc(100dvh - 140px)", display: "grid", placeItems: "center" }}>
-      <form
-        className="carte"
-        style={{ width: "min(400px, 100%)", display: "grid", gap: 14, textAlign: "center", padding: 24 }}
-        onSubmit={(e) => {
-          e.preventDefault();
-          if (etape === "email") envoyer();
-        }}
-      >
-        <span className="marque-logo" style={{ width: 40, height: 40, fontSize: 18, margin: "0 auto" }} aria-hidden>V</span>
-        <h1>Cockpit Ville</h1>
-        <p className="muted">Cadrage, backlog et décisions du projet — depuis n'importe où.</p>
-        {etape === "email" && <BoutonFaceId suite={suite.startsWith("/") ? suite : "/"} />}
-        {etape === "email" ? (
-          <>
-            <input type="email" inputMode="email" autoComplete="email" placeholder="ton e-mail" value={email} onChange={(e) => setEmail(e.target.value)} autoFocus />
-            <button type="submit" className="bouton" data-variant="primaire" disabled={!email.includes("@") || occupe}>
-              {occupe ? "Envoi…" : "Recevoir un code"}
-            </button>
-            <p className="tiny">Un code à 6 chiffres, valable 10 minutes. Accès réservé aux adresses autorisées.</p>
-          </>
-        ) : (
-          <>
-            <p className="muted">Code envoyé à <strong>{email}</strong>. Il expire dans 10 minutes.</p>
-            <input
-              className="code-input"
-              inputMode="numeric"
-              autoComplete="one-time-code"
-              maxLength={6}
-              placeholder="······"
-              aria-label="Code à 6 chiffres"
-              autoFocus
-              disabled={occupe}
-              onChange={(e) => {
-                const v = e.target.value.replace(/\D/g, "");
-                if (v.length === 6) valider(v);
-              }}
-            />
-            <div className="rangee" style={{ justifyContent: "center" }}>
-              <button type="button" className="bouton bouton-sm" data-variant="discret" onClick={envoyer} disabled={occupe}>Renvoyer un code</button>
-              <button type="button" className="bouton bouton-sm" data-variant="discret" onClick={() => { setEtape("email"); setMsg(null); }}>Changer d'adresse</button>
-            </div>
-          </>
-        )}
-        {msg && <p className="muted" role="alert" style={{ color: "var(--danger)" }}>{msg}</p>}
-      </form>
-    </div>
+    <FormulaireConnexion
+      suite={cible}
+      textes={{
+        titre: "Cockpit Ville",
+        accroche: "Cadrage, backlog et décisions du projet — depuis n'importe où.",
+        initiale: "V",
+        apresEnvoi: "Si {email} fait partie des adresses autorisées, un code à 6 chiffres vient d'y être envoyé. Il expire dans 10 minutes.",
+        aide: "Un code à 6 chiffres, valable 10 minutes. Accès réservé aux adresses autorisées.",
+      }}
+      avant={<BoutonFaceId suite={cible} />}
+    />
   );
 }
 
 export default function Connexion() {
-  return (
-    <Suspense>
-      <Formulaire />
-    </Suspense>
-  );
+  return <Suspense><Formulaire /></Suspense>;
 }

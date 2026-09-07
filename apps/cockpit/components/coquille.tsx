@@ -1,6 +1,6 @@
 "use client";
 
-import { BarChart3, CheckSquare, ClipboardList, Compass, Database, LayoutDashboard, Eye, Palette, Server, Settings, Smartphone } from "lucide-react";
+import { BarChart3, CheckSquare, ClipboardList, Compass, Database, LayoutDashboard, Eye, Palette, Server, Settings, ShieldCheck, Smartphone } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { BandeauDemo, CoquilleAdmin, MenuProfil, type Section } from "@ville/ui";
 import { VerrouBiometrique } from "@ville/core/ui/passkeys";
@@ -27,6 +27,7 @@ export function Coquille({ children, email, aTrancher, aReporter, demo }: { chil
     // Ce qu'on veut retrouver après un mois d'absence : où tourne quoi, et par où reprendre.
     { titre: "Exploitation", destinations: [
       { href: "/pilotage/systeme", label: "Système", Icone: Server },
+      { href: "/pilotage/securite", label: "Sécurité", Icone: ShieldCheck },
     ] },
   ];
   const profil = email ? (

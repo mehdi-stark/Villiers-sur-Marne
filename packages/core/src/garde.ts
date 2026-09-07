@@ -65,8 +65,13 @@ export async function autoriseCache(app: string, email: string, verifier: (e: st
 }
 
 export type Verdict =
-  | { passe: true; email: string }
-  | { passe: false; motif: "format" | "quota_ip" | "quota_email" | "inconnu"; attendreMs: number };
+  | { passe: true; email: string; reste: number }
+  | { passe: false; motif: "format" | "quota_ip" | "quota_email" | "inconnu"; attendreMs: number; reste: number };
+
+/* `reste` = demandes encore possibles pour CETTE adresse dans l'heure. On peut l'annoncer
+ * à l'utilisateur sans rien trahir : ce quota est compté AVANT de savoir si l'adresse
+ * est connue, donc il vaut pareil pour une adresse rattachée à un dossier et pour une
+ * adresse inventée. C'est ce qui évite qu'un parent se bloque tout seul en cliquant. */
 
 export type ReglesGarde = { parIp: { max: number; fenetreMs: number }; parEmail: { max: number; fenetreMs: number } };
 
@@ -85,16 +90,16 @@ export async function garderDemandeOtp(p: {
 }): Promise<Verdict> {
   const regles = p.regles ?? REGLES;
   const email = p.email.trim().toLowerCase().slice(0, 120);
-  if (!FORMAT_EMAIL.test(email)) return { passe: false, motif: "format", attendreMs: 0 };
+  if (!FORMAT_EMAIL.test(email)) return { passe: false, motif: "format", attendreMs: 0, reste: 0 };
 
   const parIp = quota(`ip|${p.app}|${p.ip}`, regles.parIp.max, regles.parIp.fenetreMs);
-  if (!parIp.ok) return { passe: false, motif: "quota_ip", attendreMs: parIp.dansMs };
+  if (!parIp.ok) return { passe: false, motif: "quota_ip", attendreMs: parIp.dansMs, reste: 0 };
 
   const parEmail = quota(`email|${p.app}|${email}`, regles.parEmail.max, regles.parEmail.fenetreMs);
-  if (!parEmail.ok) return { passe: false, motif: "quota_email", attendreMs: parEmail.dansMs };
+  if (!parEmail.ok) return { passe: false, motif: "quota_email", attendreMs: parEmail.dansMs, reste: 0 };
 
-  if (!(await autoriseCache(p.app, email, p.autorise))) return { passe: false, motif: "inconnu", attendreMs: 0 };
-  return { passe: true, email };
+  if (!(await autoriseCache(p.app, email, p.autorise))) return { passe: false, motif: "inconnu", attendreMs: 0, reste: parEmail.reste };
+  return { passe: true, email, reste: parEmail.reste };
 }
 
 /** Délai plancher : sans lui, « adresse inconnue » (réponse immédiate) et « code envoyé »

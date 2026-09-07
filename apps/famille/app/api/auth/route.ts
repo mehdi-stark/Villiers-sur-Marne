@@ -34,7 +34,9 @@ export async function POST(req: NextRequest) {
       if (verdict.motif === "quota_ip" && alerterMartelement("famille")) {
         await poserAlerte("warn", "connexion_martelee_famille", "Tentatives de connexion en rafale bloquées avant la base", { ip: ipDe(req) });
       }
-      return repondreEnAuMoins(debut, PLANCHER_MS, NextResponse.json({ ok: true }));
+      // On annonce le nombre de demandes restantes : ce quota est compté avant de savoir
+      // si l'adresse est connue, donc le dire ne révèle rien — et évite qu'on se bloque seul.
+      return repondreEnAuMoins(debut, PLANCHER_MS, NextResponse.json({ ok: true, reste: verdict.reste }));
     }
     const recents = await db.select({ id: schema.otpCodes.id }).from(schema.otpCodes).where(and(eq(schema.otpCodes.app, APP), eq(schema.otpCodes.email, email), gt(schema.otpCodes.creeLe, new Date(Date.now() - 3600_000))));
     if (recents.length >= ENVOIS_PAR_HEURE) return NextResponse.json({ ok: true });
@@ -42,7 +44,7 @@ export async function POST(req: NextRequest) {
     await db.insert(schema.otpCodes).values({ app: APP, email, hash: await auth.empreinteOtp(email, code), expireLe: new Date(Date.now() + VALIDITE_MS) });
     const envoi = await envoyerEmail({ a: email, sujet: `${code} — votre code Portail Famille`, texte: `Votre code de connexion au Portail Famille : ${code}\nValable 10 minutes.`, html: `<p>Votre code de connexion au <strong>Portail Famille</strong> :</p><p style="font-size:32px;font-weight:800;letter-spacing:8px;font-family:ui-monospace,monospace">${code}</p><p>Valable 10 minutes. Si vous n'êtes pas à l'origine de cette demande, ignorez ce message.</p>` });
     await journal(email, envoi.ok ? "otp_envoye" : "envoi_echec", envoi.ok ? undefined : { cause: envoi.cause });
-    return repondreEnAuMoins(debut, PLANCHER_MS, NextResponse.json({ ok: true }));
+    return repondreEnAuMoins(debut, PLANCHER_MS, NextResponse.json({ ok: true, reste: verdict.reste }));
   }
   if (b.action === "valider") {
     // Le code aussi se martèle : 20 essais par IP en 10 min, comptés AVANT toute lecture.

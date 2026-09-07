@@ -38,7 +38,9 @@ export async function POST(req: NextRequest) {
       if (verdict.motif === "quota_ip" && alerterMartelement("cockpit")) {
         await poserAlerte("warn", "connexion_martelee_cockpit", "Tentatives de connexion en rafale bloquées avant la base", { ip: ipDe(req) });
       }
-      return repondreEnAuMoins(debut, PLANCHER_MS, NextResponse.json({ ok: true }));
+      // On annonce le nombre de demandes restantes : ce quota est compté avant de savoir
+      // si l'adresse est connue, donc le dire ne révèle rien — et évite qu'on se bloque seul.
+      return repondreEnAuMoins(debut, PLANCHER_MS, NextResponse.json({ ok: true, reste: verdict.reste }));
     }
     const recents = await db
       .select({ id: schema.otpCodes.id })
@@ -55,7 +57,7 @@ export async function POST(req: NextRequest) {
       html: `<p>Code de connexion au cockpit <strong>Ville</strong> :</p><p style="font-size:32px;font-weight:800;letter-spacing:8px;font-family:ui-monospace,monospace">${code}</p><p>Valable 10 minutes. Si vous n'êtes pas à l'origine de cette demande, ignorez ce message.</p>`,
     });
     await journal(email, envoi.ok ? "otp_envoye" : "envoi_echec", envoi.ok ? undefined : { cause: envoi.cause });
-    return repondreEnAuMoins(debut, PLANCHER_MS, NextResponse.json({ ok: true }));
+    return repondreEnAuMoins(debut, PLANCHER_MS, NextResponse.json({ ok: true, reste: verdict.reste }));
   }
 
   if (b.action === "valider") {

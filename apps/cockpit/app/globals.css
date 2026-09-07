@@ -74,3 +74,4 @@
 .dispo-jour[data-statut="ok"] { background: color-mix(in srgb, var(--ok) 70%, transparent); }
 .dispo-jour[data-statut="erreur"] { background: var(--danger); }
 .systeme-commande { grid-template-columns: minmax(0, auto) 1fr auto; }
+.grille-tuiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: var(--e-2); }

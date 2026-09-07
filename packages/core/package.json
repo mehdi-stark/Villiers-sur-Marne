@@ -33,7 +33,8 @@
     "./demo-seed": "./src/demo-seed.ts",
     "./sante": "./src/sante.ts",
     "./donnees/enfants": "./src/donnees/enfants.ts",
-    "./garde": "./src/garde.ts"
+    "./garde": "./src/garde.ts",
+    "./ui/connexion": "./src/ui/connexion.tsx"
   },
   "scripts": {
     "db:generate": "drizzle-kit generate",
